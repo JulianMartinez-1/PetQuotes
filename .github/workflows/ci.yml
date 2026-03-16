@@ -108,6 +108,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Prepare CI env file
+        run: |
+          if [ -f .env ]; then
+            echo ".env already exists"
+          elif [ -f .env.example ]; then
+            cp .env.example .env
+            echo "Created .env from .env.example"
+          else
+            echo "Missing .env.example to bootstrap CI env"
+            exit 1
+          fi
+
       - name: Start required services
         run: |
           docker compose up -d --build auth-db appointment-db redis rabbitmq elasticsearch
