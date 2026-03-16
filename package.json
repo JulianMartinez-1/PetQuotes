@@ -1,0 +1,36 @@
+{
+  "name": "pet-quotes-platform",
+  "private": true,
+  "version": "1.0.0",
+  "author": "Julian Martinez",
+  "homepage": "https://github.com/JulianMartinez-1",
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "libs/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev --workspace apps/web",
+    "dev:gateway": "npm run start:dev --workspace services/api-gateway",
+    "dev:auth": "npm run start:dev --workspace services/auth-service",
+    "dev:appointments": "npm run start:dev --workspace services/appointment-service",
+    "dev": "docker compose up --build",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "ci:lint": "npm run lint",
+    "ci:build": "npm run build",
+    "ci:test:unit": "npm run test",
+    "perf:sprint4": "node scripts/perf-sprint4.mjs",
+    "ci:perf": "node scripts/perf-sprint4.mjs",
+    "test:sprint2:e2e": "node scripts/e2e-sprint2.mjs",
+    "test:e2e": "node scripts/e2e-sprint2.mjs"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6"
+  },
+  "overrides": {
+    "typescript": "5.4.5",
+    "eslint": "8.57.0"
+  }
+}

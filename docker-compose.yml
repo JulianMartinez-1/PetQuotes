@@ -1,0 +1,183 @@
+version: "3.9"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: services/api-gateway/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "3001:3001"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3001/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      appointment-service:
+        condition: service_healthy
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "3002:3002"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3002/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    depends_on:
+      - auth-db
+
+  appointment-service:
+    build:
+      context: .
+      dockerfile: services/appointment-service/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "3005:3005"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3005/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    depends_on:
+      - appointment-db
+      - redis
+      - rabbitmq
+      - elasticsearch
+
+  veterinary-service:
+    build:
+      context: .
+      dockerfile: services/veterinary-service/Dockerfile
+    ports:
+      - "3003:3003"
+
+  catalog-service:
+    build:
+      context: .
+      dockerfile: services/catalog-service/Dockerfile
+    ports:
+      - "3004:3004"
+
+  staff-schedule-service:
+    build:
+      context: .
+      dockerfile: services/staff-schedule-service/Dockerfile
+    ports:
+      - "3006:3006"
+
+  search-geo-service:
+    build:
+      context: .
+      dockerfile: services/search-geo-service/Dockerfile
+    ports:
+      - "3007:3007"
+    depends_on:
+      - elasticsearch
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: services/notification-service/Dockerfile
+    ports:
+      - "3008:3008"
+
+  auth-db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auth_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+
+  appointment-db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: appointment_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - appointment_db_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./observability/prometheus-alerts.yml:/etc/prometheus/alerts/prometheus-alerts.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+      appointment-service:
+        condition: service_healthy
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./observability/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./observability/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3010:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  auth_db_data:
+  appointment_db_data:

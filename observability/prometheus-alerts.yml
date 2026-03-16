@@ -1,0 +1,38 @@
+groups:
+  - name: petquotes-availability
+    interval: 15s
+    rules:
+      - alert: PetQuotesTargetDown
+        expr: up{job=~"petquotes-.*"} == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Target caido en {{ $labels.job }}"
+          description: "Prometheus no puede scrapear {{ $labels.instance }} desde hace al menos 30s."
+
+      - alert: PetQuotesReadyEndpointFailing
+        expr: increase(petquotes_http_errors_total{endpoint=~".*/ready|/ready"}[2m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Readiness con errores en {{ $labels.service }}"
+          description: "El endpoint ready reporto errores en los ultimos 2 minutos."
+
+  - name: petquotes-reliability
+    interval: 30s
+    rules:
+      - alert: PetQuotesHighErrorRate
+        expr: |
+          (
+            sum by (service) (rate(petquotes_http_errors_total[5m]))
+            /
+            clamp_min(sum by (service) (rate(petquotes_http_requests_total[5m])), 0.001)
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Error rate alto en {{ $labels.service }}"
+          description: "La tasa de errores supera 5% en ventana de 5 minutos."

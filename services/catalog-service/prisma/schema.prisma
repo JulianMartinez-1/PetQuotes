@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("CATALOG_DATABASE_URL")
+}
+
+model Veterinary {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  branches    Branch[]
+  services    Service[]
+  createdAt   DateTime  @default(now())
+}
+
+model Branch {
+  id           String         @id @default(cuid())
+  veterinaryId String
+  city         String
+  address      String
+  lat          Float
+  lng          Float
+  veterinary   Veterinary     @relation(fields: [veterinaryId], references: [id])
+  professionals Professional[]
+}
+
+model Service {
+  id           String      @id @default(cuid())
+  veterinaryId String
+  name         String
+  price        Float
+  veterinary   Veterinary  @relation(fields: [veterinaryId], references: [id])
+}
+
+model Professional {
+  id         String         @id @default(cuid())
+  branchId   String
+  fullName   String
+  specialty  String
+  branch     Branch         @relation(fields: [branchId], references: [id])
+  slots      Availability[]
+}
+
+model Availability {
+  id             String       @id @default(cuid())
+  professionalId String
+  dayOfWeek      Int
+  startsAt       String
+  endsAt         String
+  blocked        Boolean      @default(false)
+  professional   Professional @relation(fields: [professionalId], references: [id])
+}
+
+model Pet {
+  id          String   @id @default(cuid())
+  clientId    String
+  name        String
+  species     String
+  breed       String?
+  birthDate   DateTime?
+  createdAt   DateTime @default(now())
+}
