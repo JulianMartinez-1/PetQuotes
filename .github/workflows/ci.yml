@@ -110,7 +110,9 @@ jobs:
 
       - name: Start required services
         run: |
-          docker compose up -d --build auth-db appointment-db redis rabbitmq auth-service appointment-service api-gateway
+          docker compose up -d --build auth-db appointment-db redis rabbitmq elasticsearch
+          docker compose up -d --build auth-service appointment-service
+          docker compose up -d --build api-gateway
 
       - name: Wait for API Gateway
         run: |
