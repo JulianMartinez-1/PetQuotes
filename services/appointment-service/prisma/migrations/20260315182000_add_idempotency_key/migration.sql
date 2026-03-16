@@ -9,4 +9,4 @@ CREATE UNIQUE INDEX "Appointment_idempotencyKey_key" ON "Appointment"("idempoten
 CREATE INDEX "Appointment_clientId_startsAt_idx" ON "Appointment"("clientId", "startsAt");
 
 -- CreateIndex
-CREATE INDEX "Appointment_veterinarianId_startsAt_idx" ON "Appointment"("veterinarianId", "startsAt");
+CREATE INDEX IF NOT EXISTS "Appointment_veterinarianId_startsAt_idx" ON "Appointment"("veterinarianId", "startsAt");
