@@ -5,6 +5,7 @@ import { createAppointment } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { AuthGuard } from "@/components/auth/auth-guard";
 import { FormEvent, useState } from "react";
 
 export default function BookingsPage() {
@@ -32,35 +33,37 @@ export default function BookingsPage() {
   };
 
   return (
-    <main className="page-container max-w-3xl py-4">
-      <h1 className="text-3xl font-extrabold text-navy">Reservar cita</h1>
-      <p className="mt-2 text-soft">Ejemplo funcional conectado al API Gateway.</p>
+    <AuthGuard>
+      <main className="page-container max-w-3xl py-4">
+        <h1 className="text-3xl font-extrabold text-navy">Reservar cita</h1>
+        <p className="mt-2 text-soft">Ejemplo funcional conectado al API Gateway.</p>
 
-      <Card className="mt-6">
-        <form className="grid gap-4" onSubmit={onSubmit}>
-          <Input placeholder="ID Cliente" value={form.clientId} onChange={(e) => setForm((s) => ({ ...s, clientId: e.target.value }))} />
-          <Input placeholder="ID Mascota" value={form.petId} onChange={(e) => setForm((s) => ({ ...s, petId: e.target.value }))} />
-          <Input placeholder="ID Veterinaria" value={form.veterinarianId} onChange={(e) => setForm((s) => ({ ...s, veterinarianId: e.target.value }))} />
-          <Input placeholder="ID Servicio" value={form.serviceId} onChange={(e) => setForm((s) => ({ ...s, serviceId: e.target.value }))} />
-          <Input placeholder="ID Sucursal" value={form.branchId} onChange={(e) => setForm((s) => ({ ...s, branchId: e.target.value }))} />
-          <Input type="datetime-local" value={form.startsAt} onChange={(e) => setForm((s) => ({ ...s, startsAt: e.target.value }))} />
-          <Input placeholder="Notas" value={form.notes} onChange={(e) => setForm((s) => ({ ...s, notes: e.target.value }))} />
-          <Button disabled={mutation.isPending}>{mutation.isPending ? "Reservando..." : "Confirmar reserva"}</Button>
-        </form>
-      </Card>
-
-      {mutation.isSuccess && (
-        <Card className="mt-4 border-green-200">
-          <h2 className="font-bold text-navy">Cita creada correctamente</h2>
-          <pre className="mt-2 overflow-auto text-xs text-soft">{JSON.stringify(mutation.data, null, 2)}</pre>
+        <Card className="mt-6">
+          <form className="grid gap-4" onSubmit={onSubmit}>
+            <Input placeholder="ID Cliente" value={form.clientId} onChange={(e) => setForm((s) => ({ ...s, clientId: e.target.value }))} />
+            <Input placeholder="ID Mascota" value={form.petId} onChange={(e) => setForm((s) => ({ ...s, petId: e.target.value }))} />
+            <Input placeholder="ID Veterinaria" value={form.veterinarianId} onChange={(e) => setForm((s) => ({ ...s, veterinarianId: e.target.value }))} />
+            <Input placeholder="ID Servicio" value={form.serviceId} onChange={(e) => setForm((s) => ({ ...s, serviceId: e.target.value }))} />
+            <Input placeholder="ID Sucursal" value={form.branchId} onChange={(e) => setForm((s) => ({ ...s, branchId: e.target.value }))} />
+            <Input type="datetime-local" value={form.startsAt} onChange={(e) => setForm((s) => ({ ...s, startsAt: e.target.value }))} />
+            <Input placeholder="Notas" value={form.notes} onChange={(e) => setForm((s) => ({ ...s, notes: e.target.value }))} />
+            <Button disabled={mutation.isPending}>{mutation.isPending ? "Reservando..." : "Confirmar reserva"}</Button>
+          </form>
         </Card>
-      )}
 
-      {mutation.isError && (
-        <Card className="mt-4 border-red-200">
-          <p className="text-sm text-red-600">{(mutation.error as Error).message}</p>
-        </Card>
-      )}
-    </main>
+        {mutation.isSuccess && (
+          <Card className="mt-4 border-green-200">
+            <h2 className="font-bold text-navy">Cita creada correctamente</h2>
+            <pre className="mt-2 overflow-auto text-xs text-soft">{JSON.stringify(mutation.data, null, 2)}</pre>
+          </Card>
+        )}
+
+        {mutation.isError && (
+          <Card className="mt-4 border-red-200">
+            <p className="text-sm text-red-600">{(mutation.error as Error).message}</p>
+          </Card>
+        )}
+      </main>
+    </AuthGuard>
   );
 }

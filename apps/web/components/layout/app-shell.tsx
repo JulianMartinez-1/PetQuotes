@@ -7,6 +7,7 @@ import type { PropsWithChildren } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAppState } from "@/store/app-state";
+import { useAuthState } from "@/store/auth-state";
 
 const NAV_ITEMS = [
   { href: "/", label: "Inicio" },
@@ -16,6 +17,7 @@ const NAV_ITEMS = [
 export function AppShell({ children }: PropsWithChildren) {
   const pathname = usePathname();
   const { mobileMenuOpen, setMobileMenuOpen, selectedCity } = useAppState();
+  const { isAuthenticated, user, logout } = useAuthState();
 
   return (
     <div className="app-shell">
@@ -44,7 +46,23 @@ export function AppShell({ children }: PropsWithChildren) {
 
           <div className="hidden items-center gap-3 md:flex">
             <span className="rounded-md bg-sky px-2 py-1 text-xs font-semibold text-navy">{selectedCity}</span>
-            <Button variant="ghost">Ingresar</Button>
+            {isAuthenticated ? (
+              <>
+                <span className="text-sm font-semibold text-soft">{user?.email}</span>
+                <Button variant="ghost" type="button" onClick={logout}>
+                  Cerrar sesión
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="ghost">Ingresar</Button>
+                </Link>
+                <Link href="/register">
+                  <Button variant="secondary">Registro</Button>
+                </Link>
+              </>
+            )}
           </div>
 
           <button
@@ -70,6 +88,27 @@ export function AppShell({ children }: PropsWithChildren) {
                   {item.label}
                 </Link>
               ))}
+              {!isAuthenticated ? (
+                <>
+                  <Link href="/login" className="rounded-lg px-3 py-2 text-sm font-semibold text-soft hover:bg-sky hover:text-navy" onClick={() => setMobileMenuOpen(false)}>
+                    Ingresar
+                  </Link>
+                  <Link href="/register" className="rounded-lg px-3 py-2 text-sm font-semibold text-soft hover:bg-sky hover:text-navy" onClick={() => setMobileMenuOpen(false)}>
+                    Registro
+                  </Link>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  className="rounded-lg px-3 py-2 text-left text-sm font-semibold text-soft hover:bg-sky hover:text-navy"
+                  onClick={() => {
+                    logout();
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  Cerrar sesión
+                </button>
+              )}
             </div>
           </div>
         )}

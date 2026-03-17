@@ -1,0 +1,78 @@
+"use client";
+
+import { FormEvent, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { loginRequest } from "@/lib/auth-api";
+import { useAuthState } from "@/store/auth-state";
+
+export default function LoginPage() {
+  const router = useRouter();
+  const { login } = useAuthState();
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    try {
+      const response = await loginRequest(form);
+      login({ token: response.accessToken, refreshToken: response.refreshToken, user: response.user });
+      router.push("/bookings");
+    } catch (err) {
+      setError((err as Error).message || "No fue posible iniciar sesión");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <main className="page-container max-w-md py-6">
+      <Card>
+        <h1 className="text-2xl font-bold text-navy">Iniciar sesión</h1>
+        <p className="mt-2 text-sm text-soft">Accede para administrar tus reservas y mascotas.</p>
+
+        <form className="mt-5 grid gap-3" onSubmit={onSubmit}>
+          <Input
+            type="email"
+            placeholder="correo@dominio.com"
+            value={form.email}
+            onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
+            required
+          />
+          <Input
+            type="password"
+            placeholder="Tu contraseña"
+            value={form.password}
+            onChange={(e) => setForm((prev) => ({ ...prev, password: e.target.value }))}
+            required
+          />
+
+          {error && <p className="text-sm text-red-600">{error}</p>}
+
+          <Button disabled={loading}>{loading ? "Ingresando..." : "Ingresar"}</Button>
+        </form>
+
+        <p className="mt-4 text-sm text-soft">
+          ¿No tienes cuenta?{" "}
+          <Link href="/register" className="font-semibold text-brand">
+            Regístrate aquí
+          </Link>
+        </p>
+
+        <p className="mt-2 text-sm text-soft">
+          ¿Olvidaste tu contraseña?{" "}
+          <Link href="/forgot-password" className="font-semibold text-brand">
+            Recuperar acceso
+          </Link>
+        </p>
+      </Card>
+    </main>
+  );
+}
