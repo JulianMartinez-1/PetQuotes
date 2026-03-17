@@ -1,7 +1,16 @@
 import { Body, Controller, Get, HttpException, HttpStatus, Param, Patch, Post, Req } from "@nestjs/common";
 import { HttpService } from "@nestjs/axios";
 import axios from "axios";
+import { verify } from "jsonwebtoken";
 import { firstValueFrom } from "rxjs";
+import { API_ROUTE_ROLE_POLICY, AuthRole } from "./auth/route-policy";
+
+type AccessTokenPayload = {
+  sub?: string;
+  email?: string;
+  role?: AuthRole;
+  exp?: number;
+};
 
 @Controller()
 export class ProxyController {
@@ -37,6 +46,7 @@ export class ProxyController {
     @Body() body: unknown,
     @Req() request: { headers: { authorization?: string; "x-idempotency-key"?: string; "x-request-id"?: string } }
   ) {
+    this.assertAuthorized(request.headers.authorization, API_ROUTE_ROLE_POLICY.createAppointment);
     return this.forward("APPOINTMENT_SERVICE_URL", "/appointments", body, request.headers.authorization, "POST", {
       "x-idempotency-key": request.headers["x-idempotency-key"],
       "x-request-id": request.headers["x-request-id"]
@@ -48,6 +58,7 @@ export class ProxyController {
     @Param("petId") petId: string,
     @Req() request: { headers: { authorization?: string; "x-request-id"?: string } }
   ) {
+    this.assertAuthorized(request.headers.authorization, API_ROUTE_ROLE_POLICY.listAppointmentsByPet);
     return this.forward("APPOINTMENT_SERVICE_URL", `/appointments/pet/${petId}`, undefined, request.headers.authorization, "GET", {
       "x-request-id": request.headers["x-request-id"]
     });
@@ -59,6 +70,7 @@ export class ProxyController {
     @Body() body: unknown,
     @Req() request: { headers: { authorization?: string; "x-request-id"?: string } }
   ) {
+    this.assertAuthorized(request.headers.authorization, API_ROUTE_ROLE_POLICY.updateAppointmentStatus);
     return this.forward(
       "APPOINTMENT_SERVICE_URL",
       `/appointments/${id}/status`,
@@ -75,6 +87,7 @@ export class ProxyController {
     @Body() body: unknown,
     @Req() request: { headers: { authorization?: string; "x-request-id"?: string } }
   ) {
+    this.assertAuthorized(request.headers.authorization, API_ROUTE_ROLE_POLICY.rescheduleAppointment);
     return this.forward(
       "APPOINTMENT_SERVICE_URL",
       `/appointments/${id}/reschedule`,
@@ -138,6 +151,30 @@ export class ProxyController {
         },
         HttpStatus.INTERNAL_SERVER_ERROR
       );
+    }
+  }
+
+  private assertAuthorized(authorization: string | undefined, allowedRoles: AuthRole[]) {
+    if (!authorization?.startsWith("Bearer ")) {
+      throw new HttpException({ code: "UNAUTHORIZED", message: "Missing bearer token" }, HttpStatus.UNAUTHORIZED);
+    }
+
+    const token = authorization.slice("Bearer ".length).trim();
+    const accessSecret = process.env.JWT_ACCESS_SECRET;
+    if (!accessSecret) {
+      throw new HttpException({ code: "UNAUTHORIZED", message: "Missing JWT_ACCESS_SECRET" }, HttpStatus.UNAUTHORIZED);
+    }
+
+    let payload: AccessTokenPayload;
+
+    try {
+      payload = verify(token, accessSecret) as AccessTokenPayload;
+    } catch {
+      throw new HttpException({ code: "UNAUTHORIZED", message: "Invalid access token" }, HttpStatus.UNAUTHORIZED);
+    }
+
+    if (!payload.role || !allowedRoles.includes(payload.role)) {
+      throw new HttpException({ code: "FORBIDDEN", message: "Role not allowed" }, HttpStatus.FORBIDDEN);
     }
   }
 }

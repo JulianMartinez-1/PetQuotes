@@ -11,7 +11,7 @@ export type CreateAppointmentPayload = {
 };
 
 export async function createAppointment(payload: CreateAppointmentPayload) {
-  return requestJson("/api/appointments", {
+  return requestJson("/api/proxy/appointments", {
     method: "POST",
     body: JSON.stringify(payload)
   });

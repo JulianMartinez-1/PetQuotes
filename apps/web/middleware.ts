@@ -1,16 +1,12 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { AUTH_COOKIE_NAMES } from "@/lib/auth-cookies";
-import { AuthRole, decodeJwtPayload, isJwtExpired } from "@/lib/auth-jwt";
+import { verifyJwtHs256 } from "@/lib/auth-jwt";
+import { ROUTE_ROLE_POLICY } from "@/lib/route-policy";
 
-const ROUTE_ROLE_RULES: Array<{ prefix: string; roles: AuthRole[] }> = [
-  { prefix: "/bookings", roles: ["CLIENT", "VETERINARY", "ADMIN"] },
-  { prefix: "/admin", roles: ["ADMIN"] }
-];
-
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const rule = ROUTE_ROLE_RULES.find((entry) => pathname.startsWith(entry.prefix));
+  const rule = ROUTE_ROLE_POLICY.find((entry) => pathname.startsWith(entry.prefix));
 
   if (!rule) {
     return NextResponse.next();
@@ -23,8 +19,13 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  const payload = decodeJwtPayload(accessToken);
-  if (isJwtExpired(payload)) {
+  const jwtSecret = process.env.JWT_ACCESS_SECRET;
+  if (!jwtSecret) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  const payload = await verifyJwtHs256(accessToken, jwtSecret);
+  if (!payload) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);

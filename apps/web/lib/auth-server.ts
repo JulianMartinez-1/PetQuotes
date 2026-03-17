@@ -10,7 +10,6 @@ type BackendAuthResponse = {
 };
 
 export type SessionAuthResponse = {
-  accessToken: string;
   user: {
     id: string;
     email: string;
@@ -37,7 +36,6 @@ export function normalizeSessionResponse(raw: BackendAuthResponse): SessionAuthR
   const payload = decodeJwtPayload(raw.accessToken);
 
   return {
-    accessToken: raw.accessToken,
     user: {
       id: payload.sub ?? "unknown",
       email: payload.email ?? "unknown@petquotes.local",

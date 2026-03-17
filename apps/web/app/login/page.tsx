@@ -23,7 +23,7 @@ export default function LoginPage() {
 
     try {
       const response = await loginRequest(form);
-      login({ token: response.accessToken, user: response.user });
+      login({ user: response.user });
       router.push("/bookings");
     } catch (err) {
       setError((err as Error).message || "No fue posible iniciar sesión");

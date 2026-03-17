@@ -17,7 +17,6 @@ export type ForgotPasswordPayload = {
 };
 
 type RawAuthResponse = {
-  accessToken: string;
   user: {
     id: string;
     email: string;
