@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { AuthGuard } from "@/components/auth/auth-guard";
+import { addActivityEvent } from "@/lib/activity-log";
 
 const SLOT_OPTIONS = ["08:00", "09:30", "11:00", "14:00", "15:30", "17:00"];
 
@@ -48,6 +49,11 @@ export default function BookingsPage() {
       });
     },
     onSuccess: async () => {
+      addActivityEvent({
+        type: "booking-created",
+        title: "Reserva creada",
+        description: `Nueva cita para ${form.petId} el ${form.startsAtDate} a las ${form.startsAtTime}.`
+      });
       await queryClient.invalidateQueries({ queryKey: ["appointments-history", form.petId] });
     }
   });

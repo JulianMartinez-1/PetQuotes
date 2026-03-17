@@ -7,5 +7,7 @@ export type RoutePolicyRule = {
 
 export const ROUTE_ROLE_POLICY: RoutePolicyRule[] = [
   { prefix: "/bookings", roles: ["CLIENT", "VETERINARY", "ADMIN"] },
+  { prefix: "/profile", roles: ["CLIENT", "VETERINARY", "ADMIN"] },
+  { prefix: "/activity", roles: ["CLIENT", "VETERINARY", "ADMIN"] },
   { prefix: "/admin", roles: ["ADMIN"] }
 ];

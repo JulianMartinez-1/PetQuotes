@@ -12,6 +12,8 @@ import { useAuthState } from "@/store/auth-state";
 const NAV_ITEMS = [
   { href: "/", label: "Inicio" },
   { href: "/clinics", label: "Clínicas" },
+  { href: "/profile", label: "Perfil" },
+  { href: "/activity", label: "Actividad" },
   { href: "/bookings", label: "Reservas" }
 ] as const satisfies ReadonlyArray<{ href: Route; label: string }>;
 
