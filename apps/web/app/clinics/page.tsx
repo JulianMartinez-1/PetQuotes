@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Route } from "next";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,11 +13,13 @@ import { CATALOG_PAGE_SIZE, CLINIC_CATALOG } from "@/lib/clinic-catalog";
 type SortMode = "rating" | "distance";
 
 export default function ClinicsPage() {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [selectedCity, setSelectedCity] = useState("all");
   const [openNowOnly, setOpenNowOnly] = useState(false);
   const [sortMode, setSortMode] = useState<SortMode>("rating");
   const [page, setPage] = useState(1);
+  const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
 
   const cityOptions = useMemo(
     () => ["all", ...new Set(CLINIC_CATALOG.map((item) => item.city))],
@@ -59,7 +62,9 @@ export default function ClinicsPage() {
         <p className="mt-2 text-sm text-soft">Explora, filtra y compara clínicas antes de reservar.</p>
 
         <div className="mt-5 grid gap-3 md:grid-cols-4">
+          <label className="sr-only" htmlFor="clinic-search">Buscar clínica</label>
           <Input
+            id="clinic-search"
             placeholder="Buscar por clínica, zona o servicio"
             value={query}
             onChange={(event) => {
@@ -68,7 +73,9 @@ export default function ClinicsPage() {
             }}
           />
 
+          <label className="sr-only" htmlFor="clinic-city">Filtrar por ciudad</label>
           <select
+            id="clinic-city"
             value={selectedCity}
             onChange={(event) => {
               setPage(1);
@@ -83,7 +90,9 @@ export default function ClinicsPage() {
             ))}
           </select>
 
+          <label className="sr-only" htmlFor="clinic-sort">Ordenar catálogo</label>
           <select
+            id="clinic-sort"
             value={sortMode}
             onChange={(event) => setSortMode(event.target.value as SortMode)}
             className="h-11 rounded-xl border border-line bg-white px-3 text-sm"
@@ -131,9 +140,17 @@ export default function ClinicsPage() {
               </div>
 
               <div className="mt-4 flex gap-2">
-                <Link href={`/clinics/${clinic.id}` as Route}>
-                  <Button>Ver detalle</Button>
-                </Link>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setNavigatingTo(clinic.id);
+                    router.push(`/clinics/${clinic.id}` as Route);
+                  }}
+                  disabled={navigatingTo === clinic.id}
+                  aria-busy={navigatingTo === clinic.id}
+                >
+                  {navigatingTo === clinic.id ? "Abriendo..." : "Ver detalle"}
+                </Button>
                 <Link href="/bookings">
                   <Button variant="secondary">Reservar</Button>
                 </Link>

@@ -24,6 +24,7 @@ export function AppShell({ children }: PropsWithChildren) {
 
   return (
     <div className="app-shell">
+      <a href="#main-content" className="skip-link">Saltar al contenido principal</a>
       <header className="sticky top-0 z-40 border-b border-line/80 bg-white/90 backdrop-blur">
         <div className="page-container flex h-16 items-center justify-between gap-4">
           <Link href="/" className="text-lg font-extrabold tracking-tight text-navy">
@@ -117,7 +118,7 @@ export function AppShell({ children }: PropsWithChildren) {
         )}
       </header>
 
-      <main className="flex-1 py-6">{children}</main>
+      <main id="main-content" className="flex-1 py-6" tabIndex={-1}>{children}</main>
 
       <footer className="mt-8 border-t border-line/80 bg-white/80">
         <div className="page-container py-6 text-sm text-soft">© {new Date().getFullYear()} PET QUOTES</div>
