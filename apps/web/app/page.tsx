@@ -8,6 +8,8 @@ import { Search, Stethoscope, Sparkles, Syringe, Scissors } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Modal } from "@/components/ui/modal";
+import { useState } from "react";
 
 const ClinicMap = dynamic(() => import("@/components/sections/clinic-map").then((mod) => mod.ClinicMap), {
   ssr: false
@@ -33,18 +35,10 @@ const featured = [
 ];
 
 export default function LandingPage() {
-  return (
-    <main className="mx-auto max-w-7xl px-6 pb-12 pt-6 md:px-10">
-      <header className="flex items-center justify-between">
-        <h1 className="text-xl font-extrabold tracking-tight text-navy">PET QUOTES</h1>
-        <div className="flex gap-3">
-          <Button variant="ghost">Ingresar</Button>
-          <Link href="/bookings">
-            <Button>Reservar cita</Button>
-          </Link>
-        </div>
-      </header>
+  const [aboutOpen, setAboutOpen] = useState(false);
 
+  return (
+    <main className="page-container pb-12 pt-4">
       <section className="mt-10 grid gap-8 lg:grid-cols-2">
         <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
           <p className="mb-3 inline-flex rounded-full bg-sky px-3 py-1 text-xs font-semibold text-brand">SaaS para ecosistema veterinario</p>
@@ -55,7 +49,7 @@ export default function LandingPage() {
               <Search className="h-5 w-5 text-brand" />
               <Input placeholder="Ej: Chapinero, Bogotá" />
             </div>
-            <Button>Buscar veterinarias</Button>
+            <Button type="button">Buscar veterinarias</Button>
           </div>
           <div className="mt-6 grid gap-3 md:grid-cols-3">
             {steps.map((step, i) => (
@@ -119,14 +113,21 @@ export default function LandingPage() {
       <section className="mt-12 rounded-2xl bg-navy p-8 text-white">
         <h4 className="text-3xl font-bold">¿Listo para digitalizar la agenda de tu veterinaria?</h4>
         <p className="mt-3 text-sm text-[#c6d4f4]">Crea tu cuenta y empieza a recibir reservas hoy.</p>
-        <div className="mt-5">
+        <div className="mt-5 flex flex-wrap gap-3">
           <Link href="/bookings">
             <Button variant="secondary">Crear cuenta y reservar</Button>
           </Link>
+          <Button type="button" variant="ghost" className="border-white/35 bg-transparent text-white hover:bg-white/10" onClick={() => setAboutOpen(true)}>
+            Ver stack frontend
+          </Button>
         </div>
       </section>
 
-      <footer className="mt-12 border-t border-[#dfe7f7] py-8 text-sm text-soft">© {new Date().getFullYear()} PET QUOTES. Plataforma SaaS para gestión veterinaria.</footer>
+      <Modal open={aboutOpen} onClose={() => setAboutOpen(false)} title="Sprint 1 - Base Frontend">
+        <p className="text-sm text-soft">
+          Layout principal, sistema de diseño con tokens, componentes base reutilizables, estado global y cliente API centralizado.
+        </p>
+      </Modal>
     </main>
   );
 }

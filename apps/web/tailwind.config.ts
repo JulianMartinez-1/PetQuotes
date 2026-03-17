@@ -9,16 +9,18 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        navy: "#0A2540",
-        brand: "#2563EB",
-        sky: "#E8F1FF",
-        soft: "#6B7280"
+        navy: "#0B2239",
+        brand: "#118AB2",
+        sky: "#DFF4FF",
+        soft: "#5C6D82",
+        accent: "#FFD166",
+        line: "#D4DEEA"
       },
       fontFamily: {
         sans: ["Manrope", "ui-sans-serif", "system-ui"]
       },
       boxShadow: {
-        soft: "0 20px 60px rgba(10,37,64,0.12)"
+        soft: "0 18px 45px rgba(11, 34, 57, 0.12)"
       }
     }
   },

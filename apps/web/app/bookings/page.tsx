@@ -32,7 +32,7 @@ export default function BookingsPage() {
   };
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-10">
+    <main className="page-container max-w-3xl py-4">
       <h1 className="text-3xl font-extrabold text-navy">Reservar cita</h1>
       <p className="mt-2 text-soft">Ejemplo funcional conectado al API Gateway.</p>
 
