@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/
 import { JwtService } from "@nestjs/jwt";
 import { compare, hash } from "bcryptjs";
 import { randomUUID } from "crypto";
+import type { StringValue } from "ms";
 import { PrismaService } from "../prisma.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
@@ -138,19 +139,22 @@ export class AuthService {
   }
 
   private async signTokens(userId: string, email: string, role: "CLIENT" | "VETERINARY" | "ADMIN", sid: string) {
+    const accessExpiresIn = (process.env.JWT_ACCESS_EXPIRES_IN ?? "15m") as StringValue;
+    const refreshExpiresIn = (process.env.JWT_REFRESH_EXPIRES_IN ?? "7d") as StringValue;
+
     const [accessToken, refreshToken] = await Promise.all([
       this.jwt.signAsync(
         { sub: userId, email, role },
         {
           secret: process.env.JWT_ACCESS_SECRET,
-          expiresIn: process.env.JWT_ACCESS_EXPIRES_IN ?? "15m"
+          expiresIn: accessExpiresIn
         }
       ),
       this.jwt.signAsync(
         { sub: userId, email, role, sid },
         {
           secret: process.env.JWT_REFRESH_SECRET,
-          expiresIn: process.env.JWT_REFRESH_EXPIRES_IN ?? "7d"
+          expiresIn: refreshExpiresIn
         }
       )
     ]);

@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "appointment-service",
   "version": "1.0.0",
   "private": true,
@@ -13,11 +13,11 @@
     "lint": "echo lint skipped"
   },
   "dependencies": {
-    "@nestjs/common": "^10.4.2",
-    "@nestjs/config": "^3.2.3",
-    "@nestjs/core": "^10.4.2",
-    "@nestjs/jwt": "^10.2.0",
-    "@nestjs/platform-express": "^10.4.2",
+    "@nestjs/common": "^11.1.17",
+    "@nestjs/config": "^4.0.3",
+    "@nestjs/core": "^11.1.17",
+    "@nestjs/jwt": "^11.0.2",
+    "@nestjs/platform-express": "^11.1.17",
     "@prisma/client": "^5.18.0",
     "amqplib": "^0.10.5",
     "class-transformer": "^0.5.1",
@@ -35,3 +35,4 @@
     "typescript": "5.4.5"
   }
 }
+
