@@ -27,6 +27,11 @@ export class ProxyController {
     return this.forward("AUTH_SERVICE_URL", "/auth/logout", body);
   }
 
+  @Post("auth/forgot-password")
+  async forgotPassword(@Body() body: unknown) {
+    return this.forward("AUTH_SERVICE_URL", "/auth/forgot-password", body);
+  }
+
   @Post("appointments")
   async createAppointment(
     @Body() body: unknown,

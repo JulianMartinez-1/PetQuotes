@@ -1,6 +1,8 @@
 "use client";
 
-import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, PropsWithChildren, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { refreshRequest } from "@/lib/auth-api";
+import { clearAuthCookies, setAuthCookies } from "@/lib/auth-cookies";
 
 type AuthUser = {
   id: string;
@@ -19,6 +21,7 @@ type AuthStateContextValue = {
 };
 
 const STORAGE_KEY = "petquotes.auth.v1";
+const REFRESH_INTERVAL_MS = 8 * 60 * 1000;
 const AuthStateContext = createContext<AuthStateContextValue | null>(null);
 
 export function AuthStateProvider({ children }: PropsWithChildren) {
@@ -27,33 +30,69 @@ export function AuthStateProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
 
+  const syncPersistedAuth = useCallback((payload: { token: string; refreshToken: string; user: AuthUser }) => {
+    setToken(payload.token);
+    setRefreshToken(payload.refreshToken);
+    setUser(payload.user);
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    setAuthCookies(payload.token, payload.refreshToken);
+  }, []);
+
+  const clearPersistedAuth = useCallback(() => {
+    setToken(null);
+    setRefreshToken(null);
+    setUser(null);
+    window.localStorage.removeItem(STORAGE_KEY);
+    clearAuthCookies();
+  }, []);
+
   useEffect(() => {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return;
+    if (!raw) {
+      setIsHydrated(true);
+      return;
+    }
     try {
       const parsed = JSON.parse(raw) as { token: string; refreshToken: string; user: AuthUser };
-      setToken(parsed.token);
-      setRefreshToken(parsed.refreshToken);
-      setUser(parsed.user);
+      syncPersistedAuth(parsed);
     } catch {
       window.localStorage.removeItem(STORAGE_KEY);
     } finally {
       setIsHydrated(true);
     }
-  }, []);
+  }, [syncPersistedAuth]);
+
+  const refreshSession = useCallback(async () => {
+    if (!refreshToken) return;
+
+    try {
+      const response = await refreshRequest(refreshToken);
+      syncPersistedAuth({
+        token: response.accessToken,
+        refreshToken: response.refreshToken,
+        user: response.user
+      });
+    } catch {
+      clearPersistedAuth();
+    }
+  }, [clearPersistedAuth, refreshToken, syncPersistedAuth]);
+
+  useEffect(() => {
+    if (!isHydrated || !refreshToken) return;
+
+    const interval = window.setInterval(() => {
+      void refreshSession();
+    }, REFRESH_INTERVAL_MS);
+
+    return () => window.clearInterval(interval);
+  }, [isHydrated, refreshSession, refreshToken]);
 
   const login = ({ token: nextToken, refreshToken: nextRefreshToken, user: nextUser }: { token: string; refreshToken: string; user: AuthUser }) => {
-    setToken(nextToken);
-    setRefreshToken(nextRefreshToken);
-    setUser(nextUser);
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ token: nextToken, refreshToken: nextRefreshToken, user: nextUser }));
+    syncPersistedAuth({ token: nextToken, refreshToken: nextRefreshToken, user: nextUser });
   };
 
   const logout = () => {
-    setToken(null);
-    setRefreshToken(null);
-    setUser(null);
-    window.localStorage.removeItem(STORAGE_KEY);
+    clearPersistedAuth();
   };
 
   const value = useMemo(

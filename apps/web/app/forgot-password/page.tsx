@@ -5,14 +5,27 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { forgotPasswordRequest } from "@/lib/auth-api";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSent(true);
+    setError(null);
+    setIsSending(true);
+
+    try {
+      await forgotPasswordRequest({ email });
+      setSent(true);
+    } catch (err) {
+      setError((err as Error).message || "No fue posible iniciar recuperación");
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
@@ -29,7 +42,8 @@ export default function ForgotPasswordPage() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-          <Button>Enviar instrucciones</Button>
+          {error && <p className="text-sm text-red-600">{error}</p>}
+          <Button disabled={isSending}>{isSending ? "Enviando..." : "Enviar instrucciones"}</Button>
         </form>
 
         {sent && (

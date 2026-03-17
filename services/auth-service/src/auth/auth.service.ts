@@ -131,6 +131,15 @@ export class AuthService {
     }
   }
 
+  async forgotPassword(email: string) {
+    // Respuesta uniforme para evitar enumeración de correos.
+    await this.prisma.user.findUnique({ where: { email } });
+    return {
+      success: true,
+      message: "Si existe una cuenta con ese correo, se enviarán instrucciones de recuperación"
+    };
+  }
+
   private async issueTokensWithSession(userId: string, email: string, role: "CLIENT" | "VETERINARY" | "ADMIN") {
     const sid = randomUUID();
     const tokens = await this.signTokens(userId, email, role, sid);

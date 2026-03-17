@@ -12,6 +12,10 @@ export type RegisterPayload = {
   role?: "CLIENT" | "VETERINARY" | "ADMIN";
 };
 
+export type ForgotPasswordPayload = {
+  email: string;
+};
+
 type RawAuthResponse = {
   accessToken: string;
   refreshToken: string;
@@ -76,4 +80,20 @@ export async function registerRequest(payload: RegisterPayload) {
   });
 
   return normalizeAuth(raw);
+}
+
+export async function refreshRequest(refreshToken: string) {
+  const raw = await requestJson<RawAuthResponse>("/api/auth/refresh", {
+    method: "POST",
+    body: JSON.stringify({ refreshToken })
+  });
+
+  return normalizeAuth(raw);
+}
+
+export async function forgotPasswordRequest(payload: ForgotPasswordPayload) {
+  return requestJson<{ success: boolean; message: string }>("/api/auth/forgot-password", {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
 }

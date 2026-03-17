@@ -1,5 +1,6 @@
 import { Body, Controller, Post } from "@nestjs/common";
 import { AuthService } from "./auth.service";
+import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { LoginDto } from "./dto/login.dto";
 import { LogoutDto } from "./dto/logout.dto";
 import { RefreshTokenDto } from "./dto/refresh-token.dto";
@@ -27,5 +28,10 @@ export class AuthController {
   @Post("logout")
   logout(@Body() dto: LogoutDto) {
     return this.authService.logout(dto.refreshToken);
+  }
+
+  @Post("forgot-password")
+  forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(dto.email);
   }
 }
