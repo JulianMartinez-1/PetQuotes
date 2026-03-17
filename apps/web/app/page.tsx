@@ -49,7 +49,9 @@ export default function LandingPage() {
               <Search className="h-5 w-5 text-brand" />
               <Input placeholder="Ej: Chapinero, Bogotá" />
             </div>
-            <Button type="button">Buscar veterinarias</Button>
+            <Link href="/clinics">
+              <Button type="button">Buscar veterinarias</Button>
+            </Link>
           </div>
           <div className="mt-6 grid gap-3 md:grid-cols-3">
             {steps.map((step, i) => (
@@ -114,6 +116,9 @@ export default function LandingPage() {
         <h4 className="text-3xl font-bold">¿Listo para digitalizar la agenda de tu veterinaria?</h4>
         <p className="mt-3 text-sm text-[#c6d4f4]">Crea tu cuenta y empieza a recibir reservas hoy.</p>
         <div className="mt-5 flex flex-wrap gap-3">
+          <Link href="/clinics">
+            <Button>Explorar catálogo</Button>
+          </Link>
           <Link href="/bookings">
             <Button variant="secondary">Crear cuenta y reservar</Button>
           </Link>
