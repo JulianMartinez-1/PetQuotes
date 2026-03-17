@@ -23,7 +23,7 @@ export default function RegisterPage() {
 
     try {
       const response = await registerRequest(form);
-      login({ token: response.accessToken, refreshToken: response.refreshToken, user: response.user });
+      login({ token: response.accessToken, user: response.user });
       router.push("/bookings");
     } catch (err) {
       setError((err as Error).message || "No fue posible crear la cuenta");
