@@ -99,3 +99,113 @@ body > div:first-child {
   height: 100%;
   border-radius: 1rem;
 }
+
+.clinic-pin-wrap {
+  background: transparent;
+  border: 0;
+}
+
+.clinic-pin {
+  position: relative;
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: #118ab2;
+  border: 2px solid #ffffff;
+  box-shadow: 0 10px 20px rgba(17, 138, 178, 0.35);
+}
+
+.clinic-pin::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  border: 2px solid rgba(17, 138, 178, 0.45);
+}
+
+.clinic-popup .leaflet-popup-content-wrapper {
+  border-radius: 14px;
+  padding: 0;
+  box-shadow: 0 20px 32px rgba(11, 34, 57, 0.2);
+}
+
+.clinic-popup .leaflet-popup-content {
+  margin: 0;
+}
+
+.clinic-popup-card {
+  min-width: 220px;
+  padding: 0.85rem 0.95rem;
+}
+
+.clinic-popup-card h4 {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #0b2239;
+}
+
+.clinic-popup-card p {
+  margin: 0.3rem 0 0;
+  font-size: 0.8rem;
+  color: #5c6d82;
+}
+
+.clinic-popup-kicker {
+  margin: 0 0 0.2rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #118ab2;
+}
+
+.clinic-popup-meta {
+  margin-top: 0.65rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #0b2239;
+}
+
+.gmap-popup-card {
+  min-width: 220px;
+  padding: 0.65rem 0.5rem;
+  font-family: "Manrope", ui-sans-serif, system-ui;
+}
+
+.gmap-popup-kicker {
+  margin: 0 0 0.15rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #118ab2;
+}
+
+.gmap-popup-card h4 {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #0b2239;
+}
+
+.gmap-popup-card p {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  color: #5c6d82;
+}
+
+.gmap-popup-meta {
+  margin-top: 0.55rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #0b2239;
+}
+

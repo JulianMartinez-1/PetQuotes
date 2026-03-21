@@ -1,4 +1,8 @@
+import { extractErrorMessage, normalizeApiErrorMessage, parseErrorPayload } from "@/lib/error-copy";
+import { CSRF_COOKIE_NAME, CSRF_HEADER_NAME } from "@/lib/csrf-shared";
+
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+const REQUEST_TIMEOUT_MS = Number(process.env.NEXT_PUBLIC_API_TIMEOUT_MS ?? 10_000);
 
 type RequestOptions = RequestInit & {
   query?: Record<string, string | number | boolean | undefined>;
@@ -11,6 +15,28 @@ function isSessionRoute(path: string) {
 
 function isInternalRoute(path: string) {
   return path.startsWith("/api/session/") || path.startsWith("/api/proxy/");
+}
+
+function isMutationMethod(method?: string) {
+  if (!method) return false;
+  const normalized = method.toUpperCase();
+  return normalized === "POST" || normalized === "PUT" || normalized === "PATCH" || normalized === "DELETE";
+}
+
+function getCookieValue(name: string) {
+  if (typeof document === "undefined") {
+    return undefined;
+  }
+
+  const pairs = document.cookie.split(";");
+  for (const pair of pairs) {
+    const [rawKey, ...rest] = pair.trim().split("=");
+    if (rawKey === name) {
+      return decodeURIComponent(rest.join("="));
+    }
+  }
+
+  return undefined;
 }
 
 function buildUrl(path: string, query?: RequestOptions["query"]) {
@@ -32,35 +58,69 @@ export async function requestJson<T>(path: string, options: RequestOptions = {})
   const { query, headers, retryOn401 = true, ...rest } = options;
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
 
-  const requestHeaders: HeadersInit = {
-    "Content-Type": "application/json",
-    ...(headers ?? {})
-  };
+  const requestHeaders = new Headers(headers ?? {});
+  requestHeaders.set("Content-Type", "application/json");
 
-  let response = await fetch(buildUrl(normalizedPath, query), {
-    ...rest,
-    credentials: "include",
-    headers: requestHeaders
-  });
+  if (isInternalRoute(normalizedPath) && isMutationMethod(rest.method)) {
+    const csrfToken = getCookieValue(CSRF_COOKIE_NAME);
+    if (csrfToken) {
+      requestHeaders.set(CSRF_HEADER_NAME, csrfToken);
+    }
+  }
+
+  let response: Response;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  try {
+    response = await fetch(buildUrl(normalizedPath, query), {
+      ...rest,
+      credentials: "include",
+      headers: requestHeaders,
+      signal: controller.signal
+    });
+  } catch {
+    throw new Error(normalizeApiErrorMessage(0, "network"));
+  } finally {
+    clearTimeout(timeout);
+  }
 
   if (response.status === 401 && retryOn401 && !isSessionRoute(normalizedPath)) {
+    const refreshHeaders = new Headers();
+    const refreshCsrfToken = getCookieValue(CSRF_COOKIE_NAME);
+    if (refreshCsrfToken) {
+      refreshHeaders.set(CSRF_HEADER_NAME, refreshCsrfToken);
+    }
+
     const refreshResponse = await fetch("/api/session/refresh", {
       method: "POST",
-      credentials: "include"
+      credentials: "include",
+      headers: refreshHeaders
     });
 
     if (refreshResponse.ok) {
-      response = await fetch(buildUrl(normalizedPath, query), {
-        ...rest,
-        credentials: "include",
-        headers: requestHeaders
-      });
+      const retryController = new AbortController();
+      const retryTimeout = setTimeout(() => retryController.abort(), REQUEST_TIMEOUT_MS);
+      try {
+        response = await fetch(buildUrl(normalizedPath, query), {
+          ...rest,
+          credentials: "include",
+          headers: requestHeaders,
+          signal: retryController.signal
+        });
+      } catch {
+        throw new Error(normalizeApiErrorMessage(0, "network"));
+      } finally {
+        clearTimeout(retryTimeout);
+      }
     }
   }
 
   if (!response.ok) {
     const body = await response.text();
-    throw new Error(body || `Request failed with status ${response.status}`);
+    const payload = parseErrorPayload(body);
+    const rawMessage = extractErrorMessage(payload);
+    throw new Error(normalizeApiErrorMessage(response.status, rawMessage));
   }
 
   return response.json() as Promise<T>;

@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpException, HttpStatus, Param, Patch, Post, Req } from "@nestjs/common";
 import { HttpService } from "@nestjs/axios";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { verify } from "jsonwebtoken";
 import { firstValueFrom } from "rxjs";
 import { API_ROUTE_ROLE_POLICY, AuthRole } from "./auth/route-policy";
@@ -14,6 +14,9 @@ type AccessTokenPayload = {
 
 @Controller()
 export class ProxyController {
+  private static readonly RETRY_ATTEMPTS = 3;
+  private static readonly RETRY_BACKOFF_MS = 250;
+
   constructor(private readonly http: HttpService) {}
 
   @Post("auth/register")
@@ -112,31 +115,27 @@ export class ProxyController {
     }
 
     try {
-      const response = await firstValueFrom(
-        this.http.request({
-          method,
-          url: `${baseUrl}${path}`,
-          data: body,
-          headers: {
-            ...(authorization ? { Authorization: authorization } : {}),
-            ...(extraHeaders ?? {})
-          },
-          timeout: 8000
-        })
-      );
+      const response = await this.requestWithRetry({
+        method,
+        url: `${baseUrl}${path}`,
+        data: body,
+        headers: {
+          ...(authorization ? { Authorization: authorization } : {}),
+          ...(extraHeaders ?? {})
+        },
+        timeout: 8000
+      });
 
       return response.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const upstreamStatus = error.response?.status ?? HttpStatus.BAD_GATEWAY;
-        const upstreamBody = error.response?.data;
 
         throw new HttpException(
           {
             code: "UPSTREAM_ERROR",
-            message: "Error comunicando con servicio interno",
+            message: "No se pudo completar la solicitud en este momento",
             upstreamStatus,
-            upstreamBody,
             requestId: extraHeaders?.["x-request-id"]
           },
           upstreamStatus
@@ -154,7 +153,47 @@ export class ProxyController {
     }
   }
 
-  private assertAuthorized(authorization: string | undefined, allowedRoles: AuthRole[]) {
+  private async requestWithRetry(config: {
+    method: "POST" | "GET" | "PATCH";
+    url: string;
+    data?: unknown;
+    headers: Record<string, string | undefined>;
+    timeout: number;
+  }) {
+    let lastError: unknown;
+
+    for (let attempt = 1; attempt <= ProxyController.RETRY_ATTEMPTS; attempt += 1) {
+      try {
+        return await firstValueFrom(this.http.request(config));
+      } catch (error) {
+        lastError = error;
+        if (!this.shouldRetry(error) || attempt === ProxyController.RETRY_ATTEMPTS) {
+          break;
+        }
+
+        const backoffMs = ProxyController.RETRY_BACKOFF_MS * attempt;
+        await sleep(backoffMs);
+      }
+    }
+
+    throw lastError;
+  }
+
+  private shouldRetry(error: unknown) {
+    if (!axios.isAxiosError(error)) {
+      return false;
+    }
+
+    const axiosError = error as AxiosError;
+    const status = axiosError.response?.status;
+    if (!status) {
+      return true;
+    }
+
+    return status === 502 || status === 503 || status === 504;
+  }
+
+  private assertAuthorized(authorization: string | undefined, allowedRoles: readonly AuthRole[]) {
     if (!authorization?.startsWith("Bearer ")) {
       throw new HttpException({ code: "UNAUTHORIZED", message: "Missing bearer token" }, HttpStatus.UNAUTHORIZED);
     }
@@ -177,4 +216,10 @@ export class ProxyController {
       throw new HttpException({ code: "FORBIDDEN", message: "Role not allowed" }, HttpStatus.FORBIDDEN);
     }
   }
+}
+
+function sleep(ms: number) {
+  return new Promise<void>((resolve) => {
+    setTimeout(resolve, ms);
+  });
 }

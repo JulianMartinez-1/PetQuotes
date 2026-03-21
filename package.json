@@ -24,7 +24,12 @@
     "perf:sprint4": "node scripts/perf-sprint4.mjs",
     "ci:perf": "node scripts/perf-sprint4.mjs",
     "test:sprint2:e2e": "node scripts/e2e-sprint2.mjs",
-    "test:e2e": "node scripts/e2e-sprint2.mjs"
+    "test:e2e": "node scripts/e2e-sprint2.mjs",
+    "test:smoke:booking": "node scripts/smoke-login-booking.mjs",
+    "db:seed:minimum": "npm run prisma:seed --workspace services/auth-service && npm run prisma:seed --workspace services/appointment-service",
+    "db:backup": "powershell -ExecutionPolicy Bypass -File ./scripts/db-backup.ps1",
+    "db:restore": "powershell -ExecutionPolicy Bypass -File ./scripts/db-restore.ps1",
+    "db:restore:drill": "powershell -ExecutionPolicy Bypass -File ./scripts/restore-drill.ps1"
   },
   "devDependencies": {
     "@types/express": "^5.0.6"

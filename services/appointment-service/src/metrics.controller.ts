@@ -24,6 +24,8 @@ export class MetricsController {
     lines.push("# TYPE petquotes_http_duration_max_ms gauge");
     lines.push("# HELP petquotes_http_status_total Total HTTP responses grouped by status code");
     lines.push("# TYPE petquotes_http_status_total counter");
+    lines.push("# HELP petquotes_business_event_total Total business events grouped by event and labels");
+    lines.push("# TYPE petquotes_business_event_total counter");
 
     for (const endpoint of snapshot.endpoints) {
       const baseLabels = `service=\"${escapeLabel(snapshot.service)}\",method=\"${escapeLabel(endpoint.method)}\",endpoint=\"${escapeLabel(endpoint.endpoint)}\"`;
@@ -35,6 +37,16 @@ export class MetricsController {
       for (const [status, count] of Object.entries(endpoint.statusCounts)) {
         lines.push(`petquotes_http_status_total{${baseLabels},status=\"${escapeLabel(status)}\"} ${count}`);
       }
+    }
+
+    for (const metric of snapshot.businessMetrics) {
+      const metricLabels = Object.entries(metric.labels)
+        .map(([key, value]) => `${escapeLabel(key)}=\"${escapeLabel(value)}\"`)
+        .join(",");
+      const labels = metricLabels
+        ? `service=\"${escapeLabel(snapshot.service)}\",event=\"${escapeLabel(metric.name)}\",${metricLabels}`
+        : `service=\"${escapeLabel(snapshot.service)}\",event=\"${escapeLabel(metric.name)}\"`;
+      lines.push(`petquotes_business_event_total{${labels}} ${metric.value}`);
     }
 
     return `${lines.join("\n")}\n`;

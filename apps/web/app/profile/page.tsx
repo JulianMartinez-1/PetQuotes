@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { BellRing, CircleUserRound, ShieldCheck } from "lucide-react";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -63,24 +64,41 @@ export default function ProfilePage() {
   return (
     <AuthGuard>
       <main className="page-container py-4">
-        <h1 className="text-3xl font-extrabold text-navy">Mi perfil</h1>
-        <p className="mt-2 text-soft">Edita tu información y define cómo quieres recibir notificaciones.</p>
+        <section className="surface p-6 md:p-7">
+          <h1 className="text-3xl font-extrabold text-navy md:text-4xl">Mi perfil</h1>
+          <p className="mt-2 text-soft">Mantén tus datos al dia y personaliza como quieres recibir cada aviso.</p>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+            <div className="rounded-xl border border-line bg-white px-4 py-3">
+              <p className="inline-flex items-center gap-2 text-sm font-bold text-navy"><CircleUserRound className="h-4 w-4 text-brand" />Cuenta</p>
+              <p className="mt-1 text-sm text-soft">{displayName || user.email.split("@")[0]}</p>
+            </div>
+            <div className="rounded-xl border border-line bg-white px-4 py-3">
+              <p className="inline-flex items-center gap-2 text-sm font-bold text-navy"><BellRing className="h-4 w-4 text-brand" />Recordatorios</p>
+              <p className="mt-1 text-sm text-soft">{emailReminders || whatsappReminders ? "Activos" : "Desactivados"}</p>
+            </div>
+            <div className="rounded-xl border border-line bg-white px-4 py-3">
+              <p className="inline-flex items-center gap-2 text-sm font-bold text-navy"><ShieldCheck className="h-4 w-4 text-brand" />Última actualización</p>
+              <p className="mt-1 text-sm text-soft">{savedAt ? new Date(savedAt).toLocaleDateString("es-CO") : "Sin cambios"}</p>
+            </div>
+          </div>
+        </section>
 
         <section className="mt-6 grid gap-4 lg:grid-cols-2">
           <Card>
             <h2 className="text-lg font-bold text-navy">Perfil editable</h2>
             <div className="mt-4 grid gap-3">
-              <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Nombre visible" />
-              <Input value={user.email} disabled placeholder="Correo" />
-              <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Teléfono" />
-              <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Ciudad" />
+              <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Nombre para mostrar" />
+              <Input value={user.email} disabled placeholder="Correo de acceso" />
+              <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Telefono de contacto" />
+              <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Ciudad principal" />
             </div>
           </Card>
 
           <Card>
             <h2 className="text-lg font-bold text-navy">Preferencias de notificaciones</h2>
             <div className="mt-4 grid gap-3 text-sm text-soft">
-              <label className="flex items-center gap-2"><input type="checkbox" checked={emailReminders} onChange={(e) => setEmailReminders(e.target.checked)} />Recordatorios por email</label>
+              <label className="flex items-center gap-2"><input type="checkbox" checked={emailReminders} onChange={(e) => setEmailReminders(e.target.checked)} />Recordatorios por correo</label>
               <label className="flex items-center gap-2"><input type="checkbox" checked={whatsappReminders} onChange={(e) => setWhatsappReminders(e.target.checked)} />Recordatorios por WhatsApp</label>
               <label className="flex items-center gap-2"><input type="checkbox" checked={marketingEmails} onChange={(e) => setMarketingEmails(e.target.checked)} />Novedades y promociones</label>
 
@@ -97,8 +115,8 @@ export default function ProfilePage() {
           </Card>
         </section>
 
-        <div className="mt-5 flex items-center gap-3">
-          <Button onClick={onSaveProfile}>Guardar cambios</Button>
+        <div className="mt-5 flex flex-wrap items-center gap-3">
+          <Button onClick={onSaveProfile}>Guardar preferencias</Button>
           {savedAt && <p className="text-sm text-soft">Última actualización: {new Date(savedAt).toLocaleString("es-CO")}</p>}
         </div>
       </main>

@@ -36,19 +36,19 @@ export default function RegisterPage() {
     <main className="page-container max-w-md py-6">
       <Card>
         <h1 className="text-2xl font-bold text-navy">Crear cuenta</h1>
-        <p className="mt-2 text-sm text-soft">Regístrate para empezar el onboarding en Pet Quotes.</p>
+        <p className="mt-2 text-sm text-soft">Crea tu cuenta y empieza a reservar con una experiencia simple y segura.</p>
 
         <form className="mt-5 grid gap-3" onSubmit={onSubmit}>
           <Input
             type="text"
-            placeholder="Nombre"
+            placeholder="Nombre completo"
             value={form.fullName}
             onChange={(e) => setForm((prev) => ({ ...prev, fullName: e.target.value }))}
             required
           />
           <Input
             type="email"
-            placeholder="correo@dominio.com"
+            placeholder="tu-correo@dominio.com"
             value={form.email}
             onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
             required
@@ -63,7 +63,7 @@ export default function RegisterPage() {
 
           {error && <p className="text-sm text-red-600">{error}</p>}
 
-          <Button disabled={loading}>{loading ? "Creando cuenta..." : "Crear cuenta"}</Button>
+          <Button disabled={loading}>{loading ? "Creando tu cuenta..." : "Crear mi cuenta"}</Button>
         </form>
 
         <p className="mt-4 text-sm text-soft">

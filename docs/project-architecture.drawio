@@ -1,0 +1,256 @@
+<mxfile host="app.diagrams.net" modified="2026-03-21T00:00:00.000Z" agent="GitHub Copilot" version="24.7.17" type="device">
+  <diagram id="petquotes-pro-arch" name="Pet Quotes - Professional Architecture">
+    <mxGraphModel dx="1800" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2600" pageHeight="1600" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f7f8fa;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="20" y="20" width="2520" height="1500" as="geometry" />
+        </mxCell>
+
+        <mxCell id="title" value="PET QUOTES - MICROSERVICES ARCHITECTURE" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0f172a;strokeColor=#0f172a;fontColor=#ffffff;fontStyle=1;fontSize=22;spacingLeft=18;align=left;" vertex="1" parent="1">
+          <mxGeometry x="60" y="50" width="2440" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="Frontend Next.js + API Gateway + Servicios NestJS + Data Platform + Observability" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=13;fontColor=#334155;" vertex="1" parent="1">
+          <mxGeometry x="70" y="128" width="1200" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="zone-client" value="Client Channel" style="swimlane;rounded=1;whiteSpace=wrap;html=1;startSize=34;fillColor=#e0f2fe;strokeColor=#0284c7;fontColor=#0c4a6e;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="180" width="470" height="330" as="geometry" />
+        </mxCell>
+
+        <mxCell id="user" value="Users" style="shape=mxgraph.aws4.user;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#64748b;" vertex="1" parent="zone-client">
+          <mxGeometry x="30" y="80" width="90" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="next-logo" value="" style="shape=image;imageAspect=0;aspect=fixed;verticalLabelPosition=bottom;verticalAlign=top;image=https://cdn.simpleicons.org/nextdotjs/111827;" vertex="1" parent="zone-client">
+          <mxGeometry x="160" y="80" width="62" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="web" value="Web App&#xa;apps/web&#xa;Next.js 14 - :3000" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#0ea5e9;fontStyle=1;fontColor=#0f172a;" vertex="1" parent="zone-client">
+          <mxGeometry x="130" y="150" width="230" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="zone-core" value="Platform Core" style="swimlane;rounded=1;whiteSpace=wrap;html=1;startSize=34;fillColor=#fff7ed;strokeColor=#f97316;fontColor=#7c2d12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="560" y="180" width="850" height="330" as="geometry" />
+        </mxCell>
+
+        <mxCell id="nestjs-logo" value="" style="shape=image;imageAspect=0;aspect=fixed;image=https://cdn.simpleicons.org/nestjs/E0234E;" vertex="1" parent="zone-core">
+          <mxGeometry x="320" y="70" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="gateway" value="API Gateway&#xa;services/api-gateway&#xa;NestJS - :3001" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#f97316;fontStyle=1;" vertex="1" parent="zone-core">
+          <mxGeometry x="250" y="140" width="340" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="zone-services" value="Domain Services (NestJS)" style="swimlane;rounded=1;whiteSpace=wrap;html=1;startSize=34;fillColor=#fefce8;strokeColor=#ca8a04;fontColor=#713f12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="550" width="1350" height="520" as="geometry" />
+        </mxCell>
+
+        <mxCell id="svc-auth" value="Auth Service&#xa;:3002" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#a16207;" vertex="1" parent="zone-services">
+          <mxGeometry x="40" y="70" width="170" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="svc-appointment" value="Appointment Service&#xa;:3005" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#a16207;" vertex="1" parent="zone-services">
+          <mxGeometry x="230" y="70" width="190" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="svc-vet" value="Veterinary Service&#xa;:3003" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#a16207;" vertex="1" parent="zone-services">
+          <mxGeometry x="440" y="70" width="190" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="svc-catalog" value="Catalog Service&#xa;:3004" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#a16207;" vertex="1" parent="zone-services">
+          <mxGeometry x="650" y="70" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="svc-staff" value="Staff-Schedule Service&#xa;:3006" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#a16207;" vertex="1" parent="zone-services">
+          <mxGeometry x="850" y="70" width="220" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="svc-search" value="Search-Geo Service&#xa;:3007" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#a16207;" vertex="1" parent="zone-services">
+          <mxGeometry x="1090" y="70" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="svc-notif" value="Notification Service&#xa;:3008" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#a16207;" vertex="1" parent="zone-services">
+          <mxGeometry x="40" y="190" width="190" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="contracts" value="Shared Contracts&#xa;libs/contracts" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede9fe;strokeColor=#7c3aed;fontStyle=1;" vertex="1" parent="zone-services">
+          <mxGeometry x="250" y="190" width="220" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="zone-data" value="Data and Messaging Platform" style="swimlane;rounded=1;whiteSpace=wrap;html=1;startSize=34;fillColor=#fee2e2;strokeColor=#dc2626;fontColor=#7f1d1d;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="180" width="1060" height="550" as="geometry" />
+        </mxCell>
+
+        <mxCell id="pg-logo" value="" style="shape=image;imageAspect=0;aspect=fixed;image=https://cdn.simpleicons.org/postgresql/336791;" vertex="1" parent="zone-data">
+          <mxGeometry x="60" y="70" width="56" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="db-auth" value="Auth DB&#xa;PostgreSQL&#xa;:5433" style="shape=cylinder;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;fillColor=#ffffff;strokeColor=#b91c1c;" vertex="1" parent="zone-data">
+          <mxGeometry x="130" y="60" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="db-appointment" value="Appointment DB&#xa;PostgreSQL&#xa;:5434" style="shape=cylinder;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;fillColor=#ffffff;strokeColor=#b91c1c;" vertex="1" parent="zone-data">
+          <mxGeometry x="340" y="60" width="210" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="redis-logo" value="" style="shape=image;imageAspect=0;aspect=fixed;image=https://cdn.simpleicons.org/redis/DC382D;" vertex="1" parent="zone-data">
+          <mxGeometry x="590" y="70" width="56" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="redis" value="Redis&#xa;:6379" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b91c1c;" vertex="1" parent="zone-data">
+          <mxGeometry x="660" y="60" width="120" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="rabbit-logo" value="" style="shape=image;imageAspect=0;aspect=fixed;image=https://cdn.simpleicons.org/rabbitmq/FF6600;" vertex="1" parent="zone-data">
+          <mxGeometry x="810" y="70" width="56" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="rabbit" value="RabbitMQ&#xa;:5672 / :15672" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b91c1c;" vertex="1" parent="zone-data">
+          <mxGeometry x="880" y="60" width="150" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="elastic-logo" value="" style="shape=image;imageAspect=0;aspect=fixed;image=https://cdn.simpleicons.org/elasticsearch/005571;" vertex="1" parent="zone-data">
+          <mxGeometry x="60" y="200" width="56" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="elastic" value="Elasticsearch&#xa;:9200" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b91c1c;" vertex="1" parent="zone-data">
+          <mxGeometry x="130" y="190" width="170" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="docker-logo" value="" style="shape=image;imageAspect=0;aspect=fixed;image=https://cdn.simpleicons.org/docker/2496ED;" vertex="1" parent="zone-data">
+          <mxGeometry x="340" y="200" width="56" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="compose" value="Docker Compose" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b91c1c;fontStyle=1;" vertex="1" parent="zone-data">
+          <mxGeometry x="410" y="190" width="160" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="pgadmin" value="pgAdmin&#xa;:5050" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b91c1c;" vertex="1" parent="zone-data">
+          <mxGeometry x="600" y="190" width="140" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="zone-obsv" value="Observability" style="swimlane;rounded=1;whiteSpace=wrap;html=1;startSize=34;fillColor=#dcfce7;strokeColor=#16a34a;fontColor=#14532d;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="760" width="620" height="310" as="geometry" />
+        </mxCell>
+
+        <mxCell id="zone-prod" value="Production Hardening (Implemented)" style="swimlane;rounded=1;whiteSpace=wrap;html=1;startSize=34;fillColor=#eef2ff;strokeColor=#4338ca;fontColor=#312e81;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1090" width="2000" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="prod1" value="Request ID propagation&#xa;Gateway + Auth + Appointment" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6366f1;" vertex="1" parent="zone-prod">
+          <mxGeometry x="20" y="65" width="310" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="prod2" value="Standard error contract&#xa;requestId + timestamp + path" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6366f1;" vertex="1" parent="zone-prod">
+          <mxGeometry x="350" y="65" width="310" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="prod3" value="Gateway retry with backoff&#xa;for 502/503/504 and network" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6366f1;" vertex="1" parent="zone-prod">
+          <mxGeometry x="680" y="65" width="310" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="prod4" value="Frontend request timeout&#xa;AbortController (10s default)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6366f1;" vertex="1" parent="zone-prod">
+          <mxGeometry x="1010" y="65" width="310" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="prod5" value="Idempotency key from Web&#xa;for appointment creation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6366f1;" vertex="1" parent="zone-prod">
+          <mxGeometry x="1340" y="65" width="310" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="prod6" value="Gateway unit tests&#xa;retry behavior covered" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6366f1;" vertex="1" parent="zone-prod">
+          <mxGeometry x="1670" y="65" width="300" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="prod7" value="Business metrics in Auth + Appointment&#xa;Prometheus: petquotes_business_event_total" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6366f1;" vertex="1" parent="zone-prod">
+          <mxGeometry x="20" y="160" width="640" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="prod8" value="Prisma migration hardening&#xa;CREATE INDEX IF NOT EXISTS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6366f1;" vertex="1" parent="zone-prod">
+          <mxGeometry x="680" y="160" width="430" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="prod9" value="Bookings route-level resilience&#xa;error.tsx + loading.tsx" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6366f1;" vertex="1" parent="zone-prod">
+          <mxGeometry x="1130" y="160" width="430" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="prom-logo" value="" style="shape=image;imageAspect=0;aspect=fixed;image=https://cdn.simpleicons.org/prometheus/E6522C;" vertex="1" parent="zone-obsv">
+          <mxGeometry x="70" y="90" width="56" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="prometheus" value="Prometheus&#xa;:9090" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#15803d;fontStyle=1;" vertex="1" parent="zone-obsv">
+          <mxGeometry x="140" y="80" width="180" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="graf-logo" value="" style="shape=image;imageAspect=0;aspect=fixed;image=https://cdn.simpleicons.org/grafana/F46800;" vertex="1" parent="zone-obsv">
+          <mxGeometry x="360" y="90" width="56" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="grafana" value="Grafana&#xa;:3010" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#15803d;fontStyle=1;" vertex="1" parent="zone-obsv">
+          <mxGeometry x="430" y="80" width="160" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend" value="Legend" style="swimlane;rounded=1;whiteSpace=wrap;html=1;startSize=30;fillColor=#ffffff;strokeColor=#cbd5e1;fontColor=#334155;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="2090" y="760" width="410" height="310" as="geometry" />
+        </mxCell>
+        <mxCell id="leg1" value="Solid line: sync HTTP/gateway routing" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=12;fontColor=#334155;" vertex="1" parent="legend">
+          <mxGeometry x="20" y="50" width="360" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="leg2" value="Dashed line: async/data dependencies" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=12;fontColor=#334155;" vertex="1" parent="legend">
+          <mxGeometry x="20" y="85" width="360" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="leg3" value="Green line: metrics/observability flow" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=12;fontColor=#334155;" vertex="1" parent="legend">
+          <mxGeometry x="20" y="120" width="360" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="leg4" value="Source: README + docker-compose.yml" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=12;fontColor=#64748b;" vertex="1" parent="legend">
+          <mxGeometry x="20" y="210" width="360" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e1" style="endArrow=block;endFill=1;strokeWidth=2;strokeColor=#0369a1;rounded=1;" edge="1" parent="1" source="user" target="web">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" value="REST /api" style="endArrow=block;endFill=1;strokeWidth=2;strokeColor=#0369a1;rounded=1;" edge="1" parent="1" source="web" target="gateway">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e3" value="auth" style="endArrow=block;endFill=1;strokeWidth=2;strokeColor=#ea580c;rounded=1;" edge="1" parent="1" source="gateway" target="svc-auth">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" value="appointments" style="endArrow=block;endFill=1;strokeWidth=2;strokeColor=#ea580c;rounded=1;" edge="1" parent="1" source="gateway" target="svc-appointment">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" style="endArrow=block;endFill=1;strokeWidth=2;strokeColor=#ea580c;rounded=1;" edge="1" parent="1" source="gateway" target="svc-vet">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" style="endArrow=block;endFill=1;strokeWidth=2;strokeColor=#ea580c;rounded=1;" edge="1" parent="1" source="gateway" target="svc-catalog">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" style="endArrow=block;endFill=1;strokeWidth=2;strokeColor=#ea580c;rounded=1;" edge="1" parent="1" source="gateway" target="svc-staff">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" style="endArrow=block;endFill=1;strokeWidth=2;strokeColor=#ea580c;rounded=1;" edge="1" parent="1" source="gateway" target="svc-search">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" style="endArrow=block;endFill=1;strokeWidth=2;strokeColor=#ea580c;rounded=1;" edge="1" parent="1" source="gateway" target="svc-notif">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e10" style="dashed=1;endArrow=open;endFill=0;strokeWidth=2;strokeColor=#b91c1c;" edge="1" parent="1" source="svc-auth" target="db-auth">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" style="dashed=1;endArrow=open;endFill=0;strokeWidth=2;strokeColor=#b91c1c;" edge="1" parent="1" source="svc-appointment" target="db-appointment">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e12" style="dashed=1;endArrow=open;endFill=0;strokeWidth=2;strokeColor=#b91c1c;" edge="1" parent="1" source="svc-appointment" target="redis">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e13" style="dashed=1;endArrow=open;endFill=0;strokeWidth=2;strokeColor=#b91c1c;" edge="1" parent="1" source="svc-appointment" target="rabbit">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e14" style="dashed=1;endArrow=open;endFill=0;strokeWidth=2;strokeColor=#b91c1c;" edge="1" parent="1" source="svc-appointment" target="elastic">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e15" style="dashed=1;endArrow=open;endFill=0;strokeWidth=2;strokeColor=#b91c1c;" edge="1" parent="1" source="svc-search" target="elastic">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e16" style="dashed=1;endArrow=open;endFill=0;strokeWidth=2;strokeColor=#b91c1c;" edge="1" parent="1" source="pgadmin" target="db-auth">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e17" style="dashed=1;endArrow=open;endFill=0;strokeWidth=2;strokeColor=#b91c1c;" edge="1" parent="1" source="pgadmin" target="db-appointment">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e18" value="/metrics" style="endArrow=block;endFill=1;strokeWidth=2;strokeColor=#15803d;rounded=1;" edge="1" parent="1" source="gateway" target="prometheus">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e19" value="/metrics" style="endArrow=block;endFill=1;strokeWidth=2;strokeColor=#15803d;rounded=1;" edge="1" parent="1" source="svc-auth" target="prometheus">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e20" value="/metrics" style="endArrow=block;endFill=1;strokeWidth=2;strokeColor=#15803d;rounded=1;" edge="1" parent="1" source="svc-appointment" target="prometheus">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e21" style="endArrow=block;endFill=1;strokeWidth=2;strokeColor=#15803d;rounded=1;" edge="1" parent="1" source="prometheus" target="grafana">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

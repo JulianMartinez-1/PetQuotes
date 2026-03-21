@@ -18,6 +18,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  * 
  */
 export type Appointment = $Result.DefaultSelection<Prisma.$AppointmentPayload>
+/**
+ * Model Pet
+ * 
+ */
+export type Pet = $Result.DefaultSelection<Prisma.$PetPayload>
 
 /**
  * Enums
@@ -170,6 +175,16 @@ export class PrismaClient<
     * ```
     */
   get appointment(): Prisma.AppointmentDelegate<ExtArgs>;
+
+  /**
+   * `prisma.pet`: Exposes CRUD operations for the **Pet** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Pets
+    * const pets = await prisma.pet.findMany()
+    * ```
+    */
+  get pet(): Prisma.PetDelegate<ExtArgs>;
 }
 
 export namespace Prisma {
@@ -611,7 +626,8 @@ export namespace Prisma {
 
 
   export const ModelName: {
-    Appointment: 'Appointment'
+    Appointment: 'Appointment',
+    Pet: 'Pet'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -627,7 +643,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "appointment"
+      modelProps: "appointment" | "pet"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -698,6 +714,76 @@ export namespace Prisma {
           count: {
             args: Prisma.AppointmentCountArgs<ExtArgs>
             result: $Utils.Optional<AppointmentCountAggregateOutputType> | number
+          }
+        }
+      }
+      Pet: {
+        payload: Prisma.$PetPayload<ExtArgs>
+        fields: Prisma.PetFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PetFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PetPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PetFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PetPayload>
+          }
+          findFirst: {
+            args: Prisma.PetFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PetPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PetFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PetPayload>
+          }
+          findMany: {
+            args: Prisma.PetFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PetPayload>[]
+          }
+          create: {
+            args: Prisma.PetCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PetPayload>
+          }
+          createMany: {
+            args: Prisma.PetCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PetCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PetPayload>[]
+          }
+          delete: {
+            args: Prisma.PetDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PetPayload>
+          }
+          update: {
+            args: Prisma.PetUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PetPayload>
+          }
+          deleteMany: {
+            args: Prisma.PetDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PetUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.PetUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PetPayload>
+          }
+          aggregate: {
+            args: Prisma.PetAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePet>
+          }
+          groupBy: {
+            args: Prisma.PetGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PetGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PetCountArgs<ExtArgs>
+            result: $Utils.Optional<PetCountAggregateOutputType> | number
           }
         }
       }
@@ -856,6 +942,36 @@ export namespace Prisma {
    * Count Types
    */
 
+
+  /**
+   * Count Type PetCountOutputType
+   */
+
+  export type PetCountOutputType = {
+    appointments: number
+  }
+
+  export type PetCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    appointments?: boolean | PetCountOutputTypeCountAppointmentsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * PetCountOutputType without action
+   */
+  export type PetCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PetCountOutputType
+     */
+    select?: PetCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * PetCountOutputType without action
+   */
+  export type PetCountOutputTypeCountAppointmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AppointmentWhereInput
+  }
 
 
   /**
@@ -1082,6 +1198,7 @@ export namespace Prisma {
     notes?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    pet?: boolean | PetDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["appointment"]>
 
   export type AppointmentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1097,6 +1214,7 @@ export namespace Prisma {
     notes?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    pet?: boolean | PetDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["appointment"]>
 
   export type AppointmentSelectScalar = {
@@ -1114,10 +1232,18 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
+  export type AppointmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    pet?: boolean | PetDefaultArgs<ExtArgs>
+  }
+  export type AppointmentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    pet?: boolean | PetDefaultArgs<ExtArgs>
+  }
 
   export type $AppointmentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Appointment"
-    objects: {}
+    objects: {
+      pet: Prisma.$PetPayload<ExtArgs>
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       clientId: string
@@ -1495,6 +1621,7 @@ export namespace Prisma {
    */
   export interface Prisma__AppointmentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    pet<T extends PetDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PetDefaultArgs<ExtArgs>>): Prisma__PetClient<$Result.GetResult<Prisma.$PetPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1549,6 +1676,10 @@ export namespace Prisma {
      */
     select?: AppointmentSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppointmentInclude<ExtArgs> | null
+    /**
      * Filter, which Appointment to fetch.
      */
     where: AppointmentWhereUniqueInput
@@ -1563,6 +1694,10 @@ export namespace Prisma {
      */
     select?: AppointmentSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppointmentInclude<ExtArgs> | null
+    /**
      * Filter, which Appointment to fetch.
      */
     where: AppointmentWhereUniqueInput
@@ -1576,6 +1711,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the Appointment
      */
     select?: AppointmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppointmentInclude<ExtArgs> | null
     /**
      * Filter, which Appointment to fetch.
      */
@@ -1621,6 +1760,10 @@ export namespace Prisma {
      */
     select?: AppointmentSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppointmentInclude<ExtArgs> | null
+    /**
      * Filter, which Appointment to fetch.
      */
     where?: AppointmentWhereInput
@@ -1665,6 +1808,10 @@ export namespace Prisma {
      */
     select?: AppointmentSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppointmentInclude<ExtArgs> | null
+    /**
      * Filter, which Appointments to fetch.
      */
     where?: AppointmentWhereInput
@@ -1704,6 +1851,10 @@ export namespace Prisma {
      */
     select?: AppointmentSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppointmentInclude<ExtArgs> | null
+    /**
      * The data needed to create a Appointment.
      */
     data: XOR<AppointmentCreateInput, AppointmentUncheckedCreateInput>
@@ -1733,6 +1884,10 @@ export namespace Prisma {
      */
     data: AppointmentCreateManyInput | AppointmentCreateManyInput[]
     skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppointmentIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -1743,6 +1898,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the Appointment
      */
     select?: AppointmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppointmentInclude<ExtArgs> | null
     /**
      * The data needed to update a Appointment.
      */
@@ -1776,6 +1935,10 @@ export namespace Prisma {
      */
     select?: AppointmentSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppointmentInclude<ExtArgs> | null
+    /**
      * The filter to search for the Appointment to update in case it exists.
      */
     where: AppointmentWhereUniqueInput
@@ -1797,6 +1960,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the Appointment
      */
     select?: AppointmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppointmentInclude<ExtArgs> | null
     /**
      * Filter which Appointment to delete.
      */
@@ -1821,6 +1988,970 @@ export namespace Prisma {
      * Select specific fields to fetch from the Appointment
      */
     select?: AppointmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppointmentInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Pet
+   */
+
+  export type AggregatePet = {
+    _count: PetCountAggregateOutputType | null
+    _min: PetMinAggregateOutputType | null
+    _max: PetMaxAggregateOutputType | null
+  }
+
+  export type PetMinAggregateOutputType = {
+    id: string | null
+    ownerId: string | null
+    name: string | null
+    species: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PetMaxAggregateOutputType = {
+    id: string | null
+    ownerId: string | null
+    name: string | null
+    species: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PetCountAggregateOutputType = {
+    id: number
+    ownerId: number
+    name: number
+    species: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type PetMinAggregateInputType = {
+    id?: true
+    ownerId?: true
+    name?: true
+    species?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PetMaxAggregateInputType = {
+    id?: true
+    ownerId?: true
+    name?: true
+    species?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PetCountAggregateInputType = {
+    id?: true
+    ownerId?: true
+    name?: true
+    species?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type PetAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Pet to aggregate.
+     */
+    where?: PetWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Pets to fetch.
+     */
+    orderBy?: PetOrderByWithRelationInput | PetOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PetWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Pets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Pets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Pets
+    **/
+    _count?: true | PetCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PetMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PetMaxAggregateInputType
+  }
+
+  export type GetPetAggregateType<T extends PetAggregateArgs> = {
+        [P in keyof T & keyof AggregatePet]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePet[P]>
+      : GetScalarType<T[P], AggregatePet[P]>
+  }
+
+
+
+
+  export type PetGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PetWhereInput
+    orderBy?: PetOrderByWithAggregationInput | PetOrderByWithAggregationInput[]
+    by: PetScalarFieldEnum[] | PetScalarFieldEnum
+    having?: PetScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PetCountAggregateInputType | true
+    _min?: PetMinAggregateInputType
+    _max?: PetMaxAggregateInputType
+  }
+
+  export type PetGroupByOutputType = {
+    id: string
+    ownerId: string
+    name: string
+    species: string
+    createdAt: Date
+    updatedAt: Date
+    _count: PetCountAggregateOutputType | null
+    _min: PetMinAggregateOutputType | null
+    _max: PetMaxAggregateOutputType | null
+  }
+
+  type GetPetGroupByPayload<T extends PetGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PetGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PetGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PetGroupByOutputType[P]>
+            : GetScalarType<T[P], PetGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PetSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    ownerId?: boolean
+    name?: boolean
+    species?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    appointments?: boolean | Pet$appointmentsArgs<ExtArgs>
+    _count?: boolean | PetCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["pet"]>
+
+  export type PetSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    ownerId?: boolean
+    name?: boolean
+    species?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["pet"]>
+
+  export type PetSelectScalar = {
+    id?: boolean
+    ownerId?: boolean
+    name?: boolean
+    species?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type PetInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    appointments?: boolean | Pet$appointmentsArgs<ExtArgs>
+    _count?: boolean | PetCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type PetIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+
+  export type $PetPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Pet"
+    objects: {
+      appointments: Prisma.$AppointmentPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      ownerId: string
+      name: string
+      species: string
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["pet"]>
+    composites: {}
+  }
+
+  type PetGetPayload<S extends boolean | null | undefined | PetDefaultArgs> = $Result.GetResult<Prisma.$PetPayload, S>
+
+  type PetCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<PetFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: PetCountAggregateInputType | true
+    }
+
+  export interface PetDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Pet'], meta: { name: 'Pet' } }
+    /**
+     * Find zero or one Pet that matches the filter.
+     * @param {PetFindUniqueArgs} args - Arguments to find a Pet
+     * @example
+     * // Get one Pet
+     * const pet = await prisma.pet.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PetFindUniqueArgs>(args: SelectSubset<T, PetFindUniqueArgs<ExtArgs>>): Prisma__PetClient<$Result.GetResult<Prisma.$PetPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one Pet that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {PetFindUniqueOrThrowArgs} args - Arguments to find a Pet
+     * @example
+     * // Get one Pet
+     * const pet = await prisma.pet.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PetFindUniqueOrThrowArgs>(args: SelectSubset<T, PetFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PetClient<$Result.GetResult<Prisma.$PetPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first Pet that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PetFindFirstArgs} args - Arguments to find a Pet
+     * @example
+     * // Get one Pet
+     * const pet = await prisma.pet.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PetFindFirstArgs>(args?: SelectSubset<T, PetFindFirstArgs<ExtArgs>>): Prisma__PetClient<$Result.GetResult<Prisma.$PetPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first Pet that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PetFindFirstOrThrowArgs} args - Arguments to find a Pet
+     * @example
+     * // Get one Pet
+     * const pet = await prisma.pet.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PetFindFirstOrThrowArgs>(args?: SelectSubset<T, PetFindFirstOrThrowArgs<ExtArgs>>): Prisma__PetClient<$Result.GetResult<Prisma.$PetPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more Pets that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PetFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Pets
+     * const pets = await prisma.pet.findMany()
+     * 
+     * // Get first 10 Pets
+     * const pets = await prisma.pet.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const petWithIdOnly = await prisma.pet.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PetFindManyArgs>(args?: SelectSubset<T, PetFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PetPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a Pet.
+     * @param {PetCreateArgs} args - Arguments to create a Pet.
+     * @example
+     * // Create one Pet
+     * const Pet = await prisma.pet.create({
+     *   data: {
+     *     // ... data to create a Pet
+     *   }
+     * })
+     * 
+     */
+    create<T extends PetCreateArgs>(args: SelectSubset<T, PetCreateArgs<ExtArgs>>): Prisma__PetClient<$Result.GetResult<Prisma.$PetPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many Pets.
+     * @param {PetCreateManyArgs} args - Arguments to create many Pets.
+     * @example
+     * // Create many Pets
+     * const pet = await prisma.pet.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PetCreateManyArgs>(args?: SelectSubset<T, PetCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Pets and returns the data saved in the database.
+     * @param {PetCreateManyAndReturnArgs} args - Arguments to create many Pets.
+     * @example
+     * // Create many Pets
+     * const pet = await prisma.pet.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Pets and only return the `id`
+     * const petWithIdOnly = await prisma.pet.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PetCreateManyAndReturnArgs>(args?: SelectSubset<T, PetCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PetPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a Pet.
+     * @param {PetDeleteArgs} args - Arguments to delete one Pet.
+     * @example
+     * // Delete one Pet
+     * const Pet = await prisma.pet.delete({
+     *   where: {
+     *     // ... filter to delete one Pet
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PetDeleteArgs>(args: SelectSubset<T, PetDeleteArgs<ExtArgs>>): Prisma__PetClient<$Result.GetResult<Prisma.$PetPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one Pet.
+     * @param {PetUpdateArgs} args - Arguments to update one Pet.
+     * @example
+     * // Update one Pet
+     * const pet = await prisma.pet.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PetUpdateArgs>(args: SelectSubset<T, PetUpdateArgs<ExtArgs>>): Prisma__PetClient<$Result.GetResult<Prisma.$PetPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more Pets.
+     * @param {PetDeleteManyArgs} args - Arguments to filter Pets to delete.
+     * @example
+     * // Delete a few Pets
+     * const { count } = await prisma.pet.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PetDeleteManyArgs>(args?: SelectSubset<T, PetDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Pets.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PetUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Pets
+     * const pet = await prisma.pet.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PetUpdateManyArgs>(args: SelectSubset<T, PetUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Pet.
+     * @param {PetUpsertArgs} args - Arguments to update or create a Pet.
+     * @example
+     * // Update or create a Pet
+     * const pet = await prisma.pet.upsert({
+     *   create: {
+     *     // ... data to create a Pet
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Pet we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PetUpsertArgs>(args: SelectSubset<T, PetUpsertArgs<ExtArgs>>): Prisma__PetClient<$Result.GetResult<Prisma.$PetPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of Pets.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PetCountArgs} args - Arguments to filter Pets to count.
+     * @example
+     * // Count the number of Pets
+     * const count = await prisma.pet.count({
+     *   where: {
+     *     // ... the filter for the Pets we want to count
+     *   }
+     * })
+    **/
+    count<T extends PetCountArgs>(
+      args?: Subset<T, PetCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PetCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Pet.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PetAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PetAggregateArgs>(args: Subset<T, PetAggregateArgs>): Prisma.PrismaPromise<GetPetAggregateType<T>>
+
+    /**
+     * Group by Pet.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PetGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PetGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PetGroupByArgs['orderBy'] }
+        : { orderBy?: PetGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PetGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPetGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Pet model
+   */
+  readonly fields: PetFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Pet.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PetClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    appointments<T extends Pet$appointmentsArgs<ExtArgs> = {}>(args?: Subset<T, Pet$appointmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findMany"> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Pet model
+   */ 
+  interface PetFieldRefs {
+    readonly id: FieldRef<"Pet", 'String'>
+    readonly ownerId: FieldRef<"Pet", 'String'>
+    readonly name: FieldRef<"Pet", 'String'>
+    readonly species: FieldRef<"Pet", 'String'>
+    readonly createdAt: FieldRef<"Pet", 'DateTime'>
+    readonly updatedAt: FieldRef<"Pet", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Pet findUnique
+   */
+  export type PetFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Pet
+     */
+    select?: PetSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PetInclude<ExtArgs> | null
+    /**
+     * Filter, which Pet to fetch.
+     */
+    where: PetWhereUniqueInput
+  }
+
+  /**
+   * Pet findUniqueOrThrow
+   */
+  export type PetFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Pet
+     */
+    select?: PetSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PetInclude<ExtArgs> | null
+    /**
+     * Filter, which Pet to fetch.
+     */
+    where: PetWhereUniqueInput
+  }
+
+  /**
+   * Pet findFirst
+   */
+  export type PetFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Pet
+     */
+    select?: PetSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PetInclude<ExtArgs> | null
+    /**
+     * Filter, which Pet to fetch.
+     */
+    where?: PetWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Pets to fetch.
+     */
+    orderBy?: PetOrderByWithRelationInput | PetOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Pets.
+     */
+    cursor?: PetWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Pets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Pets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Pets.
+     */
+    distinct?: PetScalarFieldEnum | PetScalarFieldEnum[]
+  }
+
+  /**
+   * Pet findFirstOrThrow
+   */
+  export type PetFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Pet
+     */
+    select?: PetSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PetInclude<ExtArgs> | null
+    /**
+     * Filter, which Pet to fetch.
+     */
+    where?: PetWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Pets to fetch.
+     */
+    orderBy?: PetOrderByWithRelationInput | PetOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Pets.
+     */
+    cursor?: PetWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Pets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Pets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Pets.
+     */
+    distinct?: PetScalarFieldEnum | PetScalarFieldEnum[]
+  }
+
+  /**
+   * Pet findMany
+   */
+  export type PetFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Pet
+     */
+    select?: PetSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PetInclude<ExtArgs> | null
+    /**
+     * Filter, which Pets to fetch.
+     */
+    where?: PetWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Pets to fetch.
+     */
+    orderBy?: PetOrderByWithRelationInput | PetOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Pets.
+     */
+    cursor?: PetWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Pets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Pets.
+     */
+    skip?: number
+    distinct?: PetScalarFieldEnum | PetScalarFieldEnum[]
+  }
+
+  /**
+   * Pet create
+   */
+  export type PetCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Pet
+     */
+    select?: PetSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PetInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Pet.
+     */
+    data: XOR<PetCreateInput, PetUncheckedCreateInput>
+  }
+
+  /**
+   * Pet createMany
+   */
+  export type PetCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Pets.
+     */
+    data: PetCreateManyInput | PetCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Pet createManyAndReturn
+   */
+  export type PetCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Pet
+     */
+    select?: PetSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many Pets.
+     */
+    data: PetCreateManyInput | PetCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Pet update
+   */
+  export type PetUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Pet
+     */
+    select?: PetSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PetInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Pet.
+     */
+    data: XOR<PetUpdateInput, PetUncheckedUpdateInput>
+    /**
+     * Choose, which Pet to update.
+     */
+    where: PetWhereUniqueInput
+  }
+
+  /**
+   * Pet updateMany
+   */
+  export type PetUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Pets.
+     */
+    data: XOR<PetUpdateManyMutationInput, PetUncheckedUpdateManyInput>
+    /**
+     * Filter which Pets to update
+     */
+    where?: PetWhereInput
+  }
+
+  /**
+   * Pet upsert
+   */
+  export type PetUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Pet
+     */
+    select?: PetSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PetInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Pet to update in case it exists.
+     */
+    where: PetWhereUniqueInput
+    /**
+     * In case the Pet found by the `where` argument doesn't exist, create a new Pet with this data.
+     */
+    create: XOR<PetCreateInput, PetUncheckedCreateInput>
+    /**
+     * In case the Pet was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PetUpdateInput, PetUncheckedUpdateInput>
+  }
+
+  /**
+   * Pet delete
+   */
+  export type PetDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Pet
+     */
+    select?: PetSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PetInclude<ExtArgs> | null
+    /**
+     * Filter which Pet to delete.
+     */
+    where: PetWhereUniqueInput
+  }
+
+  /**
+   * Pet deleteMany
+   */
+  export type PetDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Pets to delete
+     */
+    where?: PetWhereInput
+  }
+
+  /**
+   * Pet.appointments
+   */
+  export type Pet$appointmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Appointment
+     */
+    select?: AppointmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppointmentInclude<ExtArgs> | null
+    where?: AppointmentWhereInput
+    orderBy?: AppointmentOrderByWithRelationInput | AppointmentOrderByWithRelationInput[]
+    cursor?: AppointmentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AppointmentScalarFieldEnum | AppointmentScalarFieldEnum[]
+  }
+
+  /**
+   * Pet without action
+   */
+  export type PetDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Pet
+     */
+    select?: PetSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PetInclude<ExtArgs> | null
   }
 
 
@@ -1854,6 +2985,18 @@ export namespace Prisma {
   };
 
   export type AppointmentScalarFieldEnum = (typeof AppointmentScalarFieldEnum)[keyof typeof AppointmentScalarFieldEnum]
+
+
+  export const PetScalarFieldEnum: {
+    id: 'id',
+    ownerId: 'ownerId',
+    name: 'name',
+    species: 'species',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type PetScalarFieldEnum = (typeof PetScalarFieldEnum)[keyof typeof PetScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -1960,6 +3103,7 @@ export namespace Prisma {
     notes?: StringNullableFilter<"Appointment"> | string | null
     createdAt?: DateTimeFilter<"Appointment"> | Date | string
     updatedAt?: DateTimeFilter<"Appointment"> | Date | string
+    pet?: XOR<PetRelationFilter, PetWhereInput>
   }
 
   export type AppointmentOrderByWithRelationInput = {
@@ -1975,11 +3119,13 @@ export namespace Prisma {
     notes?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    pet?: PetOrderByWithRelationInput
   }
 
   export type AppointmentWhereUniqueInput = Prisma.AtLeast<{
     id?: string
     idempotencyKey?: string
+    veterinarianId_startsAt?: AppointmentVeterinarianIdStartsAtCompoundUniqueInput
     AND?: AppointmentWhereInput | AppointmentWhereInput[]
     OR?: AppointmentWhereInput[]
     NOT?: AppointmentWhereInput | AppointmentWhereInput[]
@@ -1993,7 +3139,8 @@ export namespace Prisma {
     notes?: StringNullableFilter<"Appointment"> | string | null
     createdAt?: DateTimeFilter<"Appointment"> | Date | string
     updatedAt?: DateTimeFilter<"Appointment"> | Date | string
-  }, "id" | "idempotencyKey">
+    pet?: XOR<PetRelationFilter, PetWhereInput>
+  }, "id" | "idempotencyKey" | "veterinarianId_startsAt">
 
   export type AppointmentOrderByWithAggregationInput = {
     id?: SortOrder
@@ -2031,10 +3178,69 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"Appointment"> | Date | string
   }
 
+  export type PetWhereInput = {
+    AND?: PetWhereInput | PetWhereInput[]
+    OR?: PetWhereInput[]
+    NOT?: PetWhereInput | PetWhereInput[]
+    id?: StringFilter<"Pet"> | string
+    ownerId?: StringFilter<"Pet"> | string
+    name?: StringFilter<"Pet"> | string
+    species?: StringFilter<"Pet"> | string
+    createdAt?: DateTimeFilter<"Pet"> | Date | string
+    updatedAt?: DateTimeFilter<"Pet"> | Date | string
+    appointments?: AppointmentListRelationFilter
+  }
+
+  export type PetOrderByWithRelationInput = {
+    id?: SortOrder
+    ownerId?: SortOrder
+    name?: SortOrder
+    species?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    appointments?: AppointmentOrderByRelationAggregateInput
+  }
+
+  export type PetWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: PetWhereInput | PetWhereInput[]
+    OR?: PetWhereInput[]
+    NOT?: PetWhereInput | PetWhereInput[]
+    ownerId?: StringFilter<"Pet"> | string
+    name?: StringFilter<"Pet"> | string
+    species?: StringFilter<"Pet"> | string
+    createdAt?: DateTimeFilter<"Pet"> | Date | string
+    updatedAt?: DateTimeFilter<"Pet"> | Date | string
+    appointments?: AppointmentListRelationFilter
+  }, "id">
+
+  export type PetOrderByWithAggregationInput = {
+    id?: SortOrder
+    ownerId?: SortOrder
+    name?: SortOrder
+    species?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: PetCountOrderByAggregateInput
+    _max?: PetMaxOrderByAggregateInput
+    _min?: PetMinOrderByAggregateInput
+  }
+
+  export type PetScalarWhereWithAggregatesInput = {
+    AND?: PetScalarWhereWithAggregatesInput | PetScalarWhereWithAggregatesInput[]
+    OR?: PetScalarWhereWithAggregatesInput[]
+    NOT?: PetScalarWhereWithAggregatesInput | PetScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Pet"> | string
+    ownerId?: StringWithAggregatesFilter<"Pet"> | string
+    name?: StringWithAggregatesFilter<"Pet"> | string
+    species?: StringWithAggregatesFilter<"Pet"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"Pet"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Pet"> | Date | string
+  }
+
   export type AppointmentCreateInput = {
     id?: string
     clientId: string
-    petId: string
     veterinarianId: string
     serviceId: string
     branchId: string
@@ -2044,6 +3250,7 @@ export namespace Prisma {
     notes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    pet: PetCreateNestedOneWithoutAppointmentsInput
   }
 
   export type AppointmentUncheckedCreateInput = {
@@ -2064,7 +3271,6 @@ export namespace Prisma {
   export type AppointmentUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     clientId?: StringFieldUpdateOperationsInput | string
-    petId?: StringFieldUpdateOperationsInput | string
     veterinarianId?: StringFieldUpdateOperationsInput | string
     serviceId?: StringFieldUpdateOperationsInput | string
     branchId?: StringFieldUpdateOperationsInput | string
@@ -2074,6 +3280,7 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    pet?: PetUpdateOneRequiredWithoutAppointmentsNestedInput
   }
 
   export type AppointmentUncheckedUpdateInput = {
@@ -2109,7 +3316,6 @@ export namespace Prisma {
   export type AppointmentUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     clientId?: StringFieldUpdateOperationsInput | string
-    petId?: StringFieldUpdateOperationsInput | string
     veterinarianId?: StringFieldUpdateOperationsInput | string
     serviceId?: StringFieldUpdateOperationsInput | string
     branchId?: StringFieldUpdateOperationsInput | string
@@ -2132,6 +3338,73 @@ export namespace Prisma {
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     startsAt?: DateTimeFieldUpdateOperationsInput | Date | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PetCreateInput = {
+    id: string
+    ownerId: string
+    name: string
+    species: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appointments?: AppointmentCreateNestedManyWithoutPetInput
+  }
+
+  export type PetUncheckedCreateInput = {
+    id: string
+    ownerId: string
+    name: string
+    species: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appointments?: AppointmentUncheckedCreateNestedManyWithoutPetInput
+  }
+
+  export type PetUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ownerId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    species?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appointments?: AppointmentUpdateManyWithoutPetNestedInput
+  }
+
+  export type PetUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ownerId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    species?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appointments?: AppointmentUncheckedUpdateManyWithoutPetNestedInput
+  }
+
+  export type PetCreateManyInput = {
+    id: string
+    ownerId: string
+    name: string
+    species: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PetUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ownerId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    species?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PetUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ownerId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    species?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -2184,9 +3457,19 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
+  export type PetRelationFilter = {
+    is?: PetWhereInput
+    isNot?: PetWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
+  }
+
+  export type AppointmentVeterinarianIdStartsAtCompoundUniqueInput = {
+    veterinarianId: string
+    startsAt: Date | string
   }
 
   export type AppointmentCountOrderByAggregateInput = {
@@ -2294,6 +3577,49 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type AppointmentListRelationFilter = {
+    every?: AppointmentWhereInput
+    some?: AppointmentWhereInput
+    none?: AppointmentWhereInput
+  }
+
+  export type AppointmentOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type PetCountOrderByAggregateInput = {
+    id?: SortOrder
+    ownerId?: SortOrder
+    name?: SortOrder
+    species?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PetMaxOrderByAggregateInput = {
+    id?: SortOrder
+    ownerId?: SortOrder
+    name?: SortOrder
+    species?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PetMinOrderByAggregateInput = {
+    id?: SortOrder
+    ownerId?: SortOrder
+    name?: SortOrder
+    species?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PetCreateNestedOneWithoutAppointmentsInput = {
+    create?: XOR<PetCreateWithoutAppointmentsInput, PetUncheckedCreateWithoutAppointmentsInput>
+    connectOrCreate?: PetCreateOrConnectWithoutAppointmentsInput
+    connect?: PetWhereUniqueInput
+  }
+
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
@@ -2308,6 +3634,56 @@ export namespace Prisma {
 
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
+  }
+
+  export type PetUpdateOneRequiredWithoutAppointmentsNestedInput = {
+    create?: XOR<PetCreateWithoutAppointmentsInput, PetUncheckedCreateWithoutAppointmentsInput>
+    connectOrCreate?: PetCreateOrConnectWithoutAppointmentsInput
+    upsert?: PetUpsertWithoutAppointmentsInput
+    connect?: PetWhereUniqueInput
+    update?: XOR<XOR<PetUpdateToOneWithWhereWithoutAppointmentsInput, PetUpdateWithoutAppointmentsInput>, PetUncheckedUpdateWithoutAppointmentsInput>
+  }
+
+  export type AppointmentCreateNestedManyWithoutPetInput = {
+    create?: XOR<AppointmentCreateWithoutPetInput, AppointmentUncheckedCreateWithoutPetInput> | AppointmentCreateWithoutPetInput[] | AppointmentUncheckedCreateWithoutPetInput[]
+    connectOrCreate?: AppointmentCreateOrConnectWithoutPetInput | AppointmentCreateOrConnectWithoutPetInput[]
+    createMany?: AppointmentCreateManyPetInputEnvelope
+    connect?: AppointmentWhereUniqueInput | AppointmentWhereUniqueInput[]
+  }
+
+  export type AppointmentUncheckedCreateNestedManyWithoutPetInput = {
+    create?: XOR<AppointmentCreateWithoutPetInput, AppointmentUncheckedCreateWithoutPetInput> | AppointmentCreateWithoutPetInput[] | AppointmentUncheckedCreateWithoutPetInput[]
+    connectOrCreate?: AppointmentCreateOrConnectWithoutPetInput | AppointmentCreateOrConnectWithoutPetInput[]
+    createMany?: AppointmentCreateManyPetInputEnvelope
+    connect?: AppointmentWhereUniqueInput | AppointmentWhereUniqueInput[]
+  }
+
+  export type AppointmentUpdateManyWithoutPetNestedInput = {
+    create?: XOR<AppointmentCreateWithoutPetInput, AppointmentUncheckedCreateWithoutPetInput> | AppointmentCreateWithoutPetInput[] | AppointmentUncheckedCreateWithoutPetInput[]
+    connectOrCreate?: AppointmentCreateOrConnectWithoutPetInput | AppointmentCreateOrConnectWithoutPetInput[]
+    upsert?: AppointmentUpsertWithWhereUniqueWithoutPetInput | AppointmentUpsertWithWhereUniqueWithoutPetInput[]
+    createMany?: AppointmentCreateManyPetInputEnvelope
+    set?: AppointmentWhereUniqueInput | AppointmentWhereUniqueInput[]
+    disconnect?: AppointmentWhereUniqueInput | AppointmentWhereUniqueInput[]
+    delete?: AppointmentWhereUniqueInput | AppointmentWhereUniqueInput[]
+    connect?: AppointmentWhereUniqueInput | AppointmentWhereUniqueInput[]
+    update?: AppointmentUpdateWithWhereUniqueWithoutPetInput | AppointmentUpdateWithWhereUniqueWithoutPetInput[]
+    updateMany?: AppointmentUpdateManyWithWhereWithoutPetInput | AppointmentUpdateManyWithWhereWithoutPetInput[]
+    deleteMany?: AppointmentScalarWhereInput | AppointmentScalarWhereInput[]
+  }
+
+  export type AppointmentUncheckedUpdateManyWithoutPetNestedInput = {
+    create?: XOR<AppointmentCreateWithoutPetInput, AppointmentUncheckedCreateWithoutPetInput> | AppointmentCreateWithoutPetInput[] | AppointmentUncheckedCreateWithoutPetInput[]
+    connectOrCreate?: AppointmentCreateOrConnectWithoutPetInput | AppointmentCreateOrConnectWithoutPetInput[]
+    upsert?: AppointmentUpsertWithWhereUniqueWithoutPetInput | AppointmentUpsertWithWhereUniqueWithoutPetInput[]
+    createMany?: AppointmentCreateManyPetInputEnvelope
+    set?: AppointmentWhereUniqueInput | AppointmentWhereUniqueInput[]
+    disconnect?: AppointmentWhereUniqueInput | AppointmentWhereUniqueInput[]
+    delete?: AppointmentWhereUniqueInput | AppointmentWhereUniqueInput[]
+    connect?: AppointmentWhereUniqueInput | AppointmentWhereUniqueInput[]
+    update?: AppointmentUpdateWithWhereUniqueWithoutPetInput | AppointmentUpdateWithWhereUniqueWithoutPetInput[]
+    updateMany?: AppointmentUpdateManyWithWhereWithoutPetInput | AppointmentUpdateManyWithWhereWithoutPetInput[]
+    deleteMany?: AppointmentScalarWhereInput | AppointmentScalarWhereInput[]
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -2436,15 +3812,203 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type PetCreateWithoutAppointmentsInput = {
+    id: string
+    ownerId: string
+    name: string
+    species: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PetUncheckedCreateWithoutAppointmentsInput = {
+    id: string
+    ownerId: string
+    name: string
+    species: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PetCreateOrConnectWithoutAppointmentsInput = {
+    where: PetWhereUniqueInput
+    create: XOR<PetCreateWithoutAppointmentsInput, PetUncheckedCreateWithoutAppointmentsInput>
+  }
+
+  export type PetUpsertWithoutAppointmentsInput = {
+    update: XOR<PetUpdateWithoutAppointmentsInput, PetUncheckedUpdateWithoutAppointmentsInput>
+    create: XOR<PetCreateWithoutAppointmentsInput, PetUncheckedCreateWithoutAppointmentsInput>
+    where?: PetWhereInput
+  }
+
+  export type PetUpdateToOneWithWhereWithoutAppointmentsInput = {
+    where?: PetWhereInput
+    data: XOR<PetUpdateWithoutAppointmentsInput, PetUncheckedUpdateWithoutAppointmentsInput>
+  }
+
+  export type PetUpdateWithoutAppointmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ownerId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    species?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PetUncheckedUpdateWithoutAppointmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ownerId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    species?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AppointmentCreateWithoutPetInput = {
+    id?: string
+    clientId: string
+    veterinarianId: string
+    serviceId: string
+    branchId: string
+    idempotencyKey?: string | null
+    status?: $Enums.AppointmentStatus
+    startsAt: Date | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AppointmentUncheckedCreateWithoutPetInput = {
+    id?: string
+    clientId: string
+    veterinarianId: string
+    serviceId: string
+    branchId: string
+    idempotencyKey?: string | null
+    status?: $Enums.AppointmentStatus
+    startsAt: Date | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AppointmentCreateOrConnectWithoutPetInput = {
+    where: AppointmentWhereUniqueInput
+    create: XOR<AppointmentCreateWithoutPetInput, AppointmentUncheckedCreateWithoutPetInput>
+  }
+
+  export type AppointmentCreateManyPetInputEnvelope = {
+    data: AppointmentCreateManyPetInput | AppointmentCreateManyPetInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AppointmentUpsertWithWhereUniqueWithoutPetInput = {
+    where: AppointmentWhereUniqueInput
+    update: XOR<AppointmentUpdateWithoutPetInput, AppointmentUncheckedUpdateWithoutPetInput>
+    create: XOR<AppointmentCreateWithoutPetInput, AppointmentUncheckedCreateWithoutPetInput>
+  }
+
+  export type AppointmentUpdateWithWhereUniqueWithoutPetInput = {
+    where: AppointmentWhereUniqueInput
+    data: XOR<AppointmentUpdateWithoutPetInput, AppointmentUncheckedUpdateWithoutPetInput>
+  }
+
+  export type AppointmentUpdateManyWithWhereWithoutPetInput = {
+    where: AppointmentScalarWhereInput
+    data: XOR<AppointmentUpdateManyMutationInput, AppointmentUncheckedUpdateManyWithoutPetInput>
+  }
+
+  export type AppointmentScalarWhereInput = {
+    AND?: AppointmentScalarWhereInput | AppointmentScalarWhereInput[]
+    OR?: AppointmentScalarWhereInput[]
+    NOT?: AppointmentScalarWhereInput | AppointmentScalarWhereInput[]
+    id?: StringFilter<"Appointment"> | string
+    clientId?: StringFilter<"Appointment"> | string
+    petId?: StringFilter<"Appointment"> | string
+    veterinarianId?: StringFilter<"Appointment"> | string
+    serviceId?: StringFilter<"Appointment"> | string
+    branchId?: StringFilter<"Appointment"> | string
+    idempotencyKey?: StringNullableFilter<"Appointment"> | string | null
+    status?: EnumAppointmentStatusFilter<"Appointment"> | $Enums.AppointmentStatus
+    startsAt?: DateTimeFilter<"Appointment"> | Date | string
+    notes?: StringNullableFilter<"Appointment"> | string | null
+    createdAt?: DateTimeFilter<"Appointment"> | Date | string
+    updatedAt?: DateTimeFilter<"Appointment"> | Date | string
+  }
+
+  export type AppointmentCreateManyPetInput = {
+    id?: string
+    clientId: string
+    veterinarianId: string
+    serviceId: string
+    branchId: string
+    idempotencyKey?: string | null
+    status?: $Enums.AppointmentStatus
+    startsAt: Date | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AppointmentUpdateWithoutPetInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clientId?: StringFieldUpdateOperationsInput | string
+    veterinarianId?: StringFieldUpdateOperationsInput | string
+    serviceId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
+    startsAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AppointmentUncheckedUpdateWithoutPetInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clientId?: StringFieldUpdateOperationsInput | string
+    veterinarianId?: StringFieldUpdateOperationsInput | string
+    serviceId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
+    startsAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AppointmentUncheckedUpdateManyWithoutPetInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clientId?: StringFieldUpdateOperationsInput | string
+    veterinarianId?: StringFieldUpdateOperationsInput | string
+    serviceId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
+    startsAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
 
 
   /**
    * Aliases for legacy arg types
    */
     /**
+     * @deprecated Use PetCountOutputTypeDefaultArgs instead
+     */
+    export type PetCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = PetCountOutputTypeDefaultArgs<ExtArgs>
+    /**
      * @deprecated Use AppointmentDefaultArgs instead
      */
     export type AppointmentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = AppointmentDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use PetDefaultArgs instead
+     */
+    export type PetArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = PetDefaultArgs<ExtArgs>
 
   /**
    * Batch Payload for updateMany & deleteMany & createMany

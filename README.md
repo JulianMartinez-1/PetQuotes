@@ -144,15 +144,22 @@ npm run prisma:migrate:deploy --workspace services/auth-service
 npm run prisma:migrate:deploy --workspace services/appointment-service
 ```
 
-5. Para desarrollo rápido, puedes sincronizar esquema sin historial con `prisma:push`.
+5. Para desarrollo rapido, `prisma:push` solo esta habilitado en local cuando `ALLOW_DB_PUSH=true`.
+  En staging/produccion usa siempre migraciones versionadas (`prisma migrate deploy`).
 
-6. Levantar stack:
+6. Seed minimo para ambientes vacios:
+
+```bash
+npm run db:seed:minimum
+```
+
+7. Levantar stack:
 
 ```bash
 docker compose up --build
 ```
 
-7. Validar reglas Sprint 1 + Sprint 2 (refresh/logout/lockout + RBAC + idempotencia):
+8. Validar reglas Sprint 1 + Sprint 2 (refresh/logout/lockout + RBAC + idempotencia):
 
 ```bash
 npm run test:sprint2:e2e
@@ -172,6 +179,25 @@ npm run ci:lint
 npm run ci:build
 npm run ci:test:unit
 ```
+
+## Checklist final de release
+
+Checklist consolidado de salida para merge y produccion:
+
+- `docs/release-checklist-final.md`
+
+## Operacion de backups y restore
+
+Se agregaron scripts operativos para respaldos y restore de Auth DB y Appointment DB:
+
+```bash
+npm run db:backup
+npm run db:restore -- -AuthDump ./backups/auth-db-<timestamp>.dump -AppointmentDump ./backups/appointment-db-<timestamp>.dump
+```
+
+Runbook completo:
+
+- `docs/db-operations.md`
 
 ## Sprint 3 (Inicio): Observabilidad
 
@@ -194,12 +220,17 @@ Se habilito una base de observabilidad en servicios core:
   - Appointment: `GET /metrics`
 
 El endpoint `metrics` expone contadores por endpoint (requests y errores) y latencia (promedio y maxima).
+Adicionalmente, Auth y Appointment exponen eventos de negocio acumulados (registro, login, refresh, booking, reschedule, idempotency replay) en el snapshot JSON.
 
 Para export formato Prometheus:
 
 - Gateway: `GET /api/metrics/prometheus`
 - Auth: `GET /metrics/prometheus`
 - Appointment: `GET /metrics/prometheus`
+
+Metrica de negocio en Prometheus:
+
+- `petquotes_business_event_total{service,event,...}`
 
 Se agrego `prometheus` en `docker-compose.yml` con configuracion en `observability/prometheus.yml`.
 Al levantar el stack, Prometheus queda en `http://localhost:9090`.
@@ -220,6 +251,21 @@ Provisioning automatico:
 
 - Datasource Prometheus: `observability/grafana/provisioning/datasources/datasource.yml`
 - Dashboard base: `observability/grafana/dashboards/petquotes-overview.json`
+
+## PostgreSQL con pgAdmin
+
+Se agrego `pgadmin` al `docker-compose.yml` para administrar las bases en interfaz grafica.
+
+- URL: `http://localhost:5050`
+- Usuario: `PGADMIN_DEFAULT_EMAIL` (por defecto `admin@petquotes.local`)
+- Password: `PGADMIN_DEFAULT_PASSWORD` (por defecto `admin`)
+
+Servidores precargados (archivo `observability/pgadmin/servers.json`):
+
+- `Auth DB (Docker)` -> host `auth-db`, puerto `5432`, db `auth_db`
+- `Appointment DB (Docker)` -> host `appointment-db`, puerto `5432`, db `appointment_db`
+
+Nota: la primera vez que te conectes a cada servidor, pgAdmin pedira la contraseña del usuario `postgres` (valor actual: `postgres`, definido en `docker-compose.yml`).
 
 ## Sprint 4 (Inicio): Performance + Hardening
 
@@ -248,6 +294,10 @@ Rollout recomendado para `ENFORCE_HIGH_VULN_GATE=true` (rama de ensayo):
   - artifact `npm-audit-report`
   - resumen de severidades en logs
 4. Si las 2-3 corridas son estables y sin bloqueos inesperados, activar variable de repositorio `ENFORCE_HIGH_VULN_GATE=true` para `main/master`.
+
+Nota de troubleshooting local:
+
+- Si `npm run test:sprint2:e2e` falla con `fetch failed` o errores de pipe `dockerDesktopLinuxEngine`, valida que Docker Desktop este iniciado y que el daemon Linux engine este activo antes de ejecutar `docker compose up`.
 
 ## Calidad y Seguridad Incluidas
 

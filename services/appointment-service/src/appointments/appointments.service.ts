@@ -5,11 +5,13 @@ import { Channel, ChannelModel } from "amqplib";
 import { PrismaService } from "../prisma.service";
 import { CreateAppointmentDto } from "./dto/create-appointment.dto";
 import { AuthUser } from "../auth-context";
+import { metricsStore } from "../metrics.store";
 
 type AppointmentStatus = "CONFIRMED" | "CANCELLED" | "RESCHEDULED";
 
 @Injectable()
 export class AppointmentsService implements OnModuleDestroy {
+  private static readonly SERVICE_NAME = "appointment-service";
   private readonly redis = new Redis(process.env.REDIS_URL ?? "redis://localhost:6379");
   private rabbitConnection?: ChannelModel;
   private rabbitChannel?: Channel;
@@ -23,12 +25,24 @@ export class AppointmentsService implements OnModuleDestroy {
       throw new ForbiddenException("Un cliente solo puede crear citas para su propio usuario");
     }
 
+    const pet = await this.prisma.pet.findUnique({ where: { id: dto.petId } });
+    if (!pet) {
+      throw new NotFoundException("Mascota no encontrada");
+    }
+
+    if (pet.ownerId !== dto.clientId) {
+      throw new ForbiddenException("La mascota no pertenece al cliente indicado");
+    }
+
     if (idempotencyKey) {
       const existing = await this.prisma.appointment.findUnique({ where: { idempotencyKey } });
       if (existing) {
         if (actor.role === "CLIENT" && existing.clientId !== actor.sub) {
           throw new ForbiddenException("La clave de idempotencia pertenece a otro usuario");
         }
+        metricsStore.incrementBusinessMetric(AppointmentsService.SERVICE_NAME, "booking_idempotent_replay", {
+          role: actor.role
+        });
         return existing;
       }
     }
@@ -48,6 +62,11 @@ export class AppointmentsService implements OnModuleDestroy {
 
     await this.invalidatePetCache(dto.petId);
     await this.publishEvent("appointment.created", appointment);
+    metricsStore.incrementBusinessMetric(AppointmentsService.SERVICE_NAME, "booking_created", {
+      role: actor.role,
+      branchId: dto.branchId,
+      serviceId: dto.serviceId
+    });
 
     return appointment;
   }
@@ -57,8 +76,15 @@ export class AppointmentsService implements OnModuleDestroy {
     const cached = await this.redis.get(cacheKey);
 
     if (cached) {
+      metricsStore.incrementBusinessMetric(AppointmentsService.SERVICE_NAME, "booking_list_cache_hit", {
+        role: actor.role
+      });
       return JSON.parse(cached);
     }
+
+    metricsStore.incrementBusinessMetric(AppointmentsService.SERVICE_NAME, "booking_list_cache_miss", {
+      role: actor.role
+    });
 
     const where = actor.role === "CLIENT" ? { petId, clientId: actor.sub } : { petId };
 
@@ -88,6 +114,10 @@ export class AppointmentsService implements OnModuleDestroy {
 
     await this.invalidatePetCache(updated.petId);
     await this.publishEvent("appointment.status.updated", updated);
+    metricsStore.incrementBusinessMetric(AppointmentsService.SERVICE_NAME, "booking_status_updated", {
+      role: actor.role,
+      status
+    });
 
     return updated;
   }
@@ -112,6 +142,9 @@ export class AppointmentsService implements OnModuleDestroy {
 
     await this.invalidatePetCache(updated.petId);
     await this.publishEvent("appointment.rescheduled", updated);
+    metricsStore.incrementBusinessMetric(AppointmentsService.SERVICE_NAME, "booking_rescheduled", {
+      role: actor.role
+    });
 
     return updated;
   }
@@ -141,6 +174,16 @@ export class AppointmentsService implements OnModuleDestroy {
   }
 
   private async invalidatePetCache(petId: string) {
-    await this.redis.del(`appointments:pet:${petId}`);
+    const pattern = `appointments:pet:${petId}:*`;
+    let cursor = "0";
+
+    do {
+      const [nextCursor, keys] = await this.redis.scan(cursor, "MATCH", pattern, "COUNT", 100);
+      cursor = nextCursor;
+
+      if (keys.length > 0) {
+        await this.redis.del(...keys);
+      }
+    } while (cursor !== "0");
   }
 }

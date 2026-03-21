@@ -46,7 +46,8 @@ services:
       retries: 5
       start_period: 20s
     depends_on:
-      - auth-db
+      auth-db:
+        condition: service_healthy
 
   appointment-service:
     build:
@@ -63,10 +64,14 @@ services:
       retries: 5
       start_period: 20s
     depends_on:
-      - appointment-db
-      - redis
-      - rabbitmq
-      - elasticsearch
+      appointment-db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+      elasticsearch:
+        condition: service_started
 
   veterinary-service:
     build:
@@ -107,25 +112,56 @@ services:
 
   auth-db:
     image: postgres:16
+    env_file:
+      - .env
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
       POSTGRES_DB: auth_db
+      AUTH_DB_APP_PASSWORD: ${AUTH_DB_APP_PASSWORD}
     ports:
       - "5433:5432"
     volumes:
       - auth_db_data:/var/lib/postgresql/data
+      - ./observability/postgres/auth-init.sh:/docker-entrypoint-initdb.d/10-auth-init.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d auth_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   appointment-db:
     image: postgres:16
+    env_file:
+      - .env
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
       POSTGRES_DB: appointment_db
+      APPOINTMENT_DB_APP_PASSWORD: ${APPOINTMENT_DB_APP_PASSWORD}
     ports:
       - "5434:5432"
     volumes:
       - appointment_db_data:/var/lib/postgresql/data
+      - ./observability/postgres/appointment-init.sh:/docker-entrypoint-initdb.d/10-appointment-init.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d appointment_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  pgadmin:
+    image: dpage/pgadmin4:8.12
+    env_file:
+      - .env
+    ports:
+      - "5050:80"
+    depends_on:
+      - auth-db
+      - appointment-db
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./observability/pgadmin/servers.json:/pgadmin4/servers.json:ro
 
   redis:
     image: redis:7
@@ -179,3 +215,4 @@ services:
 volumes:
   auth_db_data:
   appointment_db_data:
+  pgadmin_data:

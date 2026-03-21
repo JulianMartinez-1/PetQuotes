@@ -15,6 +15,11 @@ type MetricsSnapshot = {
     requests: number;
     errors: number;
   };
+  businessMetrics: Array<{
+    name: string;
+    value: number;
+    labels: Record<string, string>;
+  }>;
   endpoints: Array<
     EndpointMetric & {
       avgDurationMs: number;
@@ -24,6 +29,7 @@ type MetricsSnapshot = {
 
 class MetricsStore {
   private readonly endpointMetrics = new Map<string, EndpointMetric>();
+  private readonly businessMetrics = new Map<string, { name: string; value: number; labels: Record<string, string> }>();
   private lastServiceName = "unknown-service";
 
   record(service: string, method: string, endpoint: string, statusCode: number, durationMs: number) {
@@ -53,6 +59,25 @@ class MetricsStore {
     this.lastServiceName = service;
   }
 
+  incrementBusinessMetric(service: string, name: string, labels: Record<string, string> = {}, value = 1) {
+    const labelsKey = Object.entries(labels)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([k, v]) => `${k}=${v}`)
+      .join(",");
+    const metricKey = `${name}|${labelsKey}`;
+
+    const existing =
+      this.businessMetrics.get(metricKey) ?? {
+        name,
+        value: 0,
+        labels
+      };
+
+    existing.value += value;
+    this.businessMetrics.set(metricKey, existing);
+    this.lastServiceName = service;
+  }
+
   snapshot(): MetricsSnapshot {
     const endpoints = Array.from(this.endpointMetrics.values()).map((metric) => ({
       ...metric,
@@ -72,6 +97,7 @@ class MetricsStore {
       service: this.lastServiceName,
       generatedAt: new Date().toISOString(),
       totals,
+      businessMetrics: Array.from(this.businessMetrics.values()),
       endpoints
     };
   }

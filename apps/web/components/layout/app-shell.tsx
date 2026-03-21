@@ -60,10 +60,10 @@ export function AppShell({ children }: PropsWithChildren) {
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="ghost">Ingresar</Button>
+                  <Button variant="ghost">Entrar</Button>
                 </Link>
                 <Link href="/register">
-                  <Button variant="secondary">Registro</Button>
+                  <Button variant="secondary">Crear cuenta</Button>
                 </Link>
               </>
             )}
@@ -95,10 +95,10 @@ export function AppShell({ children }: PropsWithChildren) {
               {!isAuthenticated ? (
                 <>
                   <Link href="/login" className="rounded-lg px-3 py-2 text-sm font-semibold text-soft hover:bg-sky hover:text-navy" onClick={() => setMobileMenuOpen(false)}>
-                    Ingresar
+                    Entrar
                   </Link>
                   <Link href="/register" className="rounded-lg px-3 py-2 text-sm font-semibold text-soft hover:bg-sky hover:text-navy" onClick={() => setMobileMenuOpen(false)}>
-                    Registro
+                    Crear cuenta
                   </Link>
                 </>
               ) : (
@@ -121,7 +121,7 @@ export function AppShell({ children }: PropsWithChildren) {
       <main id="main-content" className="flex-1 py-6" tabIndex={-1}>{children}</main>
 
       <footer className="mt-8 border-t border-line/80 bg-white/80">
-        <div className="page-container py-6 text-sm text-soft">© {new Date().getFullYear()} PET QUOTES</div>
+        <div className="page-container py-6 text-sm text-soft">© {new Date().getFullYear()} PET QUOTES · Reservas veterinarias inteligentes</div>
       </footer>
     </div>
   );

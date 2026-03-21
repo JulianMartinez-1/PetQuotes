@@ -20,8 +20,15 @@ export type AppointmentHistoryItem = {
 };
 
 export async function createAppointment(payload: CreateAppointmentPayload) {
+  const idempotencyKey = typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+    ? crypto.randomUUID()
+    : `idem-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
   return requestJson("/api/proxy/appointments", {
     method: "POST",
+    headers: {
+      "x-idempotency-key": idempotencyKey
+    },
     body: JSON.stringify(payload)
   });
 }

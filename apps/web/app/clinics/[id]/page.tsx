@@ -25,7 +25,7 @@ export default async function ClinicDetailPage({ params }: ClinicDetailPageProps
         <div className="p-6">
           <p className="text-sm font-semibold text-brand">{clinic.city} · {clinic.neighborhood}</p>
           <h1 className="mt-1 text-3xl font-extrabold text-navy">{clinic.name}</h1>
-          <p className="mt-3 max-w-3xl text-soft">{clinic.description}</p>
+          <p className="mt-3 max-w-3xl text-soft">{clinic.description} Agenda con informacion clara, tiempos visibles y confirmacion inmediata.</p>
 
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             <div className="rounded-xl border border-line bg-sky/40 p-3">
@@ -53,10 +53,10 @@ export default async function ClinicDetailPage({ params }: ClinicDetailPageProps
 
           <div className="mt-6 flex gap-2">
             <Link href="/bookings">
-              <Button>Reservar en esta clínica</Button>
+              <Button>Reservar en esta clinica</Button>
             </Link>
             <Link href="/clinics">
-              <Button variant="ghost">Volver al catálogo</Button>
+              <Button variant="ghost">Volver al catalogo</Button>
             </Link>
           </div>
         </div>

@@ -4,11 +4,13 @@ import { compare, hash } from "bcryptjs";
 import { randomUUID } from "crypto";
 import type { StringValue } from "ms";
 import { PrismaService } from "../prisma.service";
+import { metricsStore } from "../metrics.store";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 
 @Injectable()
 export class AuthService {
+  private static readonly SERVICE_NAME = "auth-service";
   private readonly maxLoginAttempts = Number(process.env.AUTH_MAX_LOGIN_ATTEMPTS ?? 5);
   private readonly loginLockMinutes = Number(process.env.AUTH_LOGIN_LOCK_MINUTES ?? 15);
 
@@ -29,9 +31,11 @@ export class AuthService {
         email: dto.email,
         passwordHash,
         fullName: dto.fullName,
-        role: dto.role
+        role: "CLIENT"
       }
     });
+
+    metricsStore.incrementBusinessMetric(AuthService.SERVICE_NAME, "auth_register_success", { role: user.role });
 
     return this.issueTokensWithSession(user.id, user.email, user.role);
   }
@@ -39,10 +43,12 @@ export class AuthService {
   async login(dto: LoginDto) {
     const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
     if (!user) {
+      metricsStore.incrementBusinessMetric(AuthService.SERVICE_NAME, "auth_login_failed", { reason: "user_not_found" });
       throw new UnauthorizedException("Credenciales inválidas");
     }
 
     if (user.lockedUntil && user.lockedUntil > new Date()) {
+      metricsStore.incrementBusinessMetric(AuthService.SERVICE_NAME, "auth_login_blocked", { reason: "lockout" });
       throw new UnauthorizedException("Cuenta temporalmente bloqueada por múltiples intentos fallidos");
     }
 
@@ -59,6 +65,10 @@ export class AuthService {
         }
       });
 
+      metricsStore.incrementBusinessMetric(AuthService.SERVICE_NAME, "auth_login_failed", {
+        reason: mustLock ? "max_attempts_reached" : "invalid_password"
+      });
+
       throw new UnauthorizedException("Credenciales inválidas");
     }
 
@@ -69,6 +79,8 @@ export class AuthService {
         lockedUntil: null
       }
     });
+
+    metricsStore.incrementBusinessMetric(AuthService.SERVICE_NAME, "auth_login_success", { role: user.role });
 
     return this.issueTokensWithSession(user.id, user.email, user.role);
   }
@@ -89,11 +101,13 @@ export class AuthService {
       });
 
       if (!session) {
+        metricsStore.incrementBusinessMetric(AuthService.SERVICE_NAME, "auth_refresh_failed", { reason: "session_not_found" });
         throw new UnauthorizedException("Sesión de refresh inválida o revocada");
       }
 
       const valid = await compare(refreshToken, session.tokenHash);
       if (!valid) {
+        metricsStore.incrementBusinessMetric(AuthService.SERVICE_NAME, "auth_refresh_failed", { reason: "token_hash_mismatch" });
         throw new UnauthorizedException("Refresh token inválido");
       }
 
@@ -102,8 +116,11 @@ export class AuthService {
         data: { revokedAt: new Date() }
       });
 
+      metricsStore.incrementBusinessMetric(AuthService.SERVICE_NAME, "auth_refresh_success");
+
       return this.issueTokensWithSession(payload.sub, payload.email, payload.role as "CLIENT" | "VETERINARY" | "ADMIN");
     } catch {
+      metricsStore.incrementBusinessMetric(AuthService.SERVICE_NAME, "auth_refresh_failed", { reason: "invalid_token" });
       throw new UnauthorizedException("Refresh token inválido");
     }
   }
@@ -123,10 +140,14 @@ export class AuthService {
           where: { id: session.id },
           data: { revokedAt: new Date() }
         });
+        metricsStore.incrementBusinessMetric(AuthService.SERVICE_NAME, "auth_logout_success", { revoked: "true" });
+      } else {
+        metricsStore.incrementBusinessMetric(AuthService.SERVICE_NAME, "auth_logout_success", { revoked: "false" });
       }
 
       return { success: true };
     } catch {
+      metricsStore.incrementBusinessMetric(AuthService.SERVICE_NAME, "auth_logout_failed", { reason: "invalid_token" });
       throw new UnauthorizedException("Refresh token inválido");
     }
   }

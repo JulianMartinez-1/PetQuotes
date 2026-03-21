@@ -1,8 +1,5 @@
-export type AuthRole = "CLIENT" | "VETERINARY" | "ADMIN";
+import { APPOINTMENT_ROUTE_ROLE_POLICY, UserRole } from "@petquotes/contracts";
 
-export const API_ROUTE_ROLE_POLICY = {
-  createAppointment: ["CLIENT", "VETERINARY", "ADMIN"] as AuthRole[],
-  listAppointmentsByPet: ["CLIENT", "VETERINARY", "ADMIN"] as AuthRole[],
-  updateAppointmentStatus: ["VETERINARY", "ADMIN"] as AuthRole[],
-  rescheduleAppointment: ["CLIENT", "VETERINARY", "ADMIN"] as AuthRole[]
-};
+export type AuthRole = UserRole;
+
+export const API_ROUTE_ROLE_POLICY = APPOINTMENT_ROUTE_ROLE_POLICY;

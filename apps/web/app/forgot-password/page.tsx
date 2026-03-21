@@ -32,23 +32,23 @@ export default function ForgotPasswordPage() {
     <main className="page-container max-w-md py-6">
       <Card>
         <h1 className="text-2xl font-bold text-navy">Recuperar contraseña</h1>
-        <p className="mt-2 text-sm text-soft">Te enviaremos instrucciones a tu correo.</p>
+        <p className="mt-2 text-sm text-soft">Te ayudamos a recuperar el acceso en minutos.</p>
 
         <form className="mt-5 grid gap-3" onSubmit={onSubmit}>
           <Input
             type="email"
-            placeholder="correo@dominio.com"
+            placeholder="tu-correo@dominio.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
           {error && <p className="text-sm text-red-600">{error}</p>}
-          <Button disabled={isSending}>{isSending ? "Enviando..." : "Enviar instrucciones"}</Button>
+          <Button disabled={isSending}>{isSending ? "Enviando enlace..." : "Enviar enlace de recuperacion"}</Button>
         </form>
 
         {sent && (
           <p className="mt-4 text-sm text-green-700">
-            Si existe una cuenta con ese correo, recibirás un enlace para restablecer tu clave.
+            Si existe una cuenta con ese correo, recibiras un enlace para crear una nueva contrasena.
           </p>
         )}
 

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AUTH_COOKIE_NAMES, AUTH_COOKIE_TTL, getAuthCookieOptions } from "@/lib/auth-cookies";
 import { AuthRole, decodeJwtPayload } from "@/lib/auth-jwt";
+import { extractErrorMessage, normalizeApiErrorMessage, parseErrorPayload } from "@/lib/error-copy";
+import { fetchWithTimeout } from "@/lib/server-fetch";
 
 type BackendAuthResponse = {
   accessToken: string;
@@ -20,14 +22,15 @@ export type SessionAuthResponse = {
 const API_GATEWAY_URL = process.env.API_BASE_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
 export async function callAuthBackend(path: string, body: unknown) {
-  const response = await fetch(`${API_GATEWAY_URL}/api${path}`, {
+  const timeoutMs = Number(process.env.API_PROXY_TIMEOUT_MS ?? 8000);
+  const response = await fetchWithTimeout(`${API_GATEWAY_URL}/api${path}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify(body),
     cache: "no-store"
-  });
+  }, timeoutMs);
 
   return response;
 }
@@ -60,5 +63,7 @@ export function getRefreshTokenFromRequest(request: NextRequest) {
 
 export async function getErrorPayload(response: Response) {
   const text = await response.text();
-  return text || `Request failed with status ${response.status}`;
+  const payload = parseErrorPayload(text);
+  const rawMessage = extractErrorMessage(payload);
+  return normalizeApiErrorMessage(response.status, rawMessage);
 }

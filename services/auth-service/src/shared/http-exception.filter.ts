@@ -6,16 +6,17 @@ export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
+    const request = ctx.getRequest<Request & { requestId?: string }>();
 
     const status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
     const exceptionResponse = exception instanceof HttpException ? exception.getResponse() : "Internal server error";
 
     const details = typeof exceptionResponse === "object" ? exceptionResponse : { message: String(exceptionResponse) };
-    const message =
+    const rawMessage =
       typeof details === "object" && details !== null && "message" in details
         ? (details as { message?: string | string[] }).message
         : "Unexpected error";
+    const message = Array.isArray(rawMessage) ? rawMessage.join(", ") : rawMessage;
 
     response.status(status).json({
       success: false,
@@ -24,6 +25,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         message,
         details
       },
+      requestId: request.requestId,
       timestamp: new Date().toISOString(),
       path: request.url
     });

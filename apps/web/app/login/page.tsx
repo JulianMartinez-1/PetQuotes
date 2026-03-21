@@ -36,19 +36,19 @@ export default function LoginPage() {
     <main className="page-container max-w-md py-6">
       <Card>
         <h1 className="text-2xl font-bold text-navy">Iniciar sesión</h1>
-        <p className="mt-2 text-sm text-soft">Accede para administrar tus reservas y mascotas.</p>
+        <p className="mt-2 text-sm text-soft">Entra a tu cuenta para gestionar reservas, mascotas y recordatorios en un solo lugar.</p>
 
         <form className="mt-5 grid gap-3" onSubmit={onSubmit}>
           <Input
             type="email"
-            placeholder="correo@dominio.com"
+            placeholder="tu-correo@dominio.com"
             value={form.email}
             onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
             required
           />
           <Input
             type="password"
-            placeholder="Tu contraseña"
+            placeholder="Ingresa tu contraseña"
             value={form.password}
             onChange={(e) => setForm((prev) => ({ ...prev, password: e.target.value }))}
             required
@@ -56,13 +56,13 @@ export default function LoginPage() {
 
           {error && <p className="text-sm text-red-600">{error}</p>}
 
-          <Button disabled={loading}>{loading ? "Ingresando..." : "Ingresar"}</Button>
+          <Button disabled={loading}>{loading ? "Entrando a tu cuenta..." : "Entrar a mi cuenta"}</Button>
         </form>
 
         <p className="mt-4 text-sm text-soft">
           ¿No tienes cuenta?{" "}
           <Link href="/register" className="font-semibold text-brand">
-            Regístrate aquí
+            Crear cuenta
           </Link>
         </p>
 

@@ -9,7 +9,6 @@ export type RegisterPayload = {
   fullName: string;
   email: string;
   password: string;
-  role?: "CLIENT" | "VETERINARY" | "ADMIN";
 };
 
 export type ForgotPasswordPayload = {
@@ -36,10 +35,7 @@ export async function loginRequest(payload: LoginPayload) {
 export async function registerRequest(payload: RegisterPayload) {
   return requestJson<AuthResponse>("/api/session/register", {
     method: "POST",
-    body: JSON.stringify({
-      ...payload,
-      role: payload.role ?? "CLIENT"
-    })
+    body: JSON.stringify(payload)
   });
 }
 

@@ -7,6 +7,7 @@ COPY services/appointment-service/tsconfig.json ./tsconfig.json
 COPY services/appointment-service/prisma ./prisma
 RUN npx prisma generate
 COPY services/appointment-service/src ./src
+COPY libs/contracts ./node_modules/@petquotes/contracts
 USER node
 EXPOSE 3005
 CMD ["npm", "run", "start:dev"]

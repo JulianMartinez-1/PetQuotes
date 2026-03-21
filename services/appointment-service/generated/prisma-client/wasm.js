@@ -137,6 +137,15 @@ exports.Prisma.AppointmentScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.PetScalarFieldEnum = {
+  id: 'id',
+  ownerId: 'ownerId',
+  name: 'name',
+  species: 'species',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -159,7 +168,8 @@ exports.AppointmentStatus = exports.$Enums.AppointmentStatus = {
 };
 
 exports.Prisma.ModelName = {
-  Appointment: 'Appointment'
+  Appointment: 'Appointment',
+  Pet: 'Pet'
 };
 
 /**

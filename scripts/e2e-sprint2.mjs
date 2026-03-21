@@ -1,3 +1,5 @@
+import { execFileSync } from "node:child_process";
+
 const API_BASE_URL = process.env.E2E_API_BASE_URL ?? process.env.SPRINT2_API_BASE_URL ?? "http://localhost:3001/api";
 const PASSWORD = "PetQuotes123";
 const MAX_LOGIN_ATTEMPTS = Number(process.env.AUTH_MAX_LOGIN_ATTEMPTS ?? 5);
@@ -44,13 +46,16 @@ async function ensureUser(email, role) {
   const register = await request("POST", "/auth/register", {
     email,
     password: PASSWORD,
-    fullName: `E2E ${role}`,
-    role
+    fullName: `E2E ${role}`
   });
 
   // Existing users can return 400 by design.
   if (!register.ok && register.status !== 400) {
     throw new Error(`No se pudo registrar ${email}: ${JSON.stringify(register.body)}`);
+  }
+
+  if (role !== "CLIENT") {
+    ensureAuthRole(email, role);
   }
 
   const login = await request("POST", "/auth/login", { email, password: PASSWORD });
@@ -115,9 +120,11 @@ async function testSprint2RbacAndIdempotency() {
   const vet = await ensureUser(`e2e.vet.${seed}@petquotes.com`, "VETERINARY");
 
   const idempotencyKey = `idem-e2e-${seed}`;
+  const petId = `pet-e2e-${seed}`;
+  ensurePetForOwner(client.sub, petId);
   const appointmentPayload = {
     clientId: client.sub,
-    petId: `pet-e2e-${seed}`,
+    petId,
     veterinarianId: vet.sub,
     serviceId: "service-consulta",
     branchId: "branch-norte",
@@ -158,8 +165,63 @@ async function testSprint2RbacAndIdempotency() {
   console.log("[E2E] Sprint 2 OK");
 }
 
+function ensurePetForOwner(ownerId, petId) {
+  const sql = `INSERT INTO "Pet" ("id", "ownerId", "name", "species", "createdAt", "updatedAt") VALUES ('${petId}', '${ownerId}', 'Pet E2E', 'Canino', NOW(), NOW()) ON CONFLICT ("id") DO NOTHING;`;
+
+  try {
+    execFileSync("docker", [
+      "compose",
+      "exec",
+      "-T",
+      "appointment-db",
+      "psql",
+      "-U",
+      "postgres",
+      "-d",
+      "appointment_db",
+      "-c",
+      sql
+    ], {
+      stdio: "pipe"
+    });
+  } catch (error) {
+    throw new Error(`No se pudo preparar mascota de prueba en DB: ${String(error)}`);
+  }
+}
+
+function ensureAuthRole(email, role) {
+  const sql = `UPDATE "User" SET "role"='${role}' WHERE "email"='${email}';`;
+
+  try {
+    execFileSync("docker", [
+      "compose",
+      "exec",
+      "-T",
+      "auth-db",
+      "psql",
+      "-U",
+      "postgres",
+      "-d",
+      "auth_db",
+      "-c",
+      sql
+    ], {
+      stdio: "pipe"
+    });
+  } catch (error) {
+    throw new Error(`No se pudo ajustar rol de prueba en auth DB: ${String(error)}`);
+  }
+}
+
 async function main() {
   console.log("[E2E] Iniciando pruebas contra", API_BASE_URL);
+
+  const preflight = await request("GET", "/health");
+  if (!preflight.ok) {
+    throw new Error(
+      `Gateway no disponible en ${API_BASE_URL}. Verifica Docker/servicios y reintenta. status=${preflight.status}`
+    );
+  }
 
   await testSprint1AuthFlows();
   await testSprint2RbacAndIdempotency();

@@ -166,6 +166,9 @@ jobs:
           docker compose exec -T auth-service npx prisma migrate deploy
           docker compose exec -T appointment-service npx prisma migrate deploy
 
+      - name: Seed minimum data
+        run: npm run db:seed:minimum
+
       - name: Run e2e suite (Sprint 1 + 2)
         run: npm run test:e2e
 
