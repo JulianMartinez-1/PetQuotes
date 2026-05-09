@@ -75,6 +75,17 @@ Reglas Sprint 2:
 - `POST /auth/login`
 - `POST /auth/refresh`
 - `POST /auth/logout`
+- `POST /auth/forgot-password`
+- `GET /auth/oauth/providers`
+- `GET /auth/oauth/:provider/start?redirectUri=...`
+- `POST /auth/oauth/:provider/exchange`
+
+Proveedores OAuth soportados:
+
+- Google
+- Facebook
+- GitHub (opcional)
+- Microsoft (opcional)
 
 ## Ejemplo Funcional de Reserva
 
@@ -86,8 +97,7 @@ curl -X POST http://localhost:3001/api/auth/register \
   -d '{
     "email": "cliente@petquotes.com",
     "password": "PetQuotes123",
-    "fullName": "Cliente Demo",
-    "role": "CLIENT"
+    "fullName": "Cliente Demo"
   }'
 ```
 
@@ -128,6 +138,20 @@ La UI para este flujo está en `http://localhost:3000/bookings`.
 
 ```bash
 npm install
+```
+
+2.1. (Opcional) Habilitar login/registro social en `.env`:
+
+```bash
+OAUTH_STATE_SECRET=super-oauth-state-secret
+OAUTH_GOOGLE_CLIENT_ID=
+OAUTH_GOOGLE_CLIENT_SECRET=
+OAUTH_FACEBOOK_CLIENT_ID=
+OAUTH_FACEBOOK_CLIENT_SECRET=
+OAUTH_GITHUB_CLIENT_ID=
+OAUTH_GITHUB_CLIENT_SECRET=
+OAUTH_MICROSOFT_CLIENT_ID=
+OAUTH_MICROSOFT_CLIENT_SECRET=
 ```
 
 3. Generar cliente Prisma:
@@ -185,6 +209,8 @@ npm run ci:test:unit
 Checklist consolidado de salida para merge y produccion:
 
 - `docs/release-checklist-final.md`
+- `docs/post-deploy-checklist-short.md`
+- `docs/release-notes-template.md`
 
 ## Operacion de backups y restore
 

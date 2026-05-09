@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { SocialAuthButtons } from "@/components/auth/social-auth-buttons";
 import { loginRequest } from "@/lib/auth-api";
 import { useAuthState } from "@/store/auth-state";
 
@@ -19,10 +20,21 @@ export default function LoginPage() {
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
+
+    const payload = {
+      email: form.email.trim().toLowerCase(),
+      password: form.password
+    };
+
+    if (!payload.email || !payload.password) {
+      setError("Completa correo y contraseña para continuar.");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const response = await loginRequest(form);
+      const response = await loginRequest(payload);
       login({ user: response.user });
       router.push("/bookings");
     } catch (err) {
@@ -72,6 +84,8 @@ export default function LoginPage() {
             Recuperar acceso
           </Link>
         </p>
+
+        <SocialAuthButtons contextLabel="login" />
       </Card>
     </main>
   );

@@ -10,6 +10,8 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { useState } from "react";
+import { HeroSection, SectionDivider, RevealText } from "@/components/sections/hero-animations";
+import { ProofStatsSection, TestimonialCard, AnimatedFeatureCard } from "@/components/sections/animated-components";
 
 const ClinicMap = dynamic(() => import("@/components/sections/clinic-map").then((mod) => mod.ClinicMap), {
   ssr: false
@@ -73,51 +75,13 @@ export default function LandingPage() {
   const [aboutOpen, setAboutOpen] = useState(false);
 
   return (
-    <main className="page-container pb-12 pt-4">
-      <section className="mt-10 grid gap-8 lg:grid-cols-2">
-        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-          <p className="mb-3 inline-flex rounded-full bg-sky px-3 py-1 text-xs font-semibold text-brand">SaaS para ecosistema veterinario</p>
-          <h2 className="text-4xl font-extrabold leading-tight text-navy md:text-5xl">Agenda citas para tus mascotas con clínicas verificadas cerca de ti.</h2>
-          <p className="mt-4 max-w-xl text-soft">Una experiencia moderna y confiable para familias pet, clinicas y equipos operativos.</p>
-          <div className="mt-6 grid gap-3 rounded-2xl border border-[#dbe5fb] bg-white p-4 md:grid-cols-[1fr_auto]">
-            <div className="flex items-center gap-3">
-              <Search className="h-5 w-5 text-brand" />
-              <Input placeholder="Ej: Chapinero, Bogota" />
-            </div>
-            <Link href="/clinics">
-              <Button type="button">Buscar clinicas</Button>
-            </Link>
-          </div>
-
-          <div className="mt-6 grid gap-3 sm:grid-cols-3">
-            {proofStats.map((item) => (
-              <div key={item.label} className="rounded-xl border border-[#e5eaf5] bg-white px-4 py-3">
-                <p className="text-xl font-extrabold text-navy">{item.value}</p>
-                <p className="text-xs font-semibold text-soft">{item.label}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-6 grid gap-3 md:grid-cols-3">
-            {steps.map((step, i) => (
-              <motion.div
-                key={step}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.08 }}
-                className="rounded-xl border border-[#e5eaf5] bg-white p-4 text-sm text-navy"
-              >
-                <span className="mb-2 block text-xs font-bold text-brand">Paso {i + 1}</span>
-                {step}
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.45 }}>
-          <ClinicMap />
-        </motion.div>
-      </section>
+    <main className="pb-12">
+      {/* Hero Section con animaciones profesionales */}
+      <HeroSection
+        title="Agenda citas para tus mascotas con clínicas verificadas cerca de ti"
+        subtitle="Una experiencia moderna y confiable para familias pet, clínicas y equipos operativos"
+        cta={{ text: "Buscar clínicas", href: "/clinics" }}
+      />
 
       <section className="mt-12">
         <div className="rounded-2xl border border-[#dbe5fb] bg-white p-6">
@@ -145,95 +109,231 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="mt-12">
-        <h3 className="text-2xl font-bold text-navy">Servicios</h3>
-        <div className="mt-4 grid gap-4 md:grid-cols-4">
+      {/* Divisor animado */}
+      <SectionDivider />
+
+      {/* Sección de estadísticas de prueba con animaciones */}
+      <section className="py-16 px-4 max-w-6xl mx-auto">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold text-navy mb-4">Números que hablan</h2>
+          <RevealText>Confía en una plataforma construida sobre datos reales y usuarios satisfechos</RevealText>
+        </div>
+        <ProofStatsSection stats={proofStats} />
+      </section>
+
+      <SectionDivider />
+
+      {/* Sección de servicios */}
+      <section className="py-16 px-4 max-w-6xl mx-auto">
+        <h3 className="text-3xl font-bold text-navy mb-8">Servicios disponibles</h3>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {services.map(({ title, icon: Icon }) => (
-            <Card key={title} className="flex items-center gap-3">
-              <span className="rounded-xl bg-sky p-2"><Icon className="h-5 w-5 text-brand" /></span>
+            <motion.div
+              key={title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200 hover:border-blue-400 transition-all hover:shadow-lg"
+            >
+              <span className="inline-flex rounded-lg bg-white p-3 mb-4">
+                <Icon className="w-6 h-6 text-blue-600" />
+              </span>
               <p className="font-semibold text-navy">{title}</p>
-            </Card>
+            </motion.div>
           ))}
         </div>
       </section>
 
-      <section className="mt-12">
-        <h3 className="text-2xl font-bold text-navy">Por qué elegir PET QUOTES</h3>
-        <div className="mt-4 grid gap-4 md:grid-cols-3">
-          {strengths.map(({ title, icon: Icon, text }) => (
-            <Card key={title}>
-              <span className="inline-flex rounded-xl bg-sky p-2"><Icon className="h-5 w-5 text-brand" /></span>
-              <h4 className="mt-3 text-lg font-bold text-navy">{title}</h4>
-              <p className="mt-2 text-sm text-soft">{text}</p>
-            </Card>
+      {/* Sección de fortalezas con componentes animados */}
+      <section className="py-16 px-4 max-w-6xl mx-auto">
+        <h3 className="text-3xl font-bold text-navy mb-8">¿Por qué elegir PET QUOTES?</h3>
+        <div className="grid gap-6 md:grid-cols-3">
+          {strengths.map((strength) => (
+            <AnimatedFeatureCard key={strength.title} feature={strength} />
           ))}
         </div>
       </section>
 
-      <section className="mt-12">
-        <h3 className="text-2xl font-bold text-navy">Veterinarias destacadas</h3>
-        <div className="mt-4 grid gap-4 md:grid-cols-3">
-          {featured.map((clinic) => (
-            <Card key={clinic.name} className="p-0 overflow-hidden">
-              <Image src={clinic.image} alt={clinic.name} width={1000} height={600} className="h-40 w-full object-cover" />
-              <div className="p-5">
-                <h4 className="text-lg font-bold text-navy">{clinic.name}</h4>
-                <p className="text-sm text-soft">Rating {clinic.rating} • {clinic.distance}</p>
+      <SectionDivider />
+
+      {/* Sección de clínicas destacadas */}
+      <section className="py-16 px-4 max-w-6xl mx-auto">
+        <h3 className="text-3xl font-bold text-navy mb-8">Veterinarias destacadas</h3>
+        <div className="grid gap-6 md:grid-cols-3">
+          {featured.map((clinic, index) => (
+            <motion.div
+              key={clinic.name}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              className="group relative overflow-hidden rounded-lg shadow-lg hover:shadow-2xl transition-all"
+            >
+              <Image
+                src={clinic.image}
+                alt={clinic.name}
+                width={1000}
+                height={600}
+                className="h-64 w-full object-cover group-hover:scale-110 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6 text-white">
+                <h4 className="text-xl font-bold mb-2">{clinic.name}</h4>
+                <p className="text-sm text-gray-200">
+                  ⭐ {clinic.rating} • 📍 {clinic.distance}
+                </p>
               </div>
-            </Card>
+            </motion.div>
           ))}
         </div>
       </section>
 
-      <section className="mt-12 grid gap-4 md:grid-cols-2">
-        <Card>
-          <h4 className="text-lg font-bold text-navy">Beneficios para clientes</h4>
-          <p className="mt-2 text-sm text-soft">Historial de mascotas, reservas rápidas, recordatorios y acceso a clínicas por ubicación y servicio.</p>
-        </Card>
-        <Card>
-          <h4 className="text-lg font-bold text-navy">Beneficios para veterinarias</h4>
-          <p className="mt-2 text-sm text-soft">Gestión de agenda, ocupación inteligente, menor fricción operativa y más retención de clientes.</p>
-        </Card>
-      </section>
+      <SectionDivider />
 
-      <section className="mt-12">
-        <h3 className="text-2xl font-bold text-navy">Lo que dicen nuestros usuarios</h3>
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
-          {testimonials.map((item) => (
-            <Card key={item.author + item.role}>
-              <div className="mb-3 flex items-center gap-1 text-[#f59e0b]">
-                {Array.from({ length: item.score }).map((_, i) => (
-                  <Star key={`${item.author}-${i}`} className="h-4 w-4 fill-current" />
-                ))}
-              </div>
-              <p className="text-sm text-navy">&ldquo;{item.text}&rdquo;</p>
-              <p className="mt-4 text-sm font-bold text-navy">{item.author}</p>
-              <p className="text-xs font-semibold text-soft">{item.role}</p>
-            </Card>
+      {/* Sección de testimonios */}
+      <section className="py-16 px-4 max-w-6xl mx-auto">
+        <h3 className="text-3xl font-bold text-navy mb-8">Lo que dicen nuestros usuarios</h3>
+        <div className="grid gap-6 md:grid-cols-2">
+          {testimonials.map((testimonial) => (
+            <TestimonialCard key={testimonial.author + testimonial.role} testimonial={testimonial} />
           ))}
         </div>
       </section>
 
-      <section className="mt-12 rounded-2xl bg-navy p-8 text-white">
-        <h4 className="text-3xl font-bold">Activa una experiencia de reservas que da confianza desde la primera cita</h4>
-        <p className="mt-3 text-sm text-[#c6d4f4]">Empieza hoy y centraliza agenda, clientes y mascotas en un solo flujo.</p>
-        <div className="mt-5 flex flex-wrap gap-3">
-          <Link href="/clinics">
-            <Button>Explorar catalogo</Button>
-          </Link>
-          <Link href="/bookings">
-            <Button variant="secondary">Ir a reservas</Button>
-          </Link>
-          <Button type="button" variant="ghost" className="border-white/35 bg-transparent text-white hover:bg-white/10" onClick={() => setAboutOpen(true)}>
-            Ver base del frontend
-          </Button>
+      <SectionDivider />
+
+      {/* Sección de estado del producto */}
+      <section className="py-16 px-4 max-w-6xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-white"
+        >
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-widest text-blue-100 mb-2">Estado del frontend</p>
+              <h3 className="text-3xl md:text-4xl font-bold mb-4">Producto estable y listo para demo</h3>
+              <p className="text-blue-100 max-w-xl">Recorre los módulos para validar la experiencia completa de principio a fin.</p>
+            </div>
+            <span className="inline-flex rounded-full bg-green-400 text-green-900 px-4 py-2 font-semibold whitespace-nowrap">
+              ✓ Release técnico validado
+            </span>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            {productProgress.map((item) => (
+              <Link
+                key={item.module}
+                href={item.href}
+                className="flex items-center justify-between p-4 bg-white/10 hover:bg-white/20 rounded-lg backdrop-blur transition-colors group"
+              >
+                <span className="font-semibold group-hover:text-yellow-200 transition-colors">{item.module}</span>
+                <span className="bg-green-400 text-green-900 px-3 py-1 rounded-full text-xs font-bold">
+                  {item.status}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </motion.div>
+      </section>
+
+      <SectionDivider />
+
+      {/* Sección de beneficios */}
+      <section className="py-16 px-4 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-8">
+          {[
+            {
+              title: "Beneficios para clientes",
+              description:
+                "Historial de mascotas, reservas rápidas, recordatorios y acceso a clínicas por ubicación y servicio.",
+              icon: "🐾"
+            },
+            {
+              title: "Beneficios para veterinarias",
+              description:
+                "Gestión de agenda, ocupación inteligente, menor fricción operativa y más retención de clientes.",
+              icon: "🏥"
+            }
+          ].map((benefit, index) => (
+            <motion.div
+              key={benefit.title}
+              initial={{ opacity: 0, x: index === 0 ? -30 : 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="p-8 rounded-lg bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 hover:border-purple-400 transition-all"
+            >
+              <span className="text-4xl mb-4 block">{benefit.icon}</span>
+              <h4 className="text-2xl font-bold text-navy mb-3">{benefit.title}</h4>
+              <p className="text-gray-700 leading-relaxed">{benefit.description}</p>
+            </motion.div>
+          ))}
         </div>
       </section>
 
+      {/* CTA final */}
+      <section className="py-16 px-4 max-w-6xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-900 via-blue-900 to-purple-900 p-12 text-white shadow-2xl"
+        >
+          {/* Animated background gradient */}
+          <div className="absolute inset-0 opacity-20 blur-3xl">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-pink-500 rounded-full animate-pulse"></div>
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: "1s" }}></div>
+          </div>
+
+          {/* Content */}
+          <div className="relative z-10">
+            <h4 className="text-4xl md:text-5xl font-bold mb-6">
+              Activa una experiencia de reservas que da confianza desde la primera cita
+            </h4>
+            <p className="text-lg text-blue-100 mb-8 max-w-2xl">
+              Empieza hoy y centraliza agenda, clientes y mascotas en un solo flujo.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <Link href="/clinics">
+                <Button className="px-8 py-3 bg-white text-blue-900 hover:bg-blue-50 font-semibold">
+                  Explorar catálogo
+                </Button>
+              </Link>
+              <Link href="/bookings">
+                <Button className="px-8 py-3 bg-blue-600 text-white hover:bg-blue-700 font-semibold border border-blue-400">
+                  Ir a reservas
+                </Button>
+              </Link>
+              <button
+                onClick={() => setAboutOpen(true)}
+                className="px-8 py-3 border-2 border-white/50 text-white hover:border-white hover:bg-white/10 rounded-lg font-semibold transition-all"
+              >
+                Ver base del frontend
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Modal */}
       <Modal open={aboutOpen} onClose={() => setAboutOpen(false)} title="Base del Frontend">
-        <p className="text-sm text-soft">
-          Layout principal, sistema de diseno con tokens, componentes reutilizables, estado global y cliente API centralizado.
-        </p>
+        <div className="space-y-4">
+          <p className="text-gray-700">
+            Nuestro frontend está construido sobre una base sólida y escalable con las mejores prácticas modernas:
+          </p>
+          <ul className="space-y-2 text-sm text-gray-600">
+            <li>✓ Layout principal con componentes reutilizables</li>
+            <li>✓ Sistema de diseño con tokens y Tailwind CSS</li>
+            <li>✓ Animaciones profesionales con GSAP y Framer Motion</li>
+            <li>✓ Estado global centralizado</li>
+            <li>✓ Cliente API centralizado con React Query</li>
+            <li>✓ TypeScript para mayor seguridad de tipos</li>
+          </ul>
+        </div>
       </Modal>
     </main>
   );

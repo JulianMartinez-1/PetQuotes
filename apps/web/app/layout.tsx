@@ -5,6 +5,7 @@ import { QueryProvider } from "@/components/query-provider";
 import { AppShell } from "@/components/layout/app-shell";
 import { AppStateProvider } from "@/store/app-state";
 import { AuthStateProvider } from "@/store/auth-state";
+import { ScrollIndicator, SmoothScroller } from "@/components/sections/scroll-effects";
 
 export const metadata: Metadata = {
   title: "PET QUOTES | SaaS veterinario",
@@ -15,6 +16,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="es">
       <body>
+        <ScrollIndicator />
+        <SmoothScroller />
         <QueryProvider>
           <AppStateProvider>
             <AuthStateProvider>

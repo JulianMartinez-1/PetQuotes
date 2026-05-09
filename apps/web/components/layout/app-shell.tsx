@@ -52,7 +52,10 @@ export function AppShell({ children }: PropsWithChildren) {
             <span className="rounded-md bg-sky px-2 py-1 text-xs font-semibold text-navy">{selectedCity}</span>
             {isAuthenticated ? (
               <>
-                <span className="text-sm font-semibold text-soft">{user?.email}</span>
+                <Link href="/profile" className="rounded-lg border border-line px-3 py-2 text-right hover:bg-sky/50">
+                  <p className="text-sm font-bold text-navy">{user?.fullName}</p>
+                  <p className="text-xs text-soft">Mi perfil</p>
+                </Link>
                 <Button variant="ghost" type="button" onClick={logout}>
                   Cerrar sesión
                 </Button>
@@ -112,6 +115,15 @@ export function AppShell({ children }: PropsWithChildren) {
                 >
                   Cerrar sesión
                 </button>
+              )}
+              {isAuthenticated && (
+                <Link
+                  href="/profile"
+                  className="rounded-lg px-3 py-2 text-sm font-semibold text-soft hover:bg-sky hover:text-navy"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Perfil: {user?.fullName}
+                </Link>
               )}
             </div>
           </div>

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { SocialAuthButtons } from "@/components/auth/social-auth-buttons";
 import { registerRequest } from "@/lib/auth-api";
 import { useAuthState } from "@/store/auth-state";
 
@@ -19,10 +20,27 @@ export default function RegisterPage() {
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
+
+    const payload = {
+      fullName: form.fullName.trim(),
+      email: form.email.trim().toLowerCase(),
+      password: form.password
+    };
+
+    if (payload.fullName.length < 3) {
+      setError("Tu nombre debe tener al menos 3 caracteres.");
+      return;
+    }
+
+    if (payload.password.length < 8) {
+      setError("La contraseña debe tener al menos 8 caracteres.");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const response = await registerRequest(form);
+      const response = await registerRequest(payload);
       login({ user: response.user });
       router.push("/bookings");
     } catch (err) {
@@ -55,7 +73,7 @@ export default function RegisterPage() {
           />
           <Input
             type="password"
-            placeholder="Crea una contraseña"
+            placeholder="Crea una contraseña (minimo 8 caracteres)"
             value={form.password}
             onChange={(e) => setForm((prev) => ({ ...prev, password: e.target.value }))}
             required
@@ -72,6 +90,8 @@ export default function RegisterPage() {
             Inicia sesión
           </Link>
         </p>
+
+        <SocialAuthButtons contextLabel="register" />
       </Card>
     </main>
   );

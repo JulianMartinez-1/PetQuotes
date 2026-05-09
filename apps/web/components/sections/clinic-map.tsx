@@ -5,6 +5,9 @@ import { importLibrary, setOptions } from "@googlemaps/js-api-loader";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
+let googleMapsLoadPromise: Promise<void> | null = null;
+let googleMapsKey: string | null = null;
+
 const clinics = [
   {
     id: "1",
@@ -36,6 +39,16 @@ export function ClinicMap() {
   const mapElementRef = useRef<HTMLDivElement | null>(null);
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   const [useLeafletFallback, setUseLeafletFallback] = useState(false);
+
+  const loadGoogleMaps = async (key: string) => {
+    if (!googleMapsLoadPromise || googleMapsKey !== key) {
+      googleMapsKey = key;
+      setOptions({ key });
+      googleMapsLoadPromise = importLibrary("maps").then(() => undefined);
+    }
+
+    return googleMapsLoadPromise;
+  };
 
   useEffect(() => {
     const container = mapElementRef.current;
@@ -103,8 +116,7 @@ export function ClinicMap() {
 
     const initMap = async () => {
       try {
-        setOptions({ key: apiKey });
-        await importLibrary("maps");
+        await loadGoogleMaps(apiKey);
 
         if (isDisposed) {
           return;
@@ -161,6 +173,7 @@ export function ClinicMap() {
           markers.push(marker);
         });
       } catch {
+        googleMapsLoadPromise = null;
         setUseLeafletFallback(true);
       }
     };

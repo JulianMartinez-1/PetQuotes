@@ -16,6 +16,7 @@ export type SessionAuthResponse = {
     id: string;
     email: string;
     role: AuthRole;
+    fullName: string;
   };
 };
 
@@ -35,6 +36,26 @@ export async function callAuthBackend(path: string, body: unknown) {
   return response;
 }
 
+export async function callAuthBackendRequest(path: string, options?: { method?: "GET" | "POST"; body?: unknown }) {
+  const timeoutMs = Number(process.env.API_PROXY_TIMEOUT_MS ?? 8000);
+  const method = options?.method ?? "POST";
+
+  const response = await fetchWithTimeout(
+    `${API_GATEWAY_URL}/api${path}`,
+    {
+      method,
+      headers: {
+        ...(options?.body !== undefined ? { "Content-Type": "application/json" } : {})
+      },
+      ...(options?.body !== undefined ? { body: JSON.stringify(options.body) } : {}),
+      cache: "no-store"
+    },
+    timeoutMs
+  );
+
+  return response;
+}
+
 export function normalizeSessionResponse(raw: BackendAuthResponse): SessionAuthResponse {
   const payload = decodeJwtPayload(raw.accessToken);
 
@@ -42,7 +63,8 @@ export function normalizeSessionResponse(raw: BackendAuthResponse): SessionAuthR
     user: {
       id: payload.sub ?? "unknown",
       email: payload.email ?? "unknown@petquotes.local",
-      role: raw.role
+      role: raw.role,
+      fullName: payload.fullName ?? (payload.email?.split("@")[0] ?? "Usuario")
     }
   };
 }

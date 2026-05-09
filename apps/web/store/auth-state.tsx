@@ -7,6 +7,7 @@ type AuthUser = {
   id: string;
   email: string;
   role: "CLIENT" | "VETERINARY" | "ADMIN";
+  fullName: string;
 };
 
 type AuthStateContextValue = {

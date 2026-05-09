@@ -15,12 +15,29 @@ export type ForgotPasswordPayload = {
   email: string;
 };
 
+export type OAuthProviderId = "google" | "facebook" | "github" | "microsoft";
+
+export type OAuthProvider = {
+  id: OAuthProviderId;
+  name: string;
+  enabled: boolean;
+};
+
 type RawAuthResponse = {
   user: {
     id: string;
     email: string;
     role: "CLIENT" | "VETERINARY" | "ADMIN";
+    fullName: string;
   };
+};
+
+export type OAuthProfileCompletionResponse = {
+  requiresProfileCompletion: true;
+  provider: OAuthProviderId;
+  email: string;
+  suggestedFullName: string;
+  completionToken: string;
 };
 
 export type AuthResponse = RawAuthResponse;
@@ -56,6 +73,38 @@ export async function forgotPasswordRequest(payload: ForgotPasswordPayload) {
 export async function logoutRequest() {
   return requestJson<{ success: boolean }>("/api/session/logout", {
     method: "POST",
+    retryOn401: false
+  });
+}
+
+export async function getOAuthProviders() {
+  return requestJson<{ providers: OAuthProvider[] }>("/api/session/oauth/providers", {
+    method: "GET",
+    retryOn401: false
+  });
+}
+
+export async function exchangeOAuthCode(payload: {
+  provider: OAuthProviderId;
+  code: string;
+  state: string;
+  redirectUri: string;
+}) {
+  return requestJson<AuthResponse | OAuthProfileCompletionResponse>("/api/session/oauth/exchange", {
+    method: "POST",
+    body: JSON.stringify(payload),
+    retryOn401: false
+  });
+}
+
+export async function completeOAuthProfile(payload: {
+  provider: OAuthProviderId;
+  completionToken: string;
+  fullName: string;
+}) {
+  return requestJson<AuthResponse>("/api/session/oauth/complete", {
+    method: "POST",
+    body: JSON.stringify(payload),
     retryOn401: false
   });
 }

@@ -18,6 +18,23 @@ export class HttpExceptionFilter implements ExceptionFilter {
         : "Unexpected error";
     const message = Array.isArray(rawMessage) ? rawMessage.join(", ") : rawMessage;
 
+    if (status >= HttpStatus.INTERNAL_SERVER_ERROR) {
+      const error = exception as { message?: string; stack?: string };
+      console.error(
+        JSON.stringify({
+          level: "error",
+          service: "auth-service",
+          event: "unhandled_exception",
+          statusCode: status,
+          message: error?.message ?? "Internal server error",
+          path: request.url,
+          requestId: request.requestId,
+          stack: error?.stack,
+          timestamp: new Date().toISOString()
+        })
+      );
+    }
+
     response.status(status).json({
       success: false,
       error: {

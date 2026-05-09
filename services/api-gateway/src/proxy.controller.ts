@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Patch, Post, Req } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Patch, Post, Query, Req } from "@nestjs/common";
 import { HttpService } from "@nestjs/axios";
 import axios, { AxiosError } from "axios";
 import { verify } from "jsonwebtoken";
@@ -42,6 +42,27 @@ export class ProxyController {
   @Post("auth/forgot-password")
   async forgotPassword(@Body() body: unknown) {
     return this.forward("AUTH_SERVICE_URL", "/auth/forgot-password", body);
+  }
+
+  @Get("auth/oauth/providers")
+  async oauthProviders() {
+    return this.forward("AUTH_SERVICE_URL", "/auth/oauth/providers", undefined, undefined, "GET");
+  }
+
+  @Get("auth/oauth/:provider/start")
+  async oauthStart(@Param("provider") provider: string, @Query("redirectUri") redirectUri: string) {
+    const query = new URLSearchParams({ redirectUri }).toString();
+    return this.forward("AUTH_SERVICE_URL", `/auth/oauth/${provider}/start?${query}`, undefined, undefined, "GET");
+  }
+
+  @Post("auth/oauth/:provider/exchange")
+  async oauthExchange(@Param("provider") provider: string, @Body() body: unknown) {
+    return this.forward("AUTH_SERVICE_URL", `/auth/oauth/${provider}/exchange`, body);
+  }
+
+  @Post("auth/oauth/:provider/complete")
+  async oauthComplete(@Param("provider") provider: string, @Body() body: unknown) {
+    return this.forward("AUTH_SERVICE_URL", `/auth/oauth/${provider}/complete`, body);
   }
 
   @Post("appointments")
