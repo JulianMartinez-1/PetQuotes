@@ -1,7 +1,6 @@
 FROM node:20-alpine
 WORKDIR /app
-COPY apps/web/package.json ./package.json
+COPY . .
 RUN npm install
-COPY apps/web .
 EXPOSE 3000
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "dev", "--workspace", "web"]

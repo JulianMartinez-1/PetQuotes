@@ -30,7 +30,8 @@ export function HeroSection({
         
         if (!ScrollTrigger) return;
         
-        if (!gsap.plugins.ScrollTrigger) {
+        // @ts-ignore - ScrollTrigger plugin registration
+        if (!gsap.plugins?.ScrollTrigger) {
           gsap.registerPlugin(ScrollTrigger);
         }
 

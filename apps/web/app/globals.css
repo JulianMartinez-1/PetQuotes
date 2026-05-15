@@ -1,19 +1,42 @@
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Root Variables - Petshop Amigable */
 :root {
-  --background: #f7fafc;
-  --surface: #ffffff;
-  --foreground: #0b2239;
-  --muted: #5c6d82;
-  --brand: #118ab2;
-  --brand-strong: #0b6d8d;
-  --accent: #ffd166;
-  --line: #d4deea;
-
+  /* Neutrals */
+  --black: #1F1F1F;
+  --dark: #3D3D3D;
+  --dark-lighter: #5A5A5A;
+  --surface: #F5E6D3;
+  --surface-light: #FDF8F3;
+  
+  /* Text */
+  --text-primary: #2D2D2D;
+  --text-secondary: #666666;
+  --text-tertiary: #999999;
+  --text-muted: #CCCCCC;
+  
+  /* Accent Colors - Petshop */
+  --orange: #FF9500;
+  --orange-dark: #E67E00;
+  --green: #22C55E;
+  --green-dark: #16A34A;
+  --teal: #06B6D4;
+  --teal-dark: #0891B2;
+  
+  /* Semantic */
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  
+  /* Borders */
+  --border: #E5E5E5;
+  --border-light: #F0F0F0;
+  
+  /* Spacing */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -21,67 +44,138 @@
   --space-6: 1.5rem;
   --space-8: 2rem;
   --space-10: 2.5rem;
-
+  --space-12: 3rem;
+  
+  /* Radius */
   --radius-sm: 0.5rem;
   --radius-md: 0.875rem;
   --radius-lg: 1rem;
   --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
 }
 
+/* Light Mode Support */
+.light {
+  --black: #FFFFFF;
+  --dark: #F5F5F5;
+  --dark-lighter: #ECECEC;
+  --surface: #FAFAF8;
+  --surface-light: #F9F7F3;
+  --text-primary: #1F1F1F;
+  --text-secondary: #666666;
+  --text-tertiary: #999999;
+  --text-muted: #CCCCCC;
+}
+
+/* Base Styles */
 * {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
 
-html,
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  margin: 0;
-  padding: 0;
-  background:
-    radial-gradient(circle at 12% 14%, #d4f2ff 0%, transparent 30%),
-    radial-gradient(circle at 90% 12%, #ffe9be 0%, transparent 26%),
-    linear-gradient(180deg, #f7fafc 0%, #eef4fb 100%);
-  color: var(--foreground);
-  min-height: 100%;
-  font-family: "Manrope", ui-sans-serif, system-ui;
+  background-color: var(--black);
+  color: var(--text-primary);
+  font-family: "Inter", ui-sans-serif, system-ui;
+  font-size: 1rem;
+  line-height: 1.5;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Poppins", ui-sans-serif;
+  font-weight: 700;
+}
+
+/* Links */
 a {
-  color: inherit;
+  color: var(--orange);
   text-decoration: none;
+  transition: color 200ms ease;
 }
 
+a:hover {
+  color: var(--orange-dark);
+}
+
+/* Selection */
+::selection {
+  background-color: var(--green);
+  color: var(--black);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--orange);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--orange-dark);
+}
+
+/* Root Container */
 #__next,
 body > div:first-child {
   min-height: 100vh;
 }
 
+/* App Shell */
 .app-shell {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: var(--black);
 }
 
+/* Page Container */
 .page-container {
   width: min(1120px, calc(100% - 2rem));
   margin-inline: auto;
 }
 
+@media (max-width: 640px) {
+  .page-container {
+    width: calc(100% - 1rem);
+  }
+}
+
+/* Surface Component */
 .surface {
-  background: var(--surface);
-  border: 1px solid var(--line);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-xl);
 }
 
+/* Accessibility */
 .skip-link {
   position: absolute;
   left: -999px;
   top: 0;
   z-index: 60;
   padding: 0.75rem 1rem;
-  border-radius: 0.75rem;
-  background: var(--brand);
-  color: #fff;
+  border-radius: var(--radius-md);
+  background-color: var(--orange);
+  color: var(--black);
   font-weight: 700;
+  font-size: 0.875rem;
 }
 
 .skip-link:focus {
@@ -90,14 +184,93 @@ body > div:first-child {
 }
 
 :focus-visible {
-  outline: 2px solid var(--brand);
+  outline: 2px solid var(--green);
   outline-offset: 2px;
 }
 
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes bounceGentle {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(255, 149, 0, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 149, 0, 0.4);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* Utility Classes */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--magenta) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Leaflet Maps */
 .leaflet-container {
   width: 100%;
   height: 100%;
-  border-radius: 1rem;
+  border-radius: var(--radius-lg);
 }
 
 .clinic-pin-wrap {

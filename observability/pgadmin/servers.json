@@ -1,20 +1,11 @@
 {
   "Servers": {
     "1": {
-      "Name": "Auth DB (Docker)",
-      "Group": "Pet Quotes",
-      "Host": "auth-db",
+      "Name": "PET QUOTES",
+      "Group": "Databases",
+      "Host": "postgres-db",
       "Port": 5432,
-      "MaintenanceDB": "auth_db",
-      "Username": "postgres",
-      "SSLMode": "prefer"
-    },
-    "2": {
-      "Name": "Appointment DB (Docker)",
-      "Group": "Pet Quotes",
-      "Host": "appointment-db",
-      "Port": 5432,
-      "MaintenanceDB": "appointment_db",
+      "MaintenanceDB": "PET_QUOTES",
       "Username": "postgres",
       "SSLMode": "prefer"
     }

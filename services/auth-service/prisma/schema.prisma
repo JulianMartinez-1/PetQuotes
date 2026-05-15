@@ -1,11 +1,13 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma-client"
+  provider      = "prisma-client-js"
+  output        = "../generated/prisma-client"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("AUTH_DATABASE_URL")
+  schemas  = ["auth", "public"]
 }
 
 enum UserRole {
@@ -33,6 +35,8 @@ model User {
   socialAccounts     SocialAccount[]
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+
+  @@schema("auth")
 }
 
 model SocialAccount {
@@ -47,6 +51,7 @@ model SocialAccount {
   @@unique([provider, providerAccountId])
   @@unique([provider, userId])
   @@index([userId])
+  @@schema("auth")
 }
 
 model RefreshSession {
@@ -62,4 +67,5 @@ model RefreshSession {
 
   @@index([userId, sid])
   @@index([userId, revokedAt])
+  @@schema("auth")
 }

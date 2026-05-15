@@ -1,8 +1,14 @@
 "use client";
 
+import { useEffect } from "react";
 import Image from "next/image";
 
 export function SmoothScroller() {
+  useEffect(() => {
+    // Scroll al tope cuando la página se recarga
+    window.scrollTo(0, 0);
+  }, []);
+
   return null;
 }
 

@@ -9,6 +9,10 @@ services:
       API_BASE_URL: http://api-gateway:3001
     ports:
       - "3000:3000"
+    volumes:
+      - ./apps/web:/app/apps/web
+      - ./libs:/app/libs
+      - node_modules_web:/app/apps/web/node_modules
     depends_on:
       api-gateway:
         condition: service_healthy
@@ -17,6 +21,7 @@ services:
     build:
       context: .
       dockerfile: services/api-gateway/Dockerfile
+    command: ["npm", "run", "start:dev", "--workspace", "api-gateway"]
     env_file:
       - .env
     ports:
@@ -30,14 +35,12 @@ services:
     depends_on:
       auth-service:
         condition: service_healthy
-      appointment-service:
-        condition: service_healthy
 
   auth-service:
     build:
       context: .
       dockerfile: services/auth-service/Dockerfile
-    command: ["sh", "-c", "npx prisma migrate deploy && npm run start:dev"]
+    command: ["sh", "-c", "npx prisma migrate deploy --schema ./services/auth-service/prisma/schema.prisma && npm run start:dev --workspace auth-service"]
     env_file:
       - .env
     ports:
@@ -49,7 +52,7 @@ services:
       retries: 5
       start_period: 20s
     depends_on:
-      auth-db:
+      postgres-db:
         condition: service_healthy
 
   appointment-service:
@@ -67,7 +70,7 @@ services:
       retries: 5
       start_period: 20s
     depends_on:
-      appointment-db:
+      postgres-db:
         condition: service_healthy
       redis:
         condition: service_started
@@ -113,42 +116,20 @@ services:
     ports:
       - "3008:3008"
 
-  auth-db:
+  postgres-db:
     image: postgres:16
     env_file:
       - .env
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
-      POSTGRES_DB: auth_db
-      AUTH_DB_APP_PASSWORD: ${AUTH_DB_APP_PASSWORD}
+      POSTGRES_DB: PET_QUOTES
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
-      - auth_db_data:/var/lib/postgresql/data
-      - ./observability/postgres/auth-init.sh:/docker-entrypoint-initdb.d/10-auth-init.sh:ro
+      - pet_quotes_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d auth_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-
-  appointment-db:
-    image: postgres:16
-    env_file:
-      - .env
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
-      POSTGRES_DB: appointment_db
-      APPOINTMENT_DB_APP_PASSWORD: ${APPOINTMENT_DB_APP_PASSWORD}
-    ports:
-      - "5434:5432"
-    volumes:
-      - appointment_db_data:/var/lib/postgresql/data
-      - ./observability/postgres/appointment-init.sh:/docker-entrypoint-initdb.d/10-appointment-init.sh:ro
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d appointment_db"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d PET_QUOTES"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -160,8 +141,7 @@ services:
     ports:
       - "5050:80"
     depends_on:
-      - auth-db
-      - appointment-db
+      - postgres-db
     volumes:
       - pgadmin_data:/var/lib/pgadmin
       - ./observability/pgadmin/servers.json:/pgadmin4/servers.json:ro
@@ -216,6 +196,6 @@ services:
       - prometheus
 
 volumes:
-  auth_db_data:
-  appointment_db_data:
+  pet_quotes_data:
   pgadmin_data:
+  node_modules_web:

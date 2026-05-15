@@ -38,8 +38,8 @@ export function AppShell({ children }: PropsWithChildren) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${
-                    active ? "bg-sky text-navy" : "text-soft hover:text-navy"
+                  className={`rounded-lg px-3 py-2 text-base font-bold transition ${
+                    active ? "bg-sky text-navy" : "text-navy hover:text-orange hover:bg-sky/20"
                   }`}
                 >
                   {item.label}
@@ -89,7 +89,7 @@ export function AppShell({ children }: PropsWithChildren) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="rounded-lg px-3 py-2 text-sm font-semibold text-soft hover:bg-sky hover:text-navy"
+                  className="rounded-lg px-3 py-2 text-base font-bold text-navy hover:bg-sky hover:text-orange"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {item.label}
@@ -133,7 +133,7 @@ export function AppShell({ children }: PropsWithChildren) {
       <main id="main-content" className="flex-1 py-6" tabIndex={-1}>{children}</main>
 
       <footer className="mt-8 border-t border-line/80 bg-white/80">
-        <div className="page-container py-6 text-sm text-soft">© {new Date().getFullYear()} PET QUOTES · Reservas veterinarias inteligentes</div>
+        <div className="page-container py-6 text-base font-bold text-navy">© {new Date().getFullYear()} PET QUOTES · Reservas veterinarias inteligentes</div>
       </footer>
     </div>
   );

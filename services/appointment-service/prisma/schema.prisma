@@ -6,6 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("APPOINTMENT_DATABASE_URL")
+  schemas  = ["appointment", "public"]
 }
 
 enum AppointmentStatus {
@@ -34,6 +35,7 @@ model Appointment {
   @@index([veterinarianId, startsAt])
   @@index([petId, startsAt])
   @@unique([veterinarianId, startsAt])
+  @@schema("appointment")
 }
 
 model Pet {
@@ -46,4 +48,5 @@ model Pet {
   appointments Appointment[]
 
   @@index([ownerId])
+  @@schema("appointment")
 }

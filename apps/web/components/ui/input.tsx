@@ -1,14 +1,16 @@
 import { InputHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
-export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <input
-      {...props}
-      className={cn(
-        "h-11 w-full rounded-xl border border-line bg-white px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20",
-        props.className
-      )}
-    />
-  );
+type InputSize = "sm" | "base" | "lg";
+type InputProps = InputHTMLAttributes<HTMLInputElement> & { size?: InputSize; variant?: "default" | "outline" | "subtle" };
+
+export function Input(props: InputProps) {
+  const { size = "base", variant = "default", className, ...rest } = props;
+  const sizes = { sm: "h-9 px-3 text-xs", base: "h-11 px-4 text-sm", lg: "h-13 px-5 text-base" };
+  const variants = {
+    default: "bg-surface border border-border/50 text-text-primary placeholder:text-text-tertiary focus:border-cyan focus:ring-2 focus:ring-cyan/20",
+    outline: "bg-dark border-2 border-border text-text-primary placeholder:text-text-muted focus:border-cyan focus:ring-2 focus:ring-cyan/30",
+    subtle: "bg-surface-light border border-transparent text-text-primary placeholder:text-text-secondary focus:border-cyan/50 focus:ring-2 focus:ring-cyan/20"
+  };
+  return <input {...rest} className={cn("w-full rounded-lg outline-none transition-all duration-200 focus-visible:outline-none backdrop-blur-sm", sizes[size], variants[variant], className)} />;
 }
