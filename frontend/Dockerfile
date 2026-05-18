@@ -1,0 +1,53 @@
+# Build stage
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy root package files
+COPY package*.json ./
+
+# Copy frontend package files
+COPY frontend/package*.json ./frontend/
+
+# Install dependencies
+RUN npm ci
+
+# Install frontend dependencies
+WORKDIR /app/frontend
+RUN npm ci
+
+# Copy frontend source
+COPY frontend ./
+
+# Build Next.js application
+RUN npm run build
+
+# Production stage
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install dumb-init for proper signal handling
+RUN apk add --no-cache dumb-init
+
+# Copy package files
+COPY --from=builder /app/frontend/package*.json ./
+
+# Install production dependencies only
+RUN npm ci --only=production
+
+# Copy frontend build output and public files
+COPY --from=builder /app/frontend/.next ./.next
+COPY --from=builder /app/frontend/public ./public
+COPY --from=builder /app/frontend/next.config.mjs ./
+
+# Set environment for production
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+EXPOSE 3000
+
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["npm", "run", "start"]
+
+CMD ["npm", "start"]

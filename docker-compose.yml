@@ -1,201 +1,132 @@
 services:
-  web:
-    build:
-      context: .
-      dockerfile: apps/web/Dockerfile
-    env_file:
-      - .env
-    environment:
-      API_BASE_URL: http://api-gateway:3001
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./apps/web:/app/apps/web
-      - ./libs:/app/libs
-      - node_modules_web:/app/apps/web/node_modules
-    depends_on:
-      api-gateway:
-        condition: service_healthy
-
-  api-gateway:
-    build:
-      context: .
-      dockerfile: services/api-gateway/Dockerfile
-    command: ["npm", "run", "start:dev", "--workspace", "api-gateway"]
-    env_file:
-      - .env
-    ports:
-      - "3001:3001"
-    healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://localhost:3001/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-    depends_on:
-      auth-service:
-        condition: service_healthy
-
-  auth-service:
-    build:
-      context: .
-      dockerfile: services/auth-service/Dockerfile
-    command: ["sh", "-c", "npx prisma migrate deploy --schema ./services/auth-service/prisma/schema.prisma && npm run start:dev --workspace auth-service"]
-    env_file:
-      - .env
-    ports:
-      - "3002:3002"
-    healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://localhost:3002/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-    depends_on:
-      postgres-db:
-        condition: service_healthy
-
-  appointment-service:
-    build:
-      context: .
-      dockerfile: services/appointment-service/Dockerfile
-    env_file:
-      - .env
-    ports:
-      - "3005:3005"
-    healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://localhost:3005/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-    depends_on:
-      postgres-db:
-        condition: service_healthy
-      redis:
-        condition: service_started
-      rabbitmq:
-        condition: service_started
-      elasticsearch:
-        condition: service_started
-
-  veterinary-service:
-    build:
-      context: .
-      dockerfile: services/veterinary-service/Dockerfile
-    ports:
-      - "3003:3003"
-
-  catalog-service:
-    build:
-      context: .
-      dockerfile: services/catalog-service/Dockerfile
-    ports:
-      - "3004:3004"
-
-  staff-schedule-service:
-    build:
-      context: .
-      dockerfile: services/staff-schedule-service/Dockerfile
-    ports:
-      - "3006:3006"
-
-  search-geo-service:
-    build:
-      context: .
-      dockerfile: services/search-geo-service/Dockerfile
-    ports:
-      - "3007:3007"
-    depends_on:
-      - elasticsearch
-
-  notification-service:
-    build:
-      context: .
-      dockerfile: services/notification-service/Dockerfile
-    ports:
-      - "3008:3008"
-
+  # ============================================================
+  # Database (PostgreSQL)
+  # ============================================================
   postgres-db:
-    image: postgres:16
+    image: postgres:16-alpine
+    container_name: pet_quotes_postgres
     env_file:
       - .env
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
-      POSTGRES_DB: PET_QUOTES
+      POSTGRES_USER: ${DATABASE_USER:-pet_quotes}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-pet_quotes_password}
+      POSTGRES_DB: ${DATABASE_NAME:-pet_quotes_db}
     ports:
       - "5432:5432"
     volumes:
       - pet_quotes_data:/var/lib/postgresql/data
+      - ./backend/prisma/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d PET_QUOTES"]
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-pet_quotes} -d ${DATABASE_NAME:-pet_quotes_db}"]
       interval: 10s
       timeout: 5s
       retries: 10
+    networks:
+      - pet_quotes_network
 
-  pgadmin:
-    image: dpage/pgadmin4:8.12
+  # ============================================================
+  # Backend (NestJS)
+  # ============================================================
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: pet_quotes_backend
     env_file:
       - .env
+    environment:
+      DATABASE_URL: postgresql://${DATABASE_USER:-pet_quotes}:${DATABASE_PASSWORD:-pet_quotes_password}@postgres-db:5432/${DATABASE_NAME:-pet_quotes_db}
+      NODE_ENV: development
+      APP_PORT: 3001
+      FRONTEND_URL: http://frontend:3000
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/prisma:/app/prisma
+      - /app/node_modules
+    networks:
+      - pet_quotes_network
+    command: npm run start:prod
+
+  # ============================================================
+  # Frontend (Next.js)
+  # ============================================================
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: pet_quotes_frontend
+    env_file:
+      - .env
+    environment:
+      API_BASE_URL: http://backend:3001
+      NEXT_PUBLIC_API_URL: http://localhost:3001
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - pet_quotes_network
+
+  # ============================================================
+  # PgAdmin (Database Admin UI)
+  # ============================================================
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pet_quotes_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@example.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
     ports:
       - "5050:80"
     depends_on:
-      - postgres-db
+      postgres-db:
+        condition: service_healthy
     volumes:
       - pgadmin_data:/var/lib/pgadmin
-      - ./observability/pgadmin/servers.json:/pgadmin4/servers.json:ro
+    networks:
+      - pet_quotes_network
 
+  # ============================================================
+  # Redis (Cache)
+  # ============================================================
   redis:
-    image: redis:7
+    image: redis:7-alpine
+    container_name: pet_quotes_redis
     ports:
       - "6379:6379"
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-    ports:
-      - "9200:9200"
-
-  prometheus:
-    image: prom/prometheus:v2.54.1
     volumes:
-      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - ./observability/prometheus-alerts.yml:/etc/prometheus/alerts/prometheus-alerts.yml:ro
-    ports:
-      - "9090:9090"
-    depends_on:
-      api-gateway:
-        condition: service_healthy
-      auth-service:
-        condition: service_healthy
-      appointment-service:
-        condition: service_healthy
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pet_quotes_network
 
-  grafana:
-    image: grafana/grafana:11.2.0
-    environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-      - GF_USERS_ALLOW_SIGN_UP=false
-    volumes:
-      - ./observability/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
-      - ./observability/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
-      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
-    ports:
-      - "3010:3000"
-    depends_on:
-      - prometheus
-
+# ============================================================
+# Volumes
+# ============================================================
 volumes:
   pet_quotes_data:
+    driver: local
   pgadmin_data:
-  node_modules_web:
+    driver: local
+  redis_data:
+    driver: local
+
+# ============================================================
+# Networks
+# ============================================================
+networks:
+  pet_quotes_network:
+    driver: bridge
