@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SpecializedClinics } from "@/components/sections/specialized-clinics";
+import { SpecializedClinics } from "@/components/sections/specialized-clinics-api";
 import { ScrollReactivePets } from "@/components/animations/scroll-reactive-pets";
 
 export default function Vacunacion() {
@@ -30,22 +30,22 @@ export default function Vacunacion() {
 
   const vaccines = [
     {
-      icon: "💉",
+      icon: "█",
       title: "Vacuna Polivalente",
       description: "Protección contra moquillo, parvovirosis y otras enfermedades virales",
     },
     {
-      icon: "🦠",
+      icon: "█",
       title: "Vacuna Antirrábica",
       description: "Protección fundamental contra la rabia, enfermedad mortal",
     },
     {
-      icon: "🛡️",
+      icon: "█",
       title: "Vacuna Leptospirosis",
       description: "Protección contra la leptospirosis, enfermedad bacteriana grave",
     },
     {
-      icon: "📅",
+      icon: "█",
       title: "Refuerzos Periódicos",
       description: "Recordatorios automáticos para mantener la inmunización al día",
     },
@@ -281,7 +281,11 @@ export default function Vacunacion() {
       </div>
 
       {/* Specialized Clinics Section */}
-      <SpecializedClinics clinics={clinics} color="teal" />
+      <SpecializedClinics
+        serviceType="vacunacion"
+        serviceTitle="Vacunación"
+        limit={6}
+      />
 
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-teal to-teal-dark text-white">

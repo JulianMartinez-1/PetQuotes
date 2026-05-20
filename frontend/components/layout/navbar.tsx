@@ -40,7 +40,7 @@ export function NavBar() {
       <motion.nav
         className={cn(
           "fixed top-0 left-0 right-0 z-40 border-b",
-          "bg-dark/80 backdrop-blur-xl border-border/20",
+          "bg-primary backdrop-blur-md border-b border-white/10",
           "transition-all duration-300"
         )}
         initial={{ opacity: 0, y: -20 }}
@@ -58,9 +58,9 @@ export function NavBar() {
                 <div className="flex items-center gap-2 group cursor-pointer">
                   <div className={cn(
                     "w-10 h-10 rounded-lg bg-gradient-to-br",
-                    "from-orange to-green flex items-center justify-center",
+                    "from-primary to-secondary flex items-center justify-center",
                     "text-white font-bold text-lg",
-                    "shadow-lg shadow-orange/30 group-hover:shadow-xl group-hover:shadow-orange/50",
+                    "shadow-lg shadow-primary/30 group-hover:shadow-xl group-hover:shadow-primary/50",
                     "transition-all duration-300"
                   )}>
                     PQ
@@ -86,12 +86,12 @@ export function NavBar() {
                   <Link href={link.href}>
                     <span className={cn(
                       "text-base font-bold transition-all duration-300",
-                      "text-text-primary hover:text-orange",
+                      "text-white hover:text-secondary",
                       "relative group"
                     )}>
                       {link.label}
                       <span className={cn(
-                        "absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-orange to-green",
+                        "absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary",
                         "group-hover:w-full transition-all duration-300"
                       )} />
                     </span>
@@ -107,14 +107,14 @@ export function NavBar() {
                 onClick={() => toggleDarkMode()}
                 className={cn(
                   "hidden sm:flex items-center justify-center w-10 h-10 rounded-lg",
-                  "bg-surface border border-border/30 hover:border-orange/50",
+                  "bg-surface border border-border/30 hover:border-primary/50",
                   "transition-all duration-300 hover:bg-surface-light"
                 )}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 aria-label="Toggle dark mode"
               >
-                {isDark ? "🌙" : "☀️"}
+                {isDark ? "◐" : "◑"}
               </motion.button>
 
               {/* Auth Actions */}
@@ -154,13 +154,13 @@ export function NavBar() {
               {/* Mobile Menu Button */}
               <motion.button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 rounded-lg bg-surface border border-border/30 hover:border-cyan/50 transition-all"
+                className="md:hidden p-2 rounded-lg bg-surface border border-border/30 hover:border-secondary/50 transition-all"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 aria-label="Toggle menu"
               >
                 {mobileMenuOpen ? (
-                  <X size={20} className="text-cyan" />
+                  <X size={20} className="text-secondary" />
                 ) : (
                   <Menu size={20} className="text-text-primary" />
                 )}
@@ -192,7 +192,7 @@ export function NavBar() {
                   <span
                     className={cn(
                       "block py-2 px-4 rounded-lg text-base font-bold",
-                      "text-text-primary hover:text-orange hover:bg-surface",
+                      "text-text-primary hover:text-primary hover:bg-surface",
                       "transition-all duration-300"
                     )}
                     onClick={() => setMobileMenuOpen(false)}
@@ -243,3 +243,4 @@ export function NavBar() {
     </>
   );
 }
+

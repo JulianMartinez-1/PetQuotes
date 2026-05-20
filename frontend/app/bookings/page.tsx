@@ -137,8 +137,8 @@ export default function BookingsPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
           >
-            <div className="absolute top-20 left-10 w-96 h-96 bg-cyan/15 rounded-full blur-3xl" />
-            <div className="absolute bottom-20 right-10 w-96 h-96 bg-magenta/15 rounded-full blur-3xl" />
+            <div className="absolute top-20 left-10 w-96 h-96 bg-secondary/15 rounded-full blur-3xl" />
+            <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/15 rounded-full blur-3xl" />
             <div className="absolute inset-0 bg-gradient-to-b from-dark/40 via-transparent to-transparent" />
           </motion.div>
 
@@ -150,7 +150,7 @@ export default function BookingsPage() {
             >
               <h1 className={cn(
                 "text-5xl sm:text-6xl font-bold mb-6",
-                "bg-gradient-to-r from-cyan via-text-primary to-magenta",
+                "bg-gradient-to-r from-secondary via-foreground to-accent",
                 "bg-clip-text text-transparent"
               )}>
                 Reserva Tu Cita
@@ -177,7 +177,7 @@ export default function BookingsPage() {
               <Card>
                 <h2 className={cn(
                   "text-2xl font-bold mb-6",
-                  "bg-gradient-to-r from-cyan to-magenta bg-clip-text text-transparent"
+                  "bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent"
                 )}>
                   Datos de la Reserva
                 </h2>
@@ -203,8 +203,8 @@ export default function BookingsPage() {
                   <form className="space-y-6" onSubmit={onSubmit}>
                     {/* Pet Selection */}
                     <motion.div variants={itemVariants} className="space-y-2">
-                      <label className="block text-sm font-semibold text-text-primary">
-                        🐾 Tu Mascota
+                      <label className="block text-sm font-semibold text-textPrimary">
+                        Tu Mascota
                       </label>
                       <select
                         value={form.petId}
@@ -212,7 +212,7 @@ export default function BookingsPage() {
                         className={cn(
                           "w-full px-4 py-3 rounded-lg border transition-all",
                           "bg-surface border-border/30 text-text-primary",
-                          "hover:border-cyan/50 focus:border-cyan focus:ring-cyan/20",
+                          "hover:border-secondary/50 focus:border-secondary focus:ring-secondary/20",
                           "text-sm font-medium"
                         )}
                         required
@@ -230,8 +230,8 @@ export default function BookingsPage() {
 
                     {/* Veterinarian Selection */}
                     <motion.div variants={itemVariants} className="space-y-2">
-                      <label className="block text-sm font-semibold text-text-primary">
-                        👨‍⚕️ Veterinario
+                      <label className="block text-sm font-semibold text-textPrimary">
+                        Veterinario
                       </label>
                       <select
                         value={form.veterinarianId}
@@ -241,7 +241,7 @@ export default function BookingsPage() {
                         className={cn(
                           "w-full px-4 py-3 rounded-lg border transition-all",
                           "bg-surface border-border/30 text-text-primary",
-                          "hover:border-cyan/50 focus:border-cyan focus:ring-cyan/20",
+                          "hover:border-secondary/50 focus:border-secondary focus:ring-secondary/20",
                           "text-sm font-medium"
                         )}
                         required
@@ -267,7 +267,7 @@ export default function BookingsPage() {
                         className={cn(
                           "w-full px-4 py-3 rounded-lg border transition-all",
                           "bg-surface border-border/30 text-text-primary",
-                          "hover:border-cyan/50 focus:border-cyan focus:ring-cyan/20",
+                          "hover:border-secondary/50 focus:border-secondary focus:ring-secondary/20",
                           "text-sm font-medium"
                         )}
                         required
@@ -293,7 +293,7 @@ export default function BookingsPage() {
                         className={cn(
                           "w-full px-4 py-3 rounded-lg border transition-all",
                           "bg-surface border-border/30 text-text-primary",
-                          "hover:border-cyan/50 focus:border-cyan focus:ring-cyan/20",
+                          "hover:border-secondary/50 focus:border-secondary focus:ring-secondary/20",
                           "text-sm font-medium"
                         )}
                         required
@@ -340,8 +340,8 @@ export default function BookingsPage() {
                             className={cn(
                               "px-3 py-2 rounded-lg border text-sm font-semibold transition-all",
                               form.startsAtTime === slot
-                                ? "border-cyan bg-cyan/20 text-cyan"
-                                : "border-border/30 bg-surface hover:border-cyan/50"
+                                ? "border-secondary bg-secondary/20 text-secondary"
+                                : "border-border/30 bg-surface hover:border-secondary/50"
                             )}
                           >
                             {slot}
@@ -427,7 +427,7 @@ export default function BookingsPage() {
               <Card className="sticky top-24">
                 <h3 className={cn(
                   "text-lg font-bold mb-6",
-                  "bg-gradient-to-r from-cyan to-magenta bg-clip-text text-transparent"
+                  "bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent"
                 )}>
                   Resumen
                 </h3>
@@ -486,14 +486,14 @@ export default function BookingsPage() {
               <Card>
                 <h3 className={cn(
                   "text-2xl font-bold mb-6",
-                  "bg-gradient-to-r from-cyan to-magenta bg-clip-text text-transparent"
+                  "bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent"
                 )}>
                   📋 Historial de Citas
                 </h3>
 
                 {historyQuery.isLoading && (
                   <div className="text-center py-8">
-                    <Loader size={32} className="mx-auto mb-2 animate-spin text-cyan" />
+                    <Loader size={32} className="mx-auto mb-2 animate-spin text-secondary" />
                     <p className="text-text-secondary">Cargando historial...</p>
                   </div>
                 )}
@@ -531,7 +531,7 @@ export default function BookingsPage() {
                         className={cn(
                           "p-4 rounded-lg border",
                           "bg-surface border-border/30",
-                          "hover:border-cyan/50 transition-all"
+                          "hover:border-secondary/50 transition-all"
                         )}
                       >
                         <div className="flex items-start justify-between gap-3">
@@ -559,7 +559,7 @@ export default function BookingsPage() {
                                 ? "bg-success/20 border-success/50 text-success"
                                 : appointment.status === "CANCELLED"
                                   ? "bg-danger/20 border-danger/50 text-danger"
-                                  : "bg-cyan/20 border-cyan/50 text-cyan"
+                                  : "bg-secondary/20 border-secondary/50 text-secondary"
                             )}
                           >
                             {appointment.status ?? "PENDING"}
@@ -577,3 +577,4 @@ export default function BookingsPage() {
     </AuthGuard>
   );
 }
+

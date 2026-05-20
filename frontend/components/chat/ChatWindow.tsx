@@ -21,7 +21,7 @@ export default function ChatWindow({ onClose }: { onClose: () => void }) {
     {
       id: "1",
       type: "bot",
-      text: "¡Hola! Soy tu asistente de IA de Pet Quotes 🐾. Estoy aquí para ayudarte con preguntas sobre nuestros servicios veterinarios, cuidado de mascotas y reservas de citas. ¿En qué puedo ayudarte?",
+      text: "¡Hola! Soy tu asistente de IA de Pet Quotes. Estoy aquí para ayudarte con preguntas sobre nuestros servicios veterinarios, cuidado de mascotas y reservas de citas. ¿En qué puedo ayudarte?",
       timestamp: new Date(),
     },
   ]);
@@ -136,7 +136,7 @@ export default function ChatWindow({ onClose }: { onClose: () => void }) {
   return (
     <div className="flex flex-col h-full bg-gradient-to-b from-surface to-surface/80">
       {/* Header */}
-      <div className="p-4 border-b border-border/30 bg-gradient-to-r from-orange/10 to-teal/10">
+      <div className="p-4 border-b border-border/30 bg-gradient-to-r from-primary/10 to-teal/10">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="font-bold text-text-primary">Asistente IA Pet Quotes</h3>
@@ -166,7 +166,7 @@ export default function ChatWindow({ onClose }: { onClose: () => void }) {
               className={cn(
                 "max-w-xs px-4 py-2 rounded-lg text-sm leading-relaxed",
                 msg.type === "user"
-                  ? "bg-orange text-white rounded-br-none"
+                  ? "bg-primary text-white rounded-br-none"
                   : msg.type === "error"
                     ? "bg-red-500/10 text-red-700 border border-red-500/30 rounded-bl-none flex items-start gap-2"
                     : "bg-surface-secondary text-text-primary border border-border/30 rounded-bl-none"
@@ -185,7 +185,7 @@ export default function ChatWindow({ onClose }: { onClose: () => void }) {
             className="flex justify-start"
           >
             <div className="bg-surface-secondary border border-border/30 rounded-bl-none rounded-lg px-4 py-2 flex items-center gap-2">
-              <Loader className="animate-spin text-orange" size={18} />
+              <Loader className="animate-spin text-primary" size={18} />
               <span className="text-sm text-text-secondary">El asistente está escribiendo...</span>
             </div>
           </motion.div>
@@ -223,16 +223,16 @@ export default function ChatWindow({ onClose }: { onClose: () => void }) {
           }}
           placeholder="Escribe tu pregunta..."
           disabled={loading}
-          className="flex-1 px-3 py-2 bg-surface border border-border/30 rounded-lg text-text-primary placeholder-text-secondary focus:outline-none focus:border-orange focus:ring-1 focus:ring-orange/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          className="flex-1 px-3 py-2 bg-slate-700 border border-primary/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         />
         <button
           onClick={handleSendMessage}
           disabled={loading || !input.trim()}
           className={cn(
-            "px-3 py-2 bg-orange rounded-lg text-white font-medium transition-all",
+            "px-3 py-2 bg-primary rounded-lg text-white font-medium transition-all",
             loading || !input.trim()
               ? "opacity-50 cursor-not-allowed"
-              : "hover:bg-orange/90 active:scale-95"
+              : "hover:bg-primary/90 active:scale-95"
           )}
           aria-label="Enviar mensaje"
         >
@@ -246,3 +246,4 @@ export default function ChatWindow({ onClose }: { onClose: () => void }) {
 // Importar motion si no está disponible
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
+

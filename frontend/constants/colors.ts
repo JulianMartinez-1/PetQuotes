@@ -1,80 +1,90 @@
 /**
- * Paleta de colores Petshop Amigable
- * Colores cálidos, playful, amigables con mascotas
- * Tonos naranja, verde, turquesa y beige
+ * Paleta de colores moderna y profesional para plataforma veterinaria
+ * Colores profesionales: Azul oscuro, secondary, Menta, Coral
+ * Diseño limpio y moderno
  */
 
 export const colors = {
-  // Neutrals - Base cálida y amigable
-  black: "#1F1F1F",
-  dark: "#3D3D3D",
-  darkLighter: "#5A5A5A",
-  surface: "#F5E6D3",
-  surfaceLight: "#FDF8F3",
-  surface2: "#FAF2E8",
+  // Primary - Azul oscuro profesional
+  primary: "#1D4ED8",       // Azul oscuro principal
+  primaryHover: "#2563EB",  // Azul hover
+  primaryDark: "#1E40AF",   // Azul más oscuro
+  primaryLight: "#DBEAFE",  // Azul muy claro
 
-  // Text - Para legibilidad natural
-  textPrimary: "#2D2D2D",
-  textSecondary: "#666666",
-  textTertiary: "#999999",
-  textMuted: "#CCCCCC",
+  // Secondary - secondary brillante
+  secondary: "#06B6D4",     // secondary principal
+  secondaryHover: "#0891B2", // secondary hover
+  secondaryDark: "#0E7490", // secondary más oscuro
+  secondaryLight: "#CFFAFE", // secondary muy claro
 
-  // Brand Colors - Petshop Playful
-  orange: "#FF9500",
-  orangeDark: "#E67E00",
-  orangeLight: "#FFB84D",
-  
-  green: "#22C55E",
-  greenDark: "#16A34A",
-  greenLight: "#4ADE80",
+  // Mint - Verde menta
+  mint: "#10B981",          // Verde menta principal
+  mintHover: "#059669",     // Verde menta hover
+  mintDark: "#047857",      // Verde menta más oscuro
+  mintLight: "#D1FAE5",     // Verde menta muy claro
 
-  teal: "#06B6D4",
-  tealDark: "#0891B2",
-  tealLight: "#22D3EE",
+  // Accent - Coral
+  accent: "#FB7185",        // Coral principal
+  accentHover: "#F43F5E",   // Coral hover
+  accentDark: "#E11D48",    // Coral más oscuro
+  accentLight: "#FFE4E6",   // Coral muy claro
+
+  // Background & Surface
+  background: "#F1F5F9",    // Fondo principal claro
+  surface: "#FFFFFF",       // Superficie blanca
+  surfaceLight: "#F8FAFC",  // Gris muy claro
+  surface2: "#E2E8F0",      // Gris claro
+
+  // Text - Texto oscuro sobre fondos claros
+  textPrimary: "#0F172A",   // Texto principal oscuro
+  textSecondary: "#475569", // Texto secundario
+  textTertiary: "#64748B",  // Texto terciario
+  textMuted: "#94A3B8",     // Texto suave
 
   // Semantic colors
-  success: "#22C55E",
-  successLight: "#4ADE80",
-  successDark: "#16A34A",
+  success: "#10B981",       // Verde menta para éxito
+  successLight: "#D1FAE5",  // Verde muy claro
+  successDark: "#047857",   // Verde más oscuro
   
-  warning: "#F59E0B",
-  warningLight: "#FBBF24",
-  warningDark: "#D97706",
+  warning: "#F59E0B",       // Ámbar para advertencia
+  warningLight: "#FEF3C7",  // Ámbar muy claro
+  warningDark: "#D97706",   // Ámbar más oscuro
   
-  danger: "#EF4444",
-  dangerLight: "#F87171",
-  dangerDark: "#DC2626",
+  danger: "#EF4444",        // Rojo para peligro
+  dangerLight: "#FEE2E2",   // Rojo muy claro
+  dangerDark: "#DC2626",    // Rojo más oscuro
 
   // Borders & Lines
-  border: "#E5E5E5",
-  borderLight: "#F0F0F0",
-  borderDark: "#D0D0D0",
+  border: "#CBD5E1",        // Borde estándar
+  borderLight: "#E2E8F0",   // Borde claro
+  borderDark: "#94A3B8",    // Borde oscuro
 
   // Overlays & Backdrops
-  overlay: "rgba(31, 31, 31, 0.6)",
-  overlayLight: "rgba(10, 14, 39, 0.5)",
-  overlayDark: "rgba(10, 14, 39, 0.95)",
+  overlay: "rgba(15, 23, 42, 0.7)",
+  overlayLight: "rgba(15, 23, 42, 0.5)",
+  overlayDark: "rgba(15, 23, 42, 0.9)",
 
   // Legacy (compatibilidad)
-  navy: "#0B2239",
-  brand: "#00D4FF",
-  sky: "#DFF4FF",
-  soft: "#A8B2C1",
-  accent: "#FF006E",
-  line: "#3A4260"
+  navy: "#1D4ED8",          // Azul oscuro principal
+  brand: "#06B6D4",         // secondary secundario
+  sky: "#CFFAFE",           // secondary claro
+  soft: "#E2E8F0",          // Gris claro
+  line: "#CBD5E1"           // Borde
 } as const;
 
 export type ColorKey = keyof typeof colors;
 
 /**
- * Gradients cinematográficos
+ * Gradients - Moderna paleta profesional
  */
 export const gradients = {
-  hero: "linear-gradient(135deg, #0A0E27 0%, #1A1F3A 50%, #2A3150 100%)",
-  accent: "linear-gradient(135deg, #00D4FF 0%, #FF006E 100%)",
-  magentaCyan: "linear-gradient(135deg, #FF006E 0%, #00D4FF 100%)",
-  darkBlue: "linear-gradient(135deg, #0A0E27 0%, #00A8CC 100%)",
-  card: "linear-gradient(135deg, rgba(42, 49, 80, 0.8) 0%, rgba(36, 42, 71, 0.8) 100%)",
-  glow: "radial-gradient(circle at 50% 50%, rgba(0, 212, 255, 0.2) 0%, transparent 100%)",
-  glowMagenta: "radial-gradient(circle at 50% 50%, rgba(255, 0, 110, 0.2) 0%, transparent 100%)"
+  hero: "linear-gradient(135deg, #06B6D4 0%, #1D4ED8 50%, #FB7185 100%)",
+  accent: "linear-gradient(135deg, #1D4ED8 0%, #06B6D4 100%)",
+  accentsecondary: "linear-gradient(135deg, #FB7185 0%, #06B6D4 100%)",
+  darkBlue: "linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%)",
+  card: "linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.98) 100%)",
+  glow: "radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.2) 0%, transparent 100%)",
+  glowaccent: "radial-gradient(circle at 50% 50%, rgba(251, 113, 133, 0.2) 0%, transparent 100%)",
+  mint: "linear-gradient(135deg, #10B981 0%, #059669 100%)"
 } as const;
+

@@ -11,7 +11,7 @@ interface Stat {
   suffix?: string;
   prefix?: string;
   description?: string;
-  color?: "orange" | "green" | "teal" | "success" | "warning";
+  color?: "primary" | "secondary" | "mint" | "accent";
 }
 
 interface StatsGridProps {
@@ -36,19 +36,18 @@ export function StatsGrid({
   };
 
   const colorMap = {
-    orange: "text-orange",
-    green: "text-green",
-    teal: "text-teal",
-    success: "text-success",
-    warning: "text-warning",
+    primary: "text-primary",
+    secondary: "text-secondary",
+    mint: "text-mint",
+    accent: "text-accent",
   };
 
   return (
     <section className={cn("py-20 relative overflow-hidden", className)}>
       {/* Background Gradient */}
       <div className="absolute inset-0 -z-10 opacity-5">
-        <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-cyan rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/3 w-96 h-96 bg-magenta rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-secondary rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/3 w-96 h-96 bg-accent rounded-full blur-3xl" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -63,7 +62,7 @@ export function StatsGrid({
           >
             <h2 className={cn(
               "text-5xl sm:text-6xl font-black mb-4",
-              "bg-gradient-to-r from-orange via-green to-teal bg-clip-text text-transparent"
+              "bg-gradient-to-r from-primary via-secondary to-mint bg-clip-text text-transparent"
             )}>
               {title}
             </h2>
@@ -97,8 +96,8 @@ export function StatsGrid({
               className={cn(
                 "relative overflow-hidden rounded-2xl p-8",
                 "bg-surface border border-border/30",
-                "hover:border-cyan/50 transition-all duration-300",
-                "hover:shadow-lg hover:shadow-cyan/20"
+                "hover:border-secondary/50 transition-all duration-300",
+                "hover:shadow-lg hover:shadow-secondary/20"
               )}
               whileHover={{ y: -4, transition: { duration: 0.3 } }}
             >
@@ -106,11 +105,10 @@ export function StatsGrid({
               <motion.div
                 className={cn(
                   "absolute top-0 left-0 h-1 w-12",
-                  stat.color === "orange" && "bg-orange",
-                  stat.color === "green" && "bg-green",
-                  stat.color === "teal" && "bg-teal",
-                  stat.color === "success" && "bg-success",
-                  stat.color === "warning" && "bg-warning",
+                  stat.color === "primary" && "bg-primary",
+                  stat.color === "secondary" && "bg-secondary",
+                  stat.color === "mint" && "bg-mint",
+                  stat.color === "accent" && "bg-accent",
                 )}
                 initial={{ width: 0 }}
                 whileInView={{ width: 48 }}
@@ -124,12 +122,11 @@ export function StatsGrid({
                 <motion.div
                   className={cn(
                     "text-6xl sm:text-7xl font-black mb-3",
-                    stat.color === "orange" && "text-orange",
-                    stat.color === "green" && "text-green",
-                    stat.color === "teal" && "text-teal",
-                    stat.color === "success" && "text-success",
-                    stat.color === "warning" && "text-warning",
-                    !stat.color && "text-orange"
+                    stat.color === "primary" && "text-primary",
+                    stat.color === "secondary" && "text-secondary",
+                    stat.color === "mint" && "text-mint",
+                    stat.color === "accent" && "text-accent",
+                    !stat.color && "text-primary"
                   )}
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
@@ -168,11 +165,10 @@ export function StatsGrid({
               <motion.div
                 className={cn(
                   "absolute -bottom-8 -right-8 w-32 h-32 rounded-full opacity-10",
-                  stat.color === "orange" && "bg-orange",
-                  stat.color === "green" && "bg-green",
-                  stat.color === "teal" && "bg-teal",
-                  stat.color === "success" && "bg-success",
-                  stat.color === "warning" && "bg-warning",
+                  stat.color === "primary" && "bg-primary",
+                  stat.color === "secondary" && "bg-secondary",
+                  stat.color === "mint" && "bg-mint",
+                  stat.color === "accent" && "bg-accent",
                 )}
               />
             </motion.div>
@@ -189,19 +185,19 @@ export function StatCard({
   value,
   label,
   icon: Icon,
-  color = "orange",
+  color = "primary",
   animate = true,
   delay = 0,
 }: {
   value: number;
   label: string;
   icon?: any;
-  color?: "orange" | "green" | "teal" | "success" | "warning";
+  color?: "primary" | "green" | "teal" | "success" | "warning";
   animate?: boolean;
   delay?: number;
 }) {
   const colorMap = {
-    orange: { bg: "bg-orange/10", text: "text-orange", border: "border-orange/30" },
+    primary: { bg: "bg-primary/10", text: "text-primary", border: "border-primary/30" },
     green: { bg: "bg-green/10", text: "text-green", border: "border-green/30" },
     teal: { bg: "bg-teal/10", text: "text-teal", border: "border-teal/30" },
     success: { bg: "bg-success/10", text: "text-success", border: "border-success/30" },
@@ -254,3 +250,4 @@ export function StatCard({
     </motion.div>
   );
 }
+

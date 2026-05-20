@@ -13,7 +13,7 @@ interface Testimonial {
   image?: string;
   content: string;
   rating?: number;
-  color?: "orange" | "green" | "teal" | "success" | "warning";
+  color?: "primary" | "secondary" | "mint" | "accent";
 }
 
 interface TestimonialsGridProps {
@@ -61,8 +61,8 @@ export function TestimonialsGrid({
     <section className={cn("py-20 relative overflow-hidden", className)}>
       {/* Background */}
       <div className="absolute inset-0 -z-10 opacity-5">
-        <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-orange rounded-full blur-3xl" />
-        <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-green rounded-full blur-3xl" />
+        <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-primary rounded-full blur-3xl" />
+        <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-secondary rounded-full blur-3xl" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -77,7 +77,7 @@ export function TestimonialsGrid({
           >
             <h2 className={cn(
               "text-5xl sm:text-6xl font-black mb-4",
-              "bg-gradient-to-r from-orange via-green to-teal bg-clip-text text-transparent"
+              "bg-gradient-to-r from-primary via-secondary to-mint bg-clip-text text-transparent"
             )}>
               {title}
             </h2>
@@ -123,11 +123,10 @@ export function TestimonialCard({
   delay?: number;
 }) {
   const colorMap = {
-    orange: "border-orange/30 hover:border-orange/60 shadow-orange/20 hover:shadow-orange/40",
-    green: "border-green/30 hover:border-green/60 shadow-green/20 hover:shadow-green/40",
-    teal: "border-teal/30 hover:border-teal/60 shadow-teal/20 hover:shadow-teal/40",
-    success: "border-success/30 hover:border-success/60 shadow-success/20 hover:shadow-success/40",
-    warning: "border-warning/30 hover:border-warning/60 shadow-warning/20 hover:shadow-warning/40",
+    primary: "border-primary/30 hover:border-primary/60 shadow-primary/20 hover:shadow-primary/40",
+    secondary: "border-secondary/30 hover:border-secondary/60 shadow-secondary/20 hover:shadow-secondary/40",
+    mint: "border-mint/30 hover:border-mint/60 shadow-mint/20 hover:shadow-mint/40",
+    accent: "border-accent/30 hover:border-accent/60 shadow-accent/20 hover:shadow-accent/40",
   };
 
   return (
@@ -146,12 +145,12 @@ export function TestimonialCard({
       className={cn(
         "relative overflow-hidden rounded-2xl p-8",
         "bg-surface border",
-        colorMap[testimonial.color || "orange"],
+        colorMap[testimonial.color || "primary"],
         "shadow-lg transition-all duration-300"
       )}
     >
       {/* Quote Mark Background */}
-      <div className="absolute -top-8 -right-8 text-7xl opacity-5 text-cyan">
+      <div className="absolute -top-8 -right-8 text-7xl opacity-5 text-secondary">
         &quot;
       </div>
 
@@ -187,7 +186,7 @@ export function TestimonialCard({
         {testimonial.image && (
           <motion.div
             whileHover={{ scale: 1.1 }}
-            className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-cyan/30"
+            className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-secondary/30"
           >
             <Image
               src={testimonial.image}
@@ -234,7 +233,7 @@ export function TestimonialCarousel({
           >
             <h2 className={cn(
               "text-4xl sm:text-5xl font-bold mb-4",
-              "bg-gradient-to-r from-cyan to-magenta bg-clip-text text-transparent"
+              "bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent"
             )}>
               {title}
             </h2>
@@ -265,3 +264,4 @@ export function TestimonialCarousel({
     </section>
   );
 }
+

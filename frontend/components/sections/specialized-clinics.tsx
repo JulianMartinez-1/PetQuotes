@@ -15,46 +15,46 @@ interface Clinic {
   distance: string;
   hours: string;
   badge?: string;
-  color: "orange" | "green" | "teal" | "warning";
+  color: "primary" | "secondary" | "mint" | "accent";
 }
 
 interface SpecializedClinicsProps {
   title?: string;
   clinics: Clinic[];
-  color?: "orange" | "green" | "teal" | "warning";
+  color?: "primary" | "secondary" | "mint" | "accent";
 }
 
 const colorMap = {
-  orange: {
-    badge: "bg-orange/10 text-orange border-orange/30",
-    button: "bg-orange hover:bg-orange-dark text-white",
-    star: "text-orange",
-    header: "text-orange",
+  primary: {
+    badge: "bg-primary/10 text-primary border-primary/30",
+    button: "bg-primary hover:bg-primary-dark text-white",
+    star: "text-primary",
+    header: "text-primary",
   },
-  green: {
-    badge: "bg-green/10 text-green border-green/30",
-    button: "bg-green hover:bg-green-dark text-white",
-    star: "text-green",
-    header: "text-green",
+  secondary: {
+    badge: "bg-secondary/10 text-secondary border-secondary/30",
+    button: "bg-secondary hover:bg-secondary-dark text-white",
+    star: "text-secondary",
+    header: "text-secondary",
   },
-  teal: {
-    badge: "bg-teal/10 text-teal border-teal/30",
-    button: "bg-teal hover:bg-teal-dark text-white",
-    star: "text-teal",
-    header: "text-teal",
+  mint: {
+    badge: "bg-mint/10 text-mint border-mint/30",
+    button: "bg-mint hover:bg-mint-dark text-white",
+    star: "text-mint",
+    header: "text-mint",
   },
-  warning: {
-    badge: "bg-warning/10 text-warning border-warning/30",
-    button: "bg-warning hover:bg-warning-dark text-white",
-    star: "text-warning",
-    header: "text-warning",
+  accent: {
+    badge: "bg-accent/10 text-accent border-accent/30",
+    button: "bg-accent hover:bg-accent-dark text-white",
+    star: "text-accent",
+    header: "text-accent",
   },
 };
 
 export function SpecializedClinics({
   title = "Clínicas Especializadas Recomendadas",
   clinics,
-  color = "orange",
+  color = "primary",
 }: SpecializedClinicsProps) {
   const colors = colorMap[color];
 
@@ -82,7 +82,7 @@ export function SpecializedClinics({
     <section className="py-20 relative overflow-hidden">
       {/* Background Gradient */}
       <div className="absolute inset-0 -z-10 opacity-5">
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-orange rounded-full blur-3xl" />
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-primary rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-teal rounded-full blur-3xl" />
       </div>
 
@@ -117,7 +117,7 @@ export function SpecializedClinics({
               variants={itemVariants}
               className="group relative"
             >
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-orange/20 to-teal/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/20 to-teal/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               
               <div className="relative h-full bg-white rounded-2xl border-2 border-border p-6 hover:shadow-2xl transition-all duration-300">
                 {/* Header */}
@@ -208,3 +208,4 @@ export function SpecializedClinics({
     </section>
   );
 }
+

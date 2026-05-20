@@ -23,11 +23,11 @@ export const PetTrotting = ({
   const getIcon = () => {
     switch (type) {
       case 'cat':
-        return <Cat className="w-12 h-12 text-orange-600" />;
+        return <Cat className="w-12 h-12 text-primary-600" />;
       case 'bird':
         return <Bird className="w-10 h-10 text-green-500" />;
       default:
-        return <Dog className="w-12 h-12 text-orange-500" />;
+        return <Dog className="w-12 h-12 text-primary-500" />;
     }
   };
 
@@ -119,8 +119,8 @@ export const PlayfulPets = ({
                 repeat: Infinity,
               }}
             >
-              {petType === 'dog' && <Dog className="w-16 h-16 text-orange-500" />}
-              {petType === 'cat' && <Cat className="w-16 h-16 text-orange-600" />}
+              {petType === 'dog' && <Dog className="w-16 h-16 text-primary-500" />}
+              {petType === 'cat' && <Cat className="w-16 h-16 text-primary-600" />}
               {petType === 'bird' && <Bird className="w-14 h-14 text-green-500" />}
             </motion.div>
             <motion.div
@@ -160,8 +160,8 @@ export const PetsEntering = ({ className = '' }: { className?: string }) => {
   };
 
   const petTypes = [
-    { icon: Dog, color: 'text-orange-500', label: 'Perro' },
-    { icon: Cat, color: 'text-orange-600', label: 'Gato' },
+    { icon: Dog, color: 'text-primary-500', label: 'Perro' },
+    { icon: Cat, color: 'text-primary-600', label: 'Gato' },
     { icon: Bird, color: 'text-green-500', label: 'Pájaro' }
   ];
 
@@ -221,8 +221,8 @@ export const FloatingPets = ({ className = '' }: { className?: string }) => {
             opacity: 0.15
           }}
         >
-          {i === 0 && <Dog className="w-24 h-24 text-orange-500" />}
-          {i === 1 && <Cat className="w-20 h-20 text-orange-600" />}
+          {i === 0 && <Dog className="w-24 h-24 text-primary-500" />}
+          {i === 1 && <Cat className="w-20 h-20 text-primary-600" />}
           {i === 2 && <Bird className="w-16 h-16 text-green-500" />}
         </motion.div>
       ))}
@@ -322,7 +322,7 @@ export const PetActivityIndicator = ({
 
   return (
     <motion.div
-      className={`w-3 h-3 rounded-full bg-orange-500 ${className}`}
+      className={`w-3 h-3 rounded-full bg-primary-500 ${className}`}
       variants={pulseVariants}
       animate={active ? 'animate' : undefined}
       transition={{
@@ -333,3 +333,4 @@ export const PetActivityIndicator = ({
     />
   );
 };
+

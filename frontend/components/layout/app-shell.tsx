@@ -24,10 +24,9 @@ export function AppShell({ children }: PropsWithChildren) {
 
   return (
     <div className="app-shell">
-      <a href="#main-content" className="skip-link">Saltar al contenido principal</a>
-      <header className="sticky top-0 z-40 border-b border-line/80 bg-white/90 backdrop-blur">
+      <header className="sticky top-0 z-40 border-b border-border/20 bg-slate-900 backdrop-blur">
         <div className="page-container flex h-16 items-center justify-between gap-4">
-          <Link href="/" className="text-lg font-extrabold tracking-tight text-navy">
+          <Link href="/" className="text-lg font-extrabold tracking-tight text-white">
             PET QUOTES
           </Link>
 
@@ -39,7 +38,7 @@ export function AppShell({ children }: PropsWithChildren) {
                   key={item.href}
                   href={item.href}
                   className={`rounded-lg px-3 py-2 text-base font-bold transition ${
-                    active ? "bg-sky text-navy" : "text-navy hover:text-orange hover:bg-sky/20"
+                    active ? "bg-primary text-white" : "text-white hover:text-primary hover:bg-slate-800"
                   }`}
                 >
                   {item.label}
@@ -49,12 +48,12 @@ export function AppShell({ children }: PropsWithChildren) {
           </nav>
 
           <div className="hidden items-center gap-3 md:flex">
-            <span className="rounded-md bg-sky px-2 py-1 text-xs font-semibold text-navy">{selectedCity}</span>
+            <span className="rounded-md bg-primary px-2 py-1 text-xs font-semibold text-white">{selectedCity}</span>
             {isAuthenticated ? (
               <>
-                <Link href="/profile" className="rounded-lg border border-line px-3 py-2 text-right hover:bg-sky/50">
-                  <p className="text-sm font-bold text-navy">{user?.fullName}</p>
-                  <p className="text-xs text-soft">Mi perfil</p>
+                <Link href="/profile" className="rounded-lg border border-primary/30 px-3 py-2 text-right hover:bg-slate-800">
+                  <p className="text-sm font-bold text-white">{user?.fullName}</p>
+                  <p className="text-xs text-gray-400">Mi perfil</p>
                 </Link>
                 <Button variant="ghost" type="button" onClick={logout}>
                   Cerrar sesión
@@ -75,7 +74,7 @@ export function AppShell({ children }: PropsWithChildren) {
           <button
             type="button"
             aria-label={mobileMenuOpen ? "Cerrar menu" : "Abrir menu"}
-            className="inline-flex rounded-lg border border-line p-2 md:hidden"
+            className="inline-flex rounded-lg border border-white/20 p-2 text-white md:hidden hover:bg-slate-800"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -83,13 +82,13 @@ export function AppShell({ children }: PropsWithChildren) {
         </div>
 
         {mobileMenuOpen && (
-          <div className="border-t border-line bg-white md:hidden">
+          <div className="border-t border-border/20 bg-slate-800 md:hidden">
             <div className="page-container grid gap-1 py-3">
               {NAV_ITEMS.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="rounded-lg px-3 py-2 text-base font-bold text-navy hover:bg-sky hover:text-orange"
+                  className="rounded-lg px-3 py-2 text-base font-bold text-white hover:bg-slate-700 hover:text-primary"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {item.label}
@@ -97,17 +96,17 @@ export function AppShell({ children }: PropsWithChildren) {
               ))}
               {!isAuthenticated ? (
                 <>
-                  <Link href="/login" className="rounded-lg px-3 py-2 text-sm font-semibold text-soft hover:bg-sky hover:text-navy" onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/login" className="rounded-lg px-3 py-2 text-sm font-semibold text-gray-400 hover:bg-slate-700 hover:text-white" onClick={() => setMobileMenuOpen(false)}>
                     Entrar
                   </Link>
-                  <Link href="/register" className="rounded-lg px-3 py-2 text-sm font-semibold text-soft hover:bg-sky hover:text-navy" onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/register" className="rounded-lg px-3 py-2 text-sm font-semibold text-gray-400 hover:bg-slate-700 hover:text-white" onClick={() => setMobileMenuOpen(false)}>
                     Crear cuenta
                   </Link>
                 </>
               ) : (
                 <button
                   type="button"
-                  className="rounded-lg px-3 py-2 text-left text-sm font-semibold text-soft hover:bg-sky hover:text-navy"
+                  className="rounded-lg px-3 py-2 text-left text-sm font-semibold text-gray-400 hover:bg-slate-700 hover:text-white"
                   onClick={() => {
                     logout();
                     setMobileMenuOpen(false);
@@ -132,9 +131,10 @@ export function AppShell({ children }: PropsWithChildren) {
 
       <main id="main-content" className="flex-1 py-6" tabIndex={-1}>{children}</main>
 
-      <footer className="mt-8 border-t border-line/80 bg-white/80">
-        <div className="page-container py-6 text-base font-bold text-navy">© {new Date().getFullYear()} PET QUOTES · Reservas veterinarias inteligentes</div>
+      <footer className="mt-8 border-t border-border/20 bg-slate-900">
+        <div className="page-container py-6 text-base font-bold text-white">© {new Date().getFullYear()} PET QUOTES · Reservas veterinarias inteligentes</div>
       </footer>
     </div>
   );
 }
+

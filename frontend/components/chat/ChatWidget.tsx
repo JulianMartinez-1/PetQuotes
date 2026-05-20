@@ -13,7 +13,7 @@ export function ChatWidget() {
       {/* Botón flotante */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-to-r from-orange to-teal shadow-lg z-50 flex items-center justify-center text-white hover:shadow-xl transition-shadow"
+        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-to-r from-primary to-teal shadow-lg z-50 flex items-center justify-center text-white hover:shadow-xl transition-shadow"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         aria-label={isOpen ? "Cerrar chatbot" : "Abrir chatbot"}
@@ -60,3 +60,4 @@ export function ChatWidget() {
     </>
   );
 }
+

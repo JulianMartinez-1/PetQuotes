@@ -122,8 +122,8 @@ export default function ProfilePage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
           >
-            <div className="absolute top-20 left-10 w-96 h-96 bg-cyan/15 rounded-full blur-3xl" />
-            <div className="absolute bottom-20 right-10 w-96 h-96 bg-magenta/15 rounded-full blur-3xl" />
+            <div className="absolute top-20 left-10 w-96 h-96 bg-secondary/15 rounded-full blur-3xl" />
+            <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/15 rounded-full blur-3xl" />
             <div className="absolute inset-0 bg-gradient-to-b from-dark/40 via-transparent to-transparent" />
           </motion.div>
 
@@ -135,7 +135,7 @@ export default function ProfilePage() {
             >
               <h1 className={cn(
                 "text-5xl sm:text-6xl font-bold mb-6",
-                "bg-gradient-to-r from-cyan via-text-primary to-magenta",
+                "bg-gradient-to-r from-secondary via-foreground to-accent",
                 "bg-clip-text text-transparent"
               )}>
                 Mi Perfil
@@ -182,7 +182,7 @@ export default function ProfilePage() {
             ].map(({ icon: Icon, title, value }, idx) => (
               <motion.div key={idx} variants={itemVariants}>
                 <Card className="text-center">
-                  <Icon size={32} className="mx-auto text-cyan mb-4" />
+                  <Icon size={32} className="mx-auto text-secondary mb-4" />
                   <p className="text-sm font-semibold text-text-tertiary uppercase tracking-wide mb-2">
                     {title}
                   </p>
@@ -206,7 +206,7 @@ export default function ProfilePage() {
             <Card>
               <h2 className={cn(
                 "text-2xl font-bold mb-6",
-                "bg-gradient-to-r from-cyan to-magenta bg-clip-text text-transparent"
+                "bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent"
               )}>
                 📋 Información Personal
               </h2>
@@ -218,7 +218,7 @@ export default function ProfilePage() {
                   className="space-y-2"
                 >
                   <label className="block text-sm font-semibold text-text-primary">
-                    <User className="inline mr-2 text-cyan" size={16} />
+                    <User className="inline mr-2 text-secondary" size={16} />
                     Nombre para Mostrar
                   </label>
                   <Input
@@ -235,7 +235,7 @@ export default function ProfilePage() {
                   className="space-y-2"
                 >
                   <label className="block text-sm font-semibold text-text-primary">
-                    <Mail className="inline mr-2 text-cyan" size={16} />
+                    <Mail className="inline mr-2 text-secondary" size={16} />
                     Correo de Acceso
                   </label>
                   <Input
@@ -255,7 +255,7 @@ export default function ProfilePage() {
                   className="space-y-2"
                 >
                   <label className="block text-sm font-semibold text-text-primary">
-                    <Phone className="inline mr-2 text-cyan" size={16} />
+                    <Phone className="inline mr-2 text-secondary" size={16} />
                     Teléfono de Contacto
                   </label>
                   <Input
@@ -272,7 +272,7 @@ export default function ProfilePage() {
                   className="space-y-2"
                 >
                   <label className="block text-sm font-semibold text-text-primary">
-                    <MapPin className="inline mr-2 text-cyan" size={16} />
+                    <MapPin className="inline mr-2 text-secondary" size={16} />
                     Ciudad Principal
                   </label>
                   <Input
@@ -289,7 +289,7 @@ export default function ProfilePage() {
             <Card>
               <h2 className={cn(
                 "text-2xl font-bold mb-6",
-                "bg-gradient-to-r from-cyan to-magenta bg-clip-text text-transparent"
+                "bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent"
               )}>
                 🔔 Preferencias de Notificaciones
               </h2>
@@ -301,8 +301,8 @@ export default function ProfilePage() {
                   className={cn(
                     "flex items-center gap-4 p-4 rounded-lg border cursor-pointer transition-all",
                     emailReminders
-                      ? "bg-cyan/10 border-cyan/30"
-                      : "bg-surface border-border/30 hover:border-cyan/50"
+                      ? "bg-secondary/10 border-secondary/30"
+                      : "bg-surface border-border/30 hover:border-secondary/50"
                   )}
                 >
                   <input
@@ -320,7 +320,7 @@ export default function ProfilePage() {
                     </p>
                   </div>
                   {emailReminders && (
-                    <CheckCircle size={20} className="text-cyan" />
+                    <CheckCircle size={20} className="text-secondary" />
                   )}
                 </motion.label>
 
@@ -359,8 +359,8 @@ export default function ProfilePage() {
                   className={cn(
                     "flex items-center gap-4 p-4 rounded-lg border cursor-pointer transition-all",
                     marketingEmails
-                      ? "bg-magenta/10 border-magenta/30"
-                      : "bg-surface border-border/30 hover:border-magenta/50"
+                      ? "bg-accent/10 border-accent/30"
+                      : "bg-surface border-border/30 hover:border-accent/50"
                   )}
                 >
                   <input
@@ -370,15 +370,15 @@ export default function ProfilePage() {
                     className="w-5 h-5 cursor-pointer rounded"
                   />
                   <div className="flex-1">
-                    <p className="font-semibold text-text-primary">
-                      🎁 Novedades y Promociones
+                    <p className="font-semibold text-textPrimary">
+                      Novedades y Promociones
                     </p>
-                    <p className="text-xs text-text-tertiary">
+                    <p className="text-xs text-textTertiary">
                       Recibe ofertas especiales
                     </p>
                   </div>
                   {marketingEmails && (
-                    <CheckCircle size={20} className="text-magenta" />
+                    <CheckCircle size={20} className="text-accent" />
                   )}
                 </motion.label>
 
@@ -398,7 +398,7 @@ export default function ProfilePage() {
                     className={cn(
                       "w-full px-4 py-3 rounded-lg border transition-all",
                       "bg-surface border-border/30 text-text-primary",
-                      "hover:border-cyan/50 focus:border-cyan focus:ring-cyan/20",
+                      "hover:border-secondary/50 focus:border-secondary focus:ring-secondary/20",
                       "text-sm font-medium"
                     )}
                   >
@@ -460,14 +460,14 @@ export default function ProfilePage() {
             viewport={{ once: true }}
             className="mt-12"
           >
-            <Card className="bg-cyan/5 border-cyan/30">
+            <Card className="bg-secondary/5 border-secondary/30">
               <div className="flex gap-4">
-                <Shield size={24} className="text-cyan flex-shrink-0 mt-1" />
+                <Shield size={24} className="text-secondary flex-shrink-0 mt-1" />
                 <div>
-                  <h3 className="font-semibold text-text-primary mb-2">
-                    🔒 Tu información está segura
+                  <h3 className="font-semibold text-textPrimary mb-2">
+                    Tu información está segura
                   </h3>
-                  <p className="text-sm text-text-secondary">
+                  <p className="text-sm text-textSecondary">
                     Todos tus datos están encriptados y protegidos. Tus preferencias se actualizan inmediatamente.
                   </p>
                 </div>
@@ -479,3 +479,4 @@ export default function ProfilePage() {
     </AuthGuard>
   );
 }
+

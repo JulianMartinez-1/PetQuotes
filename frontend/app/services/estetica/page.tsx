@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SpecializedClinics } from "@/components/sections/specialized-clinics";
+import { SpecializedClinics } from "@/components/sections/specialized-clinics-api";
 import { ScrollReactivePets } from "@/components/animations/scroll-reactive-pets";
 
 export default function Estetica() {
@@ -30,22 +30,22 @@ export default function Estetica() {
 
   const treatments = [
     {
-      icon: "🌟",
+      icon: "█",
       title: "Tratamientos de Pelaje",
       description: "Mascarillas hidratantes y acondicionamientos de lujo para pelaje brillante",
     },
     {
-      icon: "💆",
+      icon: "█",
       title: "Masajes Relajantes",
       description: "Masajes terapéuticos que reducen estrés y mejoran la circulación",
     },
     {
-      icon: "🎨",
+      icon: "█",
       title: "Coloración Segura",
       description: "Tintes dermatológicamente seguros para cambios de color creativos",
     },
     {
-      icon: "✨",
+      icon: "█",
       title: "Tratamientos Especiales",
       description: "Hidratación profunda, botox capilar y tratamientos anti-edad",
     },
@@ -130,7 +130,7 @@ export default function Estetica() {
             transition={{ duration: 0.6 }}
           >
             <div className="flex items-center gap-4 mb-4">
-              <div className="text-5xl">✨</div>
+              <div className="text-5xl">█</div>
               <h1 className="text-4xl sm:text-5xl font-black text-warning">
                 Estética
               </h1>
@@ -264,7 +264,11 @@ export default function Estetica() {
       </div>
 
       {/* Specialized Clinics Section */}
-      <SpecializedClinics clinics={clinics} color="warning" />
+      <SpecializedClinics
+        serviceType="estetica"
+        serviceTitle="Estética"
+        limit={6}
+      />
 
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-warning to-warning-dark text-white">

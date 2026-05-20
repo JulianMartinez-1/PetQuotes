@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { getOAuthProviders, OAuthProvider } from "@/lib/auth-api";
+import { OAuthProvider } from "@/lib/auth-api";
+import { getOAuthProviders } from "@/lib/auth-api";
 
-const providerOrder = ["google", "facebook", "github", "microsoft"] as const;
 const ALLOWED_PROVIDERS = ["google", "facebook", "github", "microsoft"] as const;
 
 type SocialAuthButtonsProps = {
@@ -18,11 +18,11 @@ function getProviderStyle(providerId: OAuthProvider["id"]): string {
     case "google":
       return `${baseClass} bg-red-500 hover:bg-red-600`;
     case "facebook":
-      return `${baseClass} bg-blue-600 hover:bg-blue-700`;
+      return `${baseClass} bg-[#1877F2] hover:bg-[#1565D8]`;
     case "github":
       return `${baseClass} bg-gray-800 hover:bg-gray-900`;
     case "microsoft":
-      return `${baseClass} bg-blue-400 hover:bg-blue-500`;
+      return `${baseClass} bg-[#00A4EF] hover:bg-[#0078D4]`;
     default:
       return `${baseClass} bg-gray-500 hover:bg-gray-600`;
   }
@@ -33,63 +33,47 @@ export function SocialAuthButtons({ contextLabel }: SocialAuthButtonsProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let mounted = true;
-
-    const loadProviders = async () => {
+    const fetchProviders = async () => {
       try {
         const response = await getOAuthProviders();
-        if (!mounted) return;
-
-        const sorted = [...response.providers].sort(
-          (a, b) => providerOrder.indexOf(a.id) - providerOrder.indexOf(b.id)
-        );
-        setProviders(sorted);
-      } catch {
-        if (!mounted) return;
-        setProviders([]);
-      } finally {
-        if (mounted) {
-          setLoading(false);
+        if (response.providers) {
+          setProviders(response.providers.filter(p => p.enabled));
         }
+      } catch (error) {
+        console.error("Failed to load OAuth providers:", error);
+        // Fallback to default providers if API fails
+        setProviders([
+          { id: "google", name: "Google", enabled: true },
+          { id: "facebook", name: "Facebook", enabled: true }
+        ]);
+      } finally {
+        setLoading(false);
       }
     };
 
-    void loadProviders();
-
-    return () => {
-      mounted = false;
-    };
+    fetchProviders();
   }, []);
 
   if (loading) {
-    return <p className="text-xs text-soft">Cargando opciones sociales...</p>;
-  }
-
-  if (providers.length === 0) {
-    return null;
-  }
-
-  const enabledProviders = providers
-    .filter((provider) => provider.enabled)
-    .filter((provider) => ALLOWED_PROVIDERS.includes(provider.id as typeof ALLOWED_PROVIDERS[number]));
-  
-  if (enabledProviders.length === 0) {
     return (
-      <p className="text-xs text-soft">
-        Inicio de sesion social disponible proximamente.
-      </p>
+      <div className="mt-6 grid gap-3">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="h-11 bg-gray-700 rounded-lg animate-pulse" />
+          <div className="h-11 bg-gray-700 rounded-lg animate-pulse" />
+        </div>
+      </div>
     );
   }
 
   return (
-    <div className="mt-4 grid gap-2">
-      <p className="text-xs text-soft">
+    <div className="mt-6 grid gap-3">
+      <p className="text-sm text-white/80 text-center font-medium">
         {contextLabel === "login"
           ? "O entra con tu cuenta social"
           : "O crea tu cuenta con un proveedor social"}
       </p>
       <div className="grid grid-cols-2 gap-3">
-        {enabledProviders.map((provider) => (
+        {providers.map((provider) => (
           <button
             key={provider.id}
             type="button"

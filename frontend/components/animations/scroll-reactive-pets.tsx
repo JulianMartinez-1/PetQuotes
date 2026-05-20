@@ -69,7 +69,7 @@ export function ScrollReactivePets({
           ease: "easeInOut",
         }}
       >
-        <Dog className="w-16 h-16 text-orange/40 drop-shadow-lg" />
+        <Dog className="w-16 h-16 text-primary/40 drop-shadow-lg" />
       </motion.div>
 
       {/* Cat */}
@@ -131,3 +131,4 @@ export function FloatingPetsSection({
     </div>
   );
 }
+

@@ -38,10 +38,10 @@ export function Footer() {
   ];
 
   const socialLinks = [
-    { icon: Twitter, href: "#", label: "Twitter", color: "hover:text-orange" },
-    { icon: Github, href: "#", label: "GitHub", color: "hover:text-green" },
-    { icon: Linkedin, href: "#", label: "LinkedIn", color: "hover:text-teal" },
-    { icon: Mail, href: "mailto:contact@petquotes.com", label: "Email", color: "hover:text-warning" },
+    { icon: Twitter, href: "#", label: "Twitter", color: "hover:text-primary" },
+    { icon: Github, href: "#", label: "GitHub", color: "hover:text-mint" },
+    { icon: Linkedin, href: "#", label: "LinkedIn", color: "hover:text-secondary" },
+    { icon: Mail, href: "mailto:contact@petquotes.com", label: "Email", color: "hover:text-accent" },
   ];
 
   const containerVariants = {
@@ -66,13 +66,13 @@ export function Footer() {
 
   return (
     <footer className={cn(
-      "relative bg-dark border-t border-border/20",
+      "relative bg-foreground border-t border-border/20",
       "overflow-hidden"
     )}>
       {/* Animated Background Gradient */}
       <div className={cn(
-        "absolute inset-0 opacity-10",
-        "bg-gradient-to-t from-orange/20 via-transparent to-transparent"
+        "absolute inset-0 opacity-5",
+        "bg-gradient-to-t from-primary/20 via-transparent to-transparent"
       )} />
 
       {/* Content */}
@@ -90,9 +90,9 @@ export function Footer() {
               <div className="flex items-center gap-2 mb-4 group cursor-pointer">
                 <div className={cn(
                   "w-10 h-10 rounded-lg bg-gradient-to-br",
-                  "from-orange to-green flex items-center justify-center",
+                  "from-primary to-secondary flex items-center justify-center",
                   "text-white font-bold text-lg",
-                  "shadow-lg shadow-orange/30 group-hover:shadow-orange/50",
+                  "shadow-lg shadow-primary/30 group-hover:shadow-primary/50",
                   "transition-all duration-300"
                 )}>
                   PQ
@@ -104,7 +104,7 @@ export function Footer() {
                 </span>
               </div>
             </Link>
-            <p className="text-text-primary font-medium text-base leading-relaxed mb-6">
+            <p className="text-white font-medium text-base leading-relaxed mb-6">
               Making veterinary appointments seamless and effortless for pet owners everywhere.
             </p>
             <div className="flex items-center gap-4">
@@ -118,7 +118,7 @@ export function Footer() {
                     "p-2 rounded-lg bg-surface border border-border/30",
                     "transition-all duration-300",
                     social.color,
-                    "hover:bg-surface-light hover:border-cyan/50"
+                    "hover:bg-surface-light hover:border-secondary/50"
                   )}
                   whileHover={{ scale: 1.1, y: -2 }}
                   whileTap={{ scale: 0.95 }}
@@ -138,7 +138,7 @@ export function Footer() {
               className="md:col-span-1"
             >
               <h3 className={cn(
-                "font-black text-text-primary mb-4",
+                "font-black text-white mb-4",
                 "text-base uppercase tracking-wider"
               )}>
                 {section.title}
@@ -148,13 +148,13 @@ export function Footer() {
                   <li key={link.href}>
                     <Link href={link.href}>
                       <span className={cn(
-                        "text-text-primary font-medium text-base",
-                        "hover:text-orange transition-colors duration-300",
+                        "text-white font-medium text-base",
+                        "hover:text-primary transition-colors duration-300",
                         "relative group inline-block"
                       )}>
                         {link.label}
                         <span className={cn(
-                          "absolute bottom-0 left-0 w-0 h-0.5 bg-orange",
+                          "absolute bottom-0 left-0 w-0 h-0.5 bg-primary",
                           "group-hover:w-full transition-all duration-300"
                         )} />
                       </span>
@@ -168,7 +168,7 @@ export function Footer() {
 
         {/* Divider */}
         <motion.div
-          className="h-0.5 bg-gradient-to-r from-transparent via-cyan/30 to-transparent my-8"
+          className="h-0.5 bg-gradient-to-r from-transparent via-secondary/30 to-transparent my-8"
           initial={{ scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
           transition={{ duration: 0.8 }}
@@ -185,13 +185,13 @@ export function Footer() {
         >
           <motion.p
             variants={itemVariants}
-            className="text-text-primary font-medium text-base text-center md:text-left flex items-center gap-2"
+            className="text-white font-medium text-base text-center md:text-left flex items-center gap-2"
           >
-            Made with <Heart size={16} className="text-magenta animate-pulse" /> by Julian Martinez © {currentYear}
+            Made with <Heart size={16} className="text-accent animate-pulse" /> by Julian Martinez © {currentYear}
           </motion.p>
           <motion.p
             variants={itemVariants}
-            className="text-text-primary font-medium text-base"
+            className="text-white font-medium text-base"
           >
             PetQuotes • Veterinary Appointments Made Simple
           </motion.p>
@@ -200,3 +200,4 @@ export function Footer() {
     </footer>
   );
 }
+

@@ -29,7 +29,7 @@ export function EnhancedSectionHeader({
         <motion.h2
           className={cn(
             "text-4xl sm:text-5xl lg:text-6xl font-bold mb-4",
-            "bg-gradient-to-r from-cyan via-text-primary to-magenta",
+            "bg-gradient-to-r from-secondary via-text-primary to-accent",
             "bg-clip-text text-transparent"
           )}
         >
@@ -69,9 +69,9 @@ export function EnhancedFeatureCard({
       <motion.div
         className={cn(
           "relative p-8 rounded-xl border-2 border-surface-light/30",
-          "bg-surface/50 backdrop-blur-lg hover:border-cyan/50",
+          "bg-surface/50 backdrop-blur-lg hover:border-secondary/50",
           "transition-all duration-300 hover:bg-surface/80",
-          "hover:shadow-lg hover:shadow-cyan/20",
+          "hover:shadow-lg hover:shadow-secondary/20",
           className
         )}
         whileHover={{ y: -8, borderColor: "rgba(0, 255, 255, 0.7)" }}
@@ -83,7 +83,7 @@ export function EnhancedFeatureCard({
           whileHover={{ rotate: 10, scale: 1.1 }}
           transition={{ duration: 0.6 }}
         >
-          <Icon className="w-8 h-8 text-cyan" />
+          <Icon className="w-8 h-8 text-secondary" />
         </motion.div>
 
         <h3 className="text-xl font-bold text-text-primary mb-2">{title}</h3>
@@ -91,7 +91,7 @@ export function EnhancedFeatureCard({
 
         {/* Accent line */}
         <motion.div
-          className="absolute top-0 left-0 h-1 bg-gradient-to-r from-cyan to-transparent rounded-full"
+          className="absolute top-0 left-0 h-1 bg-gradient-to-r from-secondary to-transparent rounded-full"
           initial={{ width: 0 }}
           whileInView={{ width: "100%" }}
           transition={{ duration: 0.8 }}
@@ -120,8 +120,8 @@ export function EnhancedStatCard({
     <ScrollScale from={0.8} to={1}>
       <motion.div
         className={cn(
-          "relative p-8 rounded-xl border-2 border-cyan/30",
-          "bg-gradient-to-br from-cyan/10 to-magenta/5",
+          "relative p-8 rounded-xl border-2 border-secondary/30",
+          "bg-gradient-to-br from-secondary/10 to-accent/5",
           "backdrop-blur-lg text-center",
           className
         )}
@@ -133,7 +133,7 @@ export function EnhancedStatCard({
         transition={{ duration: 0.3 }}
       >
         <motion.div
-          className="text-4xl sm:text-5xl font-bold text-cyan mb-2"
+          className="text-4xl sm:text-5xl font-bold text-secondary mb-2"
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay, duration: 0.6 }}
@@ -146,7 +146,7 @@ export function EnhancedStatCard({
 
         {/* Bottom accent */}
         <motion.div
-          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-gradient-to-r from-magenta to-cyan rounded-full"
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-gradient-to-r from-accent to-secondary rounded-full"
           initial={{ scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
           transition={{ delay: delay + 0.2, duration: 0.6 }}
@@ -187,7 +187,7 @@ export function EnhancedTestimonialCard({
         transition={{ duration: 0.3 }}
       >
         {/* Quote mark watermark */}
-        <div className="absolute top-4 right-4 text-6xl text-cyan/10">&ldquo;</div>
+        <div className="absolute top-4 right-4 text-6xl text-secondary/10">&ldquo;</div>
 
         {/* Rating stars */}
         <div className="flex gap-1 mb-4">
@@ -213,7 +213,7 @@ export function EnhancedTestimonialCard({
         <div className="border-t border-surface-light/20 pt-4">
           <p className="font-bold text-text-primary">{name}</p>
           <p className="text-sm text-text-secondary">{role}</p>
-          <p className="text-xs text-cyan/60">{company}</p>
+          <p className="text-xs text-secondary/60">{company}</p>
         </div>
       </motion.div>
     </ScrollReveal>
@@ -241,8 +241,8 @@ export function EnhancedCTASection({
       <section
         className={cn(
           "py-24 relative overflow-hidden rounded-2xl",
-          "bg-gradient-to-r from-cyan/20 via-magenta/10 to-cyan/20",
-          "border-2 border-cyan/30",
+          "bg-gradient-to-r from-secondary/20 via-accent/10 to-secondary/20",
+          "border-2 border-secondary/30",
           className
         )}
       >
@@ -282,9 +282,9 @@ export function EnhancedCTASection({
               className={cn(
                 "inline-flex items-center gap-2",
                 "px-8 py-4 rounded-lg",
-                "bg-cyan text-dark font-bold",
-                "hover:bg-cyan/90 transition-all duration-300",
-                "shadow-lg shadow-cyan/30"
+                "bg-secondary text-dark font-bold",
+                "hover:bg-secondary/90 transition-all duration-300",
+                "shadow-lg shadow-secondary/30"
               )}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -335,3 +335,4 @@ export function EnhancedGrid({
     </motion.div>
   );
 }
+

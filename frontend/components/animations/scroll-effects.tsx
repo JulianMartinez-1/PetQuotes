@@ -110,7 +110,7 @@ export function ScrollStaggerContainer({
 export function ScrollColorReveal({
   children,
   fromColor = "from-surface",
-  toColor = "from-cyan",
+  toColor = "from-secondary",
 }: {
   children: ReactNode;
   fromColor?: string;
@@ -120,7 +120,7 @@ export function ScrollColorReveal({
     <motion.div
       initial={{ backgroundImage: `linear-gradient(to right, var(--surface))` }}
       whileInView={{
-        backgroundImage: `linear-gradient(to right, var(--cyan), var(--magenta))`,
+        backgroundImage: `linear-gradient(to right, var(--secondary), var(--accent))`,
       }}
       transition={{ duration: 0.8 }}
       viewport={{ once: true, amount: 0.5 }}
@@ -330,14 +330,14 @@ export function FloatingAnimation({
  */
 export function PulseGlow({
   children,
-  color = "cyan",
+  color = "secondary",
 }: {
   children: ReactNode;
-  color?: "cyan" | "magenta" | "success" | "warning";
+  color?: "secondary" | "accent" | "success" | "warning";
 }) {
   const colorMap = {
-    cyan: "rgba(0, 255, 255, 0.3)",
-    magenta: "rgba(255, 0, 255, 0.3)",
+    secondary: "rgba(0, 255, 255, 0.3)",
+    accent: "rgba(255, 0, 255, 0.3)",
     success: "rgba(34, 197, 94, 0.3)",
     warning: "rgba(234, 179, 8, 0.3)",
   };
@@ -361,3 +361,4 @@ export function PulseGlow({
     </motion.div>
   );
 }
+

@@ -11,7 +11,7 @@ export default function TestPage() {
       <p className="text-lg mb-4">Count: {count}</p>
       <button 
         onClick={() => setCount(c => c + 1)}
-        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        className="px-4 py-2 bg-[#333333] text-white rounded hover:bg-[#1A1A1A]"
       >
         Increment
       </button>

@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SpecializedClinics } from "@/components/sections/specialized-clinics";
+import { SpecializedClinics } from "@/components/sections/specialized-clinics-api";
 import { ScrollReactivePets } from "@/components/animations/scroll-reactive-pets";
 
 export default function BanoGrooming() {
@@ -71,7 +71,7 @@ export default function BanoGrooming() {
       distance: "1.8 km de ti",
       hours: "Mar-Dom 9am - 6pm",
       badge: "Elite",
-      color: "green" as const,
+      color: "primary" as const,
     },
     {
       id: "2",
@@ -83,7 +83,7 @@ export default function BanoGrooming() {
       distance: "2.9 km de ti",
       hours: "Lun-Dom 8am - 7pm",
       badge: "Premium",
-      color: "green" as const,
+      color: "secondary" as const,
     },
     {
       id: "3",
@@ -94,7 +94,7 @@ export default function BanoGrooming() {
       address: "Avenida 15 #23-45, Centro",
       distance: "3.5 km de ti",
       hours: "Lun-Sab 10am - 6pm",
-      color: "green" as const,
+      color: "mint" as const,
     },
   ];
 
@@ -228,7 +228,11 @@ export default function BanoGrooming() {
       </div>
 
       {/* Specialized Clinics Section */}
-      <SpecializedClinics clinics={clinics} color="green" />
+      <SpecializedClinics
+        serviceType="bano-grooming"
+        serviceTitle="Baño & Grooming"
+        limit={6}
+      />
 
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-green to-green-dark text-white">

@@ -12,7 +12,7 @@ interface ServiceWithLink {
   icon: ReactNode;
   title: string;
   description: string;
-  color?: "orange" | "green" | "teal" | "success" | "warning";
+  color?: "primary" | "green" | "teal" | "success" | "warning";
   href: string;
 }
 
@@ -62,8 +62,8 @@ export function ServicesGrid({
     <section className={cn("py-20 relative overflow-hidden", className)}>
       {/* Background Gradient */}
       <div className="absolute inset-0 -z-10 opacity-5">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-magenta rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-secondary rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent rounded-full blur-3xl" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -79,7 +79,7 @@ export function ServicesGrid({
             <motion.h2
               className={cn(
                 "text-5xl sm:text-6xl font-black mb-6",
-                "bg-gradient-to-r from-orange via-green to-teal bg-clip-text text-transparent"
+                "bg-gradient-to-r from-primary via-secondary to-mint bg-clip-text text-transparent"
               )}
             >
               {title}
@@ -109,7 +109,7 @@ export function ServicesGrid({
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 >
                   {/* Gradient Glow on Hover */}
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-orange/20 to-teal/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/20 to-teal/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                   {/* Card */}
                   <div className="relative h-full bg-white rounded-2xl border-2 border-border p-8 hover:shadow-2xl transition-all duration-300">
@@ -158,3 +158,4 @@ export function ServicesGrid({
     </section>
   );
 }
+

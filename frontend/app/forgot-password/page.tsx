@@ -63,7 +63,7 @@ export default function ForgotPasswordPage() {
         transition={{ duration: 1 }}
       >
         <div className="absolute top-0 right-0 w-96 h-96 bg-warning/15 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-cyan/15 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-secondary/15 rounded-full blur-3xl" />
       </motion.div>
 
       {/* Content */}
@@ -101,7 +101,7 @@ export default function ForgotPasswordPage() {
                   </div>
                   <h1 className={cn(
                     "text-4xl font-bold mb-3",
-                    "bg-gradient-to-r from-warning to-cyan bg-clip-text text-transparent"
+                    "bg-gradient-to-r from-accent to-secondary bg-clip-text text-transparent"
                   )}>
                     Recuperar Acceso
                   </h1>
@@ -118,7 +118,7 @@ export default function ForgotPasswordPage() {
                 >
                   {/* Email Input */}
                   <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan/40 size-5" />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary/40 size-5" />
                     <Input
                       type="email"
                       placeholder="tu-correo@dominio.com"
@@ -186,7 +186,7 @@ export default function ForgotPasswordPage() {
                 >
                   <p className="text-text-secondary">
                     ¿Ya recordaste tu contraseña?{" "}
-                    <Link href="/login" className="text-cyan hover:text-cyan/80 font-semibold transition-colors">
+                    <Link href="/login" className="text-secondary hover:text-secondary/80 font-semibold transition-colors">
                       Inicia sesión
                     </Link>
                   </p>
@@ -195,10 +195,10 @@ export default function ForgotPasswordPage() {
                 {/* Info Card */}
                 <motion.div
                   variants={itemVariants}
-                  className="mt-6 p-4 rounded-lg bg-cyan/5 border border-cyan/30"
+                  className="mt-6 p-4 rounded-lg bg-secondary/5 border border-secondary/30"
                 >
-                  <p className="text-xs text-text-secondary">
-                    <span className="font-semibold text-text-primary">💡 Consejo:</span> Si el correo existe en nuestro sistema, recibirás un enlace de recuperación en minutos. Por tu seguridad, no revelamos si la cuenta existe.
+                  <p className="text-xs text-textSecondary">
+                    <span className="font-semibold text-textPrimary">Consejo:</span> Si el correo existe en nuestro sistema, recibirás un enlace de recuperación en minutos. Por tu seguridad, no revelamos si la cuenta existe.
                   </p>
                 </motion.div>
               </>
@@ -223,7 +223,7 @@ export default function ForgotPasswordPage() {
                   {/* Title */}
                   <h2 className={cn(
                     "text-3xl font-bold",
-                    "bg-gradient-to-r from-success to-cyan bg-clip-text text-transparent"
+                    "bg-gradient-to-r from-success to-secondary bg-clip-text text-transparent"
                   )}>
                     ¡Enlace Enviado!
                   </h2>
@@ -256,8 +256,8 @@ export default function ForgotPasswordPage() {
                         transition={{ delay: 0.3 + idx * 0.1 }}
                         className="flex items-center gap-3 p-3 rounded-lg bg-surface border border-border/30"
                       >
-                        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-cyan/20 border border-cyan/50 flex items-center justify-center">
-                          <span className="text-xs font-semibold text-cyan">{idx + 1}</span>
+                        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-secondary/20 border border-secondary/50 flex items-center justify-center">
+                          <span className="text-xs font-semibold text-secondary">{idx + 1}</span>
                         </div>
                         <span className="text-sm text-text-secondary">{step}</span>
                       </motion.div>
@@ -294,3 +294,4 @@ export default function ForgotPasswordPage() {
     </main>
   );
 }
+

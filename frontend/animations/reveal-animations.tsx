@@ -104,9 +104,9 @@ export function GlowEffect({ children }: PropsWithChildren) {
     <motion.div
       animate={{
         boxShadow: [
-          "0 0 20px rgba(0, 212, 255, 0.3)",
-          "0 0 40px rgba(0, 212, 255, 0.6)",
-          "0 0 20px rgba(0, 212, 255, 0.3)"
+          "0 0 20px rgba(255, 255, 255, 0.2)",
+          "0 0 40px rgba(255, 255, 255, 0.4)",
+          "0 0 20px rgba(255, 255, 255, 0.2)"
         ]
       }}
       transition={{ duration: 3, repeat: Infinity }}

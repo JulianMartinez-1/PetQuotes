@@ -104,8 +104,8 @@ export default function ClinicsPage() {
           animate={{ opacity: 1 }}
           transition={{ duration: 1 }}
         >
-          <div className="absolute top-20 left-10 w-96 h-96 bg-cyan/15 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-magenta/15 rounded-full blur-3xl" />
+          <div className="absolute top-20 left-10 w-96 h-96 bg-secondary/15 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/15 rounded-full blur-3xl" />
           <div className="absolute inset-0 bg-gradient-to-b from-dark/40 via-transparent to-transparent" />
         </motion.div>
 
@@ -116,14 +116,14 @@ export default function ClinicsPage() {
             transition={{ duration: DURATIONS.base / 1000 }}
             className="text-center mb-12"
           >
-            <Badge className="mb-4 px-4 py-2 bg-cyan/20 border-cyan/50 inline-block">
+            <Badge className="mb-4 px-4 py-2 bg-secondary/20 border-secondary/50 inline-block">
               <Building2 size={16} className="inline mr-2" />
               Directorio Premium
             </Badge>
 
             <h1 className={cn(
               "text-5xl sm:text-6xl font-bold mb-6",
-              "bg-gradient-to-r from-cyan via-text-primary to-magenta",
+              "bg-gradient-to-r from-secondary via-foreground to-accent",
               "bg-clip-text text-transparent"
             )}>
               Encuentra Tu Veterinaria Ideal
@@ -152,7 +152,7 @@ export default function ClinicsPage() {
                 className={cn(
                   "p-4 rounded-xl text-center",
                   "bg-surface border border-border/30",
-                  "hover:border-cyan/50 transition-all"
+                  "hover:border-secondary/50 transition-all"
                 )}
               >
                 <div className="text-2xl font-bold text-text-primary">{stat.value}</div>
@@ -176,14 +176,14 @@ export default function ClinicsPage() {
           )}
         >
           <div className="flex items-center gap-2 mb-6">
-            <SlidersHorizontal size={20} className="text-cyan" />
+            <SlidersHorizontal size={20} className="text-secondary" />
             <h2 className="text-lg font-bold text-text-primary">Filtros</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Search Input */}
             <div className="relative lg:col-span-2">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan/40 size-5" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary/40 size-5" />
               <Input
                 placeholder="Busca clínica, zona o servicio..."
                 value={query}
@@ -206,7 +206,7 @@ export default function ClinicsPage() {
               className={cn(
                 "px-4 py-3 rounded-lg border transition-all",
                 "bg-surface border-border/30 text-text-primary",
-                "hover:border-cyan/50 focus:border-cyan focus:ring-cyan/20",
+                "hover:border-secondary/50 focus:border-secondary focus:ring-secondary/20",
                 "text-sm font-medium"
               )}
             >
@@ -224,7 +224,7 @@ export default function ClinicsPage() {
               className={cn(
                 "px-4 py-3 rounded-lg border transition-all",
                 "bg-surface border-border/30 text-text-primary",
-                "hover:border-cyan/50 focus:border-cyan focus:ring-cyan/20",
+                "hover:border-secondary/50 focus:border-secondary focus:ring-secondary/20",
                 "text-sm font-medium"
               )}
             >
@@ -235,7 +235,7 @@ export default function ClinicsPage() {
             {/* Open Now Checkbox */}
             <label className={cn(
               "px-4 py-3 rounded-lg border cursor-pointer transition-all flex items-center gap-3",
-              "bg-surface border-border/30 hover:border-cyan/50",
+              "bg-surface border-border/30 hover:border-secondary/50",
               "text-sm font-medium"
             )}>
               <input
@@ -266,7 +266,7 @@ export default function ClinicsPage() {
             >
               {paginated.map((clinic) => (
                 <motion.div key={clinic.id} variants={itemVariants}>
-                  <Card className="overflow-hidden group h-full flex flex-col hover:border-cyan/50 transition-all">
+                  <Card className="overflow-hidden group h-full flex flex-col hover:border-secondary/50 transition-all">
                     {/* Image Container */}
                     <div className="relative overflow-hidden h-48">
                       <Image
@@ -322,7 +322,7 @@ export default function ClinicsPage() {
                           </span>
                         </div>
                         <div className="flex items-center gap-1 text-text-secondary">
-                          <MapPin size={16} className="text-cyan" />
+                          <MapPin size={16} className="text-secondary" />
                           <span className="text-sm">{clinic.distanceKm.toFixed(1)} km</span>
                         </div>
                       </div>
@@ -336,7 +336,7 @@ export default function ClinicsPage() {
                           {clinic.services.slice(0, 3).map((service) => (
                             <Badge
                               key={service}
-                              className="bg-cyan/10 border-cyan/30 text-cyan text-xs"
+                              className="bg-secondary/10 border-secondary/30 text-secondary text-xs"
                             >
                               {service}
                             </Badge>
@@ -450,3 +450,4 @@ export default function ClinicsPage() {
     </main>
   );
 }
+

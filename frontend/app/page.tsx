@@ -7,7 +7,7 @@ import { Search, MapPin, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { FeaturesGrid } from "@/components/sections/features-section";
+import { ServiceCard } from "@/components/ui/service-card";
 import { StatsGrid } from "@/components/sections/stats-section";
 import { CTA } from "@/components/sections/cta-section";
 import { TestimonialsGrid } from "@/components/sections/testimonials-section";
@@ -21,28 +21,32 @@ export default function HomePage() {
 
   const services = [
     {
-      icon: "🩺",
+      icon: "█",
       title: "Consulta Veterinaria",
       description: "Diagnósticos y tratamientos de expertos",
-      color: "orange" as const,
+      href: "/services/consulta-veterinaria",
+      color: "primary" as const,
     },
     {
-      icon: "✂️",
+      icon: "█",
       title: "Baño & Grooming",
       description: "Cuidado profesional para tu mascota",
-      color: "green" as const,
+      href: "/services/bano-grooming",
+      color: "mint" as const,
     },
     {
-      icon: "💉",
+      icon: "█",
       title: "Vacunación",
       description: "Inmunización completa y segura",
-      color: "teal" as const,
+      href: "/services/vacunacion",
+      color: "secondary" as const,
     },
     {
-      icon: "✨",
+      icon: "█",
       title: "Estética",
       description: "Belleza y bienestar para tu pet",
-      color: "warning" as const,
+      href: "/services/estetica",
+      color: "accent" as const,
     },
   ];
 
@@ -50,27 +54,27 @@ export default function HomePage() {
     {
       label: "Clínicas Verificadas",
       value: 250,
-      color: "orange" as const,
+      color: "primary" as const,
       description: "En toda la región",
     },
     {
       label: "Mascotas Felices",
       value: 15000,
       suffix: "+",
-      color: "green" as const,
+      color: "mint" as const,
       description: "Cuidadas este año",
     },
     {
       label: "Citas Reservadas",
       value: 98,
       suffix: "%",
-      color: "teal" as const,
+      color: "secondary" as const,
       description: "Tasa de confirmación",
     },
     {
       label: "Tiempo Promedio",
       value: 2,
-      color: "warning" as const,
+      color: "accent" as const,
       description: "Minutos para reservar",
     },
   ];
@@ -83,7 +87,7 @@ export default function HomePage() {
       content:
         "Encontré la mejor clínica para mi gato en minutos. El servicio fue excelente y Luna está mucho mejor.",
       rating: 5,
-      color: "orange" as const,
+      color: "primary" as const,
     },
     {
       name: "Carlos Ruiz",
@@ -92,7 +96,7 @@ export default function HomePage() {
       content:
         "Aplicación intuitiva y fácil de usar. Recomendado a todos mis amigos con mascotas.",
       rating: 5,
-      color: "green" as const,
+      color: "mint" as const,
     },
     {
       name: "Ana Martínez",
@@ -101,7 +105,7 @@ export default function HomePage() {
       content:
         "Finalmente un lugar donde confiar. Las clínicas verificadas dan total tranquilidad.",
       rating: 5,
-      color: "teal" as const,
+      color: "secondary" as const,
     },
   ];
 
@@ -120,10 +124,10 @@ export default function HomePage() {
           animate={{ opacity: 1 }}
           transition={{ duration: 1 }}
         >
-          <div className="absolute top-20 left-10 w-96 h-96 bg-orange/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-green/20 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 left-1/3 w-80 h-80 bg-teal/10 rounded-full blur-3xl" />
-          <div className="absolute inset-0 bg-gradient-to-b from-surface/30 via-transparent to-transparent" />
+          <div className="absolute top-20 left-10 w-96 h-96 bg-primary/8 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/8 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/3 w-80 h-80 bg-mint/5 rounded-full blur-3xl" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-transparent" />
         </motion.div>
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
@@ -140,7 +144,7 @@ export default function HomePage() {
               transition={{ delay: 0.1, duration: DURATIONS.fast / 1000 }}
               className="flex justify-center"
             >
-              <Badge className="px-6 py-2 bg-orange/20 border-orange/50 text-lg">
+              <Badge className="px-6 py-2 bg-primary/20 border-primary/50 text-lg">
                 🐾 Cuidado veterinario, simplificado
               </Badge>
             </motion.div>
@@ -149,8 +153,7 @@ export default function HomePage() {
             <motion.h1
               className={cn(
                 "text-6xl sm:text-7xl lg:text-8xl font-black",
-                "bg-gradient-to-r from-orange via-text-primary to-green",
-                "bg-clip-text text-transparent leading-tight tracking-tight"
+                "text-foreground leading-tight tracking-tight"
               )}
               initial={{ opacity: 0, y: 30, scale: 0.8 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -168,7 +171,7 @@ export default function HomePage() {
 
             {/* Subtitle */}
             <motion.p
-              className="text-xl sm:text-2xl text-text-secondary max-w-3xl mx-auto leading-relaxed"
+              className="text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: DURATIONS.base / 1000 }}
@@ -196,7 +199,7 @@ export default function HomePage() {
             >
               <div className="flex-1 relative group">
                 <MapPin
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-orange opacity-60"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-primary opacity-60"
                   size={20}
                 />
                 <Input
@@ -212,7 +215,7 @@ export default function HomePage() {
                 <Button
                   variant="primary"
                   size="lg"
-                  className="h-14 gap-3 w-full sm:w-auto shadow-lg shadow-orange/20"
+                  className="h-14 gap-3 w-full sm:w-auto shadow-lg shadow-primary/20"
                 >
                   <Search size={20} />
                   <span>Buscar</span>
@@ -242,8 +245,8 @@ export default function HomePage() {
                   </motion.span>
                 </Button>
               </Link>
-              <p className="text-sm text-text-tertiary">
-                ✨ Únete a más de 15,000 dueños de mascotas satisfechos
+              <p className="text-sm text-textSecondary">
+                Únete a más de 15,000 dueños de mascotas satisfechos
               </p>
             </motion.div>
           </motion.div>
@@ -255,9 +258,9 @@ export default function HomePage() {
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
-          <div className="w-6 h-10 border-2 border-orange/30 rounded-full flex items-start justify-center p-2">
+          <div className="w-6 h-10 border-2 border-primary/30 rounded-full flex items-start justify-center p-2">
             <motion.div
-              className="w-1 h-2 bg-orange rounded-full"
+              className="w-1 h-2 bg-primary rounded-full"
               animate={{ opacity: [1, 0] }}
               transition={{ duration: 1, repeat: Infinity }}
             />
@@ -268,12 +271,67 @@ export default function HomePage() {
       {/* Services Section */}
       <section className="relative py-32 bg-gradient-to-b from-surface/10 via-surface/30 to-transparent">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <FeaturesGrid
-            title="Servicios Completos"
-            subtitle="Todo lo que tu mascota necesita en un solo lugar"
-            features={services}
-            columns={4}
-          />
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            className="text-center mb-16"
+          >
+            <motion.h2
+              className={cn(
+                "text-5xl sm:text-6xl font-black mb-6",
+                "bg-gradient-to-r from-primary via-secondary to-mint bg-clip-text text-transparent"
+              )}
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              viewport={{ once: false }}
+            >
+              Servicios Completos
+            </motion.h2>
+            <motion.p
+              className="text-lg font-semibold text-textSecondary max-w-2xl mx-auto"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.1, duration: 0.6, ease: "easeOut" }}
+              viewport={{ once: false }}
+            >
+              Todo lo que tu mascota necesita en un solo lugar
+            </motion.p>
+          </motion.div>
+
+          {/* Services Grid */}
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ staggerChildren: 0.1, delayChildren: 0.2 }}
+            viewport={{ once: true, amount: 0.2 }}
+          >
+            {services.map((service, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{
+                  duration: 0.6,
+                  ease: "easeOut",
+                  delay: index * 0.1,
+                }}
+                viewport={{ once: true, amount: 0.3 }}
+              >
+                <ServiceCard
+                  icon={service.icon}
+                  title={service.title}
+                  description={service.description}
+                  href={service.href}
+                  color={service.color}
+                  delay={index * 0.05}
+                />
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </section>
 
@@ -298,7 +356,7 @@ export default function HomePage() {
           <motion.h2
             className={cn(
               "text-4xl sm:text-5xl font-bold mb-16 text-center",
-              "bg-gradient-to-r from-orange via-text-primary to-green bg-clip-text text-transparent"
+              "bg-gradient-to-r from-primary via-text-primary to-green bg-clip-text text-transparent"
             )}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -320,19 +378,19 @@ export default function HomePage() {
                 step: "01",
                 title: "Busca",
                 desc: "Encuentra clínicas por ubicación, servicio y disponibilidad",
-                color: "orange",
+                color: "primary",
               },
               {
                 step: "02",
                 title: "Compara",
                 desc: "Compara precios, horarios, ratings y experiencias",
-                color: "green",
+                color: "mint",
               },
               {
                 step: "03",
                 title: "Reserva",
                 desc: "Confirma tu cita en segundos con notificaciones automáticas",
-                color: "teal",
+                color: "secondary",
               },
             ].map((item, idx) => (
               <motion.div
@@ -345,7 +403,7 @@ export default function HomePage() {
                   "relative p-8 rounded-2xl",
                   "bg-surface border border-border/30",
                   "transition-all duration-300",
-                  item.color === "orange" && "hover:border-orange/50 hover:shadow-lg hover:shadow-orange/20",
+                  item.color === "primary" && "hover:border-primary/50 hover:shadow-lg hover:shadow-primary/20",
                   item.color === "green" && "hover:border-green/50 hover:shadow-lg hover:shadow-green/20",
                   item.color === "teal" && "hover:border-teal/50 hover:shadow-lg hover:shadow-teal/20",
                 )}
@@ -354,7 +412,7 @@ export default function HomePage() {
                 {/* Step Number */}
                 <div className={cn(
                   "text-6xl font-bold mb-4",
-                  item.color === "orange" && "text-orange/20",
+                  item.color === "primary" && "text-primary/20",
                   item.color === "green" && "text-green/20",
                   item.color === "teal" && "text-teal/20",
                 )}>
@@ -369,7 +427,7 @@ export default function HomePage() {
                 {idx < 2 && (
                   <div className="hidden md:block absolute -right-4 top-1/2 -translate-y-1/2">
                     <ArrowRight size={32} className={cn(
-                      item.color === "orange" && "text-orange/30",
+                      item.color === "primary" && "text-primary/30",
                       item.color === "green" && "text-green/30",
                       item.color === "teal" && "text-teal/30",
                     )} />
@@ -413,3 +471,4 @@ export default function HomePage() {
     </main>
   );
 }
+

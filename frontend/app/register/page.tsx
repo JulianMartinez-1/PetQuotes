@@ -100,8 +100,8 @@ export default function RegisterPage() {
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
       >
-        <div className="absolute top-0 right-0 w-96 h-96 bg-magenta/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-cyan/20 rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-accent/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-secondary/20 rounded-full blur-3xl" />
       </motion.div>
 
       {/* Content */}
@@ -131,13 +131,13 @@ export default function RegisterPage() {
             {/* Header */}
             <motion.div variants={itemVariants} className="mb-8">
               <div className="mb-4">
-                <Badge className="px-3 py-1 bg-magenta/20 border-magenta/50 inline-block">
-                  ✨ Nuevo Registro
+                <Badge className="px-3 py-1 bg-accent/20 border-accent/50 inline-block">
+                  Nuevo Registro
                 </Badge>
               </div>
               <h1 className={cn(
                 "text-4xl font-bold mb-3",
-                "bg-gradient-to-r from-magenta to-cyan bg-clip-text text-transparent"
+                "bg-gradient-to-r from-accent to-secondary bg-clip-text text-transparent"
               )}>
                 Crea Tu Cuenta
               </h1>
@@ -154,7 +154,7 @@ export default function RegisterPage() {
             >
               {/* Full Name Input */}
               <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan/40 size-5" />
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary/40 size-5" />
                 <Input
                   type="text"
                   placeholder="Tu nombre completo"
@@ -184,7 +184,7 @@ export default function RegisterPage() {
 
               {/* Email Input */}
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan/40 size-5" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary/40 size-5" />
                 <Input
                   type="email"
                   placeholder="tu-correo@dominio.com"
@@ -214,7 +214,7 @@ export default function RegisterPage() {
 
               {/* Password Input */}
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan/40 size-5" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary/40 size-5" />
                 <Input
                   type="password"
                   placeholder="Mínimo 8 caracteres"
@@ -323,7 +323,7 @@ export default function RegisterPage() {
             >
               <p className="text-text-secondary">
                 ¿Ya tienes cuenta?{" "}
-                <Link href="/login" className="text-magenta hover:text-magenta/80 font-semibold transition-colors">
+                <Link href="/login" className="text-accent hover:text-accent/80 font-semibold transition-colors">
                   Inicia sesión
                 </Link>
               </p>
@@ -335,11 +335,11 @@ export default function RegisterPage() {
               className="mt-6 text-xs text-text-tertiary text-center"
             >
               Al crear una cuenta, aceptas nuestros{" "}
-              <Link href="#" className="text-cyan hover:text-cyan/80">
+              <Link href="#" className="text-secondary hover:text-secondary/80">
                 Términos de Servicio
               </Link>
               {" "}y{" "}
-              <Link href="#" className="text-cyan hover:text-cyan/80">
+              <Link href="#" className="text-secondary hover:text-secondary/80">
                 Política de Privacidad
               </Link>
             </motion.p>
@@ -351,17 +351,17 @@ export default function RegisterPage() {
             className="mt-8 grid gap-4 md:hidden"
           >
             {[
-              { icon: "🐾", title: "Mascotas", desc: "Perfil completo" },
-              { icon: "🏥", title: "Clínicas", desc: "Verificadas" },
-              { icon: "📅", title: "Citas", desc: "Confirmadas" },
+              { icon: "█", title: "Mascotas", desc: "Perfil completo" },
+              { icon: "█", title: "Clínicas", desc: "Verificadas" },
+              { icon: "█", title: "Citas", desc: "Confirmadas" },
             ].map((item) => (
               <div
                 key={item.title}
                 className="p-4 rounded-lg bg-surface/50 border border-border/30 text-center"
               >
                 <div className="text-2xl mb-2">{item.icon}</div>
-                <p className="text-sm font-semibold text-text-primary">{item.title}</p>
-                <p className="text-xs text-text-tertiary">{item.desc}</p>
+                <p className="text-sm font-semibold text-textPrimary">{item.title}</p>
+                <p className="text-xs text-textTertiary">{item.desc}</p>
               </div>
             ))}
           </motion.div>
@@ -370,3 +370,4 @@ export default function RegisterPage() {
     </main>
   );
 }
+

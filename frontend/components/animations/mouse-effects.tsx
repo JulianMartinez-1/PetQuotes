@@ -119,11 +119,11 @@ export function MouseTrackingButton({
  */
 export function HoverReveal({
   children,
-  glowColor = "cyan",
+  glowColor = "secondary",
   glowIntensity = 0.3,
 }: {
   children: React.ReactNode;
-  glowColor?: "cyan" | "magenta" | "success" | "warning";
+  glowColor?: "secondary" | "accent" | "success" | "warning";
   glowIntensity?: number;
 }) {
   const [isHovering, setIsHovering] = useState(false);
@@ -131,10 +131,10 @@ export function HoverReveal({
   const ref = useRef<HTMLDivElement>(null);
 
   const colorMap = {
-    cyan: `rgba(0, 255, 255, ${glowIntensity})`,
-    magenta: `rgba(255, 0, 255, ${glowIntensity})`,
-    success: `rgba(34, 197, 94, ${glowIntensity})`,
-    warning: `rgba(234, 179, 8, ${glowIntensity})`,
+    secondary: `rgba(6, 182, 212, ${glowIntensity})`,
+    accent: `rgba(251, 113, 133, ${glowIntensity})`,
+    success: `rgba(16, 185, 129, ${glowIntensity})`,
+    warning: `rgba(245, 158, 11, ${glowIntensity})`,
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -216,7 +216,7 @@ export function CursorDot() {
     <>
       {/* Outer ring */}
       <motion.div
-        className="fixed top-0 left-0 w-8 h-8 border-2 border-cyan rounded-full pointer-events-none -z-40"
+        className="fixed top-0 left-0 w-8 h-8 border-2 border-secondary rounded-full pointer-events-none -z-40"
         animate={{
           x: isVisible ? mousePosition.x - 16 : mousePosition.x,
           y: isVisible ? mousePosition.y - 16 : mousePosition.y,
@@ -231,7 +231,7 @@ export function CursorDot() {
 
       {/* Inner dot */}
       <motion.div
-        className="fixed top-0 left-0 w-2 h-2 bg-cyan rounded-full pointer-events-none -z-40"
+        className="fixed top-0 left-0 w-2 h-2 bg-secondary rounded-full pointer-events-none -z-40"
         animate={{
           x: isVisible ? mousePosition.x - 4 : mousePosition.x,
           y: isVisible ? mousePosition.y - 4 : mousePosition.y,
@@ -310,3 +310,4 @@ export function TextCursorGlow({
     </motion.div>
   );
 }
+

@@ -10,9 +10,8 @@ interface Feature {
   icon: ReactNode;
   title: string;
   description: string;
-  color?: "orange" | "green" | "teal" | "success" | "warning";
+  color?: "primary" | "secondary" | "mint" | "accent";
 }
-
 interface FeaturesGridProps {
   title?: string;
   subtitle?: string;
@@ -59,8 +58,8 @@ export function FeaturesGrid({
     <section className={cn("py-20 relative overflow-hidden", className)}>
       {/* Background Gradient */}
       <div className="absolute inset-0 -z-10 opacity-5">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-magenta rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-secondary rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent rounded-full blur-3xl" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -76,7 +75,7 @@ export function FeaturesGrid({
             <motion.h2
               className={cn(
                 "text-5xl sm:text-6xl font-black mb-6",
-                "bg-gradient-to-r from-orange via-green to-teal bg-clip-text text-transparent"
+                "bg-gradient-to-r from-primary via-secondary to-mint bg-clip-text text-transparent"
               )}
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -150,7 +149,7 @@ export function HeroFeatures({
         >
           <h2 className={cn(
             "text-3xl sm:text-4xl font-bold mb-4",
-            "bg-gradient-to-r from-cyan to-magenta bg-clip-text text-transparent"
+            "bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent"
           )}>
             {title}
           </h2>
@@ -179,7 +178,7 @@ export function HeroFeatures({
                 <p className="text-text-secondary mb-6 leading-relaxed">
                   {feature.description}
                 </p>
-                <div className="flex items-center gap-3 text-cyan font-medium">
+                <div className="flex items-center gap-3 text-secondary font-medium">
                   <span>Learn more</span>
                   <motion.span
                     animate={{ x: [0, 4, 0] }}
@@ -214,3 +213,4 @@ export function HeroFeatures({
     </section>
   );
 }
+

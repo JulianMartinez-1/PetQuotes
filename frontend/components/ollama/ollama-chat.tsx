@@ -43,7 +43,7 @@ export const OllamaChatComponent = () => {
     <div className="w-full max-w-2xl mx-auto p-4">
       <div className="bg-white rounded-lg shadow-lg">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-t-lg">
+        <div className="bg-gradient-to-r from-[#333333] to-[#1A1A1A] text-white p-4 rounded-t-lg">
           <h2 className="text-2xl font-bold">Ollama Chat</h2>
           <p className="text-sm opacity-90">Powered by Llama 3.2</p>
         </div>
@@ -57,8 +57,8 @@ export const OllamaChatComponent = () => {
             }}
             className={`px-4 py-2 rounded ${
               mode === 'chat'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-gray-800'
+                ? 'bg-[#333333] text-white'
+                : 'bg-[#E5E5E5] text-[#1A1A1A]'
             }`}
           >
             Chat Mode
@@ -70,8 +70,8 @@ export const OllamaChatComponent = () => {
             }}
             className={`px-4 py-2 rounded ${
               mode === 'generate'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-gray-800'
+                ? 'bg-[#333333] text-white'
+                : 'bg-[#E5E5E5] text-[#1A1A1A]'
             }`}
           >
             Generate Mode
@@ -79,9 +79,9 @@ export const OllamaChatComponent = () => {
         </div>
 
         {/* Chat Messages */}
-        <div className="h-96 overflow-y-auto p-4 space-y-4 bg-gray-50">
+        <div className="h-96 overflow-y-auto p-4 space-y-4 bg-[#F8F8F8]">
           {messages.length === 0 && (
-            <div className="text-center text-gray-400 mt-8">
+            <div className="text-center text-[#888888] mt-8">
               <p>Inicia una conversación o genera texto con Ollama</p>
             </div>
           )}
@@ -95,8 +95,8 @@ export const OllamaChatComponent = () => {
               <div
                 className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                   msg.role === 'user'
-                    ? 'bg-blue-500 text-white rounded-br-none'
-                    : 'bg-gray-300 text-gray-800 rounded-bl-none'
+                    ? 'bg-[#333333] text-white rounded-br-none'
+                    : 'bg-[#D0D0D0] text-[#1A1A1A] rounded-bl-none'
                 }`}
               >
                 <p className="break-words">{msg.content}</p>
@@ -105,7 +105,7 @@ export const OllamaChatComponent = () => {
           ))}
           {loading && (
             <div className="flex justify-start">
-              <div className="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg">
+              <div className="bg-[#D0D0D0] text-[#1A1A1A] px-4 py-2 rounded-lg">
                 <p className="animate-pulse">Escribiendo...</p>
               </div>
             </div>
@@ -114,7 +114,7 @@ export const OllamaChatComponent = () => {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-100 text-red-700 p-3 mx-4 my-2 rounded">
+          <div className="bg-[#E8E8E8] text-[#000000] p-3 mx-4 my-2 rounded border border-[#BFBFBF]">
             {error}
           </div>
         )}
@@ -129,12 +129,12 @@ export const OllamaChatComponent = () => {
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
               placeholder="Escribe tu mensaje..."
               disabled={loading}
-              className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+              className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#333333] disabled:bg-[#E5E5E5]"
             />
             <button
               onClick={handleSendMessage}
               disabled={loading || !input.trim()}
-              className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300"
+              className="px-6 py-2 bg-[#333333] text-white rounded-lg hover:bg-[#1A1A1A] disabled:bg-[#D0D0D0]"
             >
               {loading ? '...' : 'Enviar'}
             </button>

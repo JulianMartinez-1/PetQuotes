@@ -61,10 +61,12 @@ export async function POST(request: NextRequest) {
       { role: "user", content: message },
     ];
 
-    // Llamar a Gemini API
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      console.error("GEMINI_API_KEY no está configurada");
+    // Llamar a Ollama
+    const ollamaUrl = process.env.OLLAMA_API_URL || "http://localhost:11434";
+    const model = process.env.OLLAMA_MODEL || "llama2";
+
+    if (!ollamaUrl) {
+      console.error("OLLAMA_API_URL no está configurada");
       return NextResponse.json(
         {
           error:
@@ -74,52 +76,43 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Preparar el contenido del mensaje para Gemini
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
+    // Preparar el contenido del mensaje para Ollama (formato OpenAI-compatible)
+    const ollamaMessages = [
       {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          system: {
-            instructions: CHAT_SYSTEM_PROMPT,
-          },
-          contents: [
-            ...conversationHistory.map((msg) => ({
-              role: msg.role,
-              parts: [{ text: msg.content }],
-            })),
-            {
-              role: "user",
-              parts: [{ text: message }],
-            },
-          ],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 500,
-          },
-        }),
-      }
-    );
+        role: "system",
+        content: CHAT_SYSTEM_PROMPT,
+      },
+      ...messages,
+    ];
 
-    // Manejar errores de Gemini
+    const response = await fetch(`${ollamaUrl}/api/chat`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: ollamaMessages,
+        stream: false,
+        temperature: 0.7,
+      }),
+    });
+
+    // Manejar errores de Ollama
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Gemini API Error:", errorData);
+      const errorData = await response.json().catch(() => ({}));
+      console.error("Ollama API Error:", errorData);
 
-      if (response.status === 401) {
+      if (response.status === 404) {
         return NextResponse.json(
           {
-            error:
-              "Error de autenticación con la API de IA. Por favor contacta con soporte.",
+            error: `Modelo Ollama '${model}' no encontrado. Por favor verifica la configuración.`,
           },
           { status: 500 }
         );
       }
 
-      if (response.status === 429) {
+      if (response.status === 503) {
         return NextResponse.json(
           {
             error:
@@ -130,14 +123,14 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      throw new Error(`Gemini API error: ${response.status}`);
+      throw new Error(`Ollama API error: ${response.status}`);
     }
 
     const data = await response.json();
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const reply = data.message?.content;
 
     if (!reply) {
-      throw new Error("No se recibió respuesta válida de la API");
+      throw new Error("No se recibió respuesta válida de Ollama");
     }
 
     return NextResponse.json({

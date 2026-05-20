@@ -77,8 +77,8 @@ export default function LoginPage() {
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
       >
-        <div className="absolute top-0 right-0 w-96 h-96 bg-cyan/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-magenta/20 rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent/20 rounded-full blur-3xl" />
       </motion.div>
 
       {/* Content */}
@@ -109,7 +109,7 @@ export default function LoginPage() {
             <motion.div variants={itemVariants} className="mb-8">
               <h1 className={cn(
                 "text-4xl font-bold mb-3",
-                "bg-gradient-to-r from-cyan to-magenta bg-clip-text text-transparent"
+                "bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent"
               )}>
                 Bienvenido
               </h1>
@@ -126,7 +126,7 @@ export default function LoginPage() {
             >
               {/* Email Input */}
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan/40 size-5" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary/40 size-5" />
                 <Input
                   type="email"
                   placeholder="tu-correo@dominio.com"
@@ -140,7 +140,7 @@ export default function LoginPage() {
 
               {/* Password Input */}
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan/40 size-5" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary/40 size-5" />
                 <Input
                   type="password"
                   placeholder="Tu contraseña"
@@ -192,7 +192,7 @@ export default function LoginPage() {
                 className="text-center"
               >
                 <Link href="/forgot-password">
-                  <Button variant="ghost" size="sm" className="text-cyan hover:text-cyan">
+                  <Button variant="ghost" size="sm" className="text-secondary hover:text-secondary">
                     ¿Olvidaste tu contraseña?
                   </Button>
                 </Link>
@@ -224,7 +224,7 @@ export default function LoginPage() {
             >
               <p className="text-text-secondary">
                 ¿No tienes cuenta?{" "}
-                <Link href="/register" className="text-cyan hover:text-cyan/80 font-semibold transition-colors">
+                <Link href="/register" className="text-secondary hover:text-secondary/80 font-semibold transition-colors">
                   Crear cuenta
                 </Link>
               </p>
@@ -237,17 +237,17 @@ export default function LoginPage() {
             className="mt-8 grid gap-4 md:hidden"
           >
             {[
-              { icon: "🐾", title: "Mascotas", desc: "Gestiona tu mascota" },
-              { icon: "📅", title: "Citas", desc: "Reserva fácilmente" },
-              { icon: "🏥", title: "Clínicas", desc: "Verific adas" },
+              { icon: "█", title: "Mascotas", desc: "Gestiona tu mascota" },
+              { icon: "█", title: "Citas", desc: "Reserva fácilmente" },
+              { icon: "█", title: "Clínicas", desc: "Verificadas" },
             ].map((item) => (
               <div
                 key={item.title}
                 className="p-4 rounded-lg bg-surface/50 border border-border/30 text-center"
               >
                 <div className="text-2xl mb-2">{item.icon}</div>
-                <p className="text-sm font-semibold text-text-primary">{item.title}</p>
-                <p className="text-xs text-text-tertiary">{item.desc}</p>
+                <p className="text-sm font-semibold text-textPrimary">{item.title}</p>
+                <p className="text-xs text-textTertiary">{item.desc}</p>
               </div>
             ))}
           </motion.div>
@@ -256,3 +256,4 @@ export default function LoginPage() {
     </main>
   );
 }
+

@@ -68,7 +68,7 @@ export function PageLoadingOverlay() {
         animate={{ scale: [0.8, 1.2, 0.8] }}
         transition={{ duration: 1.5, repeat: Infinity }}
       >
-        <div className="w-12 h-12 rounded-full border-2 border-transparent border-t-cyan border-r-magenta" />
+        <div className="w-12 h-12 rounded-full border-2 border-transparent border-t-secondary border-r-accent" />
       </motion.div>
     </motion.div>
   );
@@ -80,7 +80,7 @@ export function PageLoadingOverlay() {
  */
 export function AnimatedBackground() {
   const shapes = Array.from({ length: 3 });
-  const bgColors = ["bg-cyan/20", "bg-magenta/15", "bg-cyan/10"];
+  const bgColors = ["bg-secondary/20", "bg-accent/15", "bg-secondary/10"];
 
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
@@ -131,7 +131,7 @@ export function ScrollProgressBar() {
 
   return (
     <motion.div
-      className="fixed top-0 left-0 h-1 bg-gradient-to-r from-cyan to-magenta z-50"
+      className="fixed top-0 left-0 h-1 bg-gradient-to-r from-secondary to-accent z-50"
       style={{ width: `${scrollProgress}%` }}
       transition={{ duration: 0.1 }}
     />
@@ -153,7 +153,7 @@ export function RevealWithLine({
     <motion.div>
       {/* Line animation */}
       <motion.div
-        className="h-1 bg-gradient-to-r from-cyan/0 via-cyan to-cyan/0 mb-4"
+        className="h-1 bg-gradient-to-r from-secondary/0 via-secondary to-secondary/0 mb-4"
         initial={{ scaleX: 0, transformOrigin: "left" }}
         whileInView={{ scaleX: 1 }}
         transition={{
@@ -180,3 +180,4 @@ export function RevealWithLine({
     </motion.div>
   );
 }
+

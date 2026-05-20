@@ -10,7 +10,7 @@ interface FeatureCardProps {
   icon: ReactNode;
   title: string;
   description: string;
-  color?: "orange" | "green" | "teal" | "success" | "warning";
+  color?: "primary" | "secondary" | "mint" | "accent";
   gradient?: boolean;
   interactive?: boolean;
   delay?: number;
@@ -21,19 +21,19 @@ export function FeatureCard({
   icon,
   title,
   description,
-  color = "orange",
+  color = "primary",
   gradient = false,
   interactive = true,
   delay = 0,
   className,
 }: FeatureCardProps) {
   const colorMap = {
-    orange: {
-      bg: "bg-orange/5",
-      border: "border-orange/20",
-      text: "text-orange",
-      glow: "shadow-lg shadow-orange/20 hover:shadow-orange/40",
-      accent: "bg-orange/10",
+    primary: {
+      bg: "bg-primary/5",
+      border: "border-primary/20",
+      text: "text-primary",
+      glow: "shadow-lg shadow-primary/20 hover:shadow-primary/40",
+      accent: "bg-primary/10",
     },
     green: {
       bg: "bg-green/5",
@@ -65,7 +65,7 @@ export function FeatureCard({
     },
   };
 
-  const colors = colorMap[color];
+  const colors = colorMap[color as keyof typeof colorMap];
 
   return (
     <motion.div
@@ -96,11 +96,10 @@ export function FeatureCard({
         className={cn(
           "absolute -inset-full opacity-0 group-hover:opacity-20 transition-opacity duration-500",
           "bg-gradient-to-br",
-          color === "orange" && "from-orange via-transparent to-green",
-          color === "green" && "from-green via-transparent to-teal",
-          color === "teal" && "from-teal via-transparent to-orange",
-          color === "success" && "from-success via-transparent to-green",
-          color === "warning" && "from-warning via-transparent to-orange",
+            color === "primary" && "border-primary",
+            color === "secondary" && "border-secondary",
+            color === "mint" && "border-mint",
+            color === "accent" && "border-accent",
         )}
       />
 
@@ -108,11 +107,10 @@ export function FeatureCard({
       <motion.div
         className={cn(
           "absolute top-0 left-0 h-1 w-12",
-          color === "orange" && "bg-gradient-to-r from-orange to-green",
-          color === "green" && "bg-gradient-to-r from-green to-teal",
-          color === "teal" && "bg-gradient-to-r from-teal to-orange",
-          color === "success" && "bg-gradient-to-r from-success to-green",
-          color === "warning" && "bg-gradient-to-r from-warning to-orange",
+          color === "primary" && "border-primary",
+          color === "secondary" && "border-secondary",
+          color === "mint" && "border-mint",
+          color === "accent" && "border-accent",
         )}
         initial={{ width: 0 }}
         whileInView={{ width: 48 }}
@@ -140,7 +138,7 @@ export function FeatureCard({
         {/* Title */}
         <h3 className={cn(
           "text-2xl font-bold text-text-primary mb-3",
-          "group-hover:text-orange transition-colors duration-300"
+          "group-hover:text-primary transition-colors duration-300"
         )}>
           {title}
         </h3>
@@ -153,7 +151,7 @@ export function FeatureCard({
         {/* Animated Arrow */}
         {interactive && (
           <motion.div
-            className="mt-6 flex items-center gap-2 text-cyan text-sm font-medium"
+            className="mt-6 flex items-center gap-2 text-secondary text-sm font-medium"
             initial={{ opacity: 0, x: -10 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ delay: delay + 0.3 }}
@@ -176,11 +174,10 @@ export function FeatureCard({
         className={cn(
           "absolute inset-0 rounded-2xl pointer-events-none",
           "border",
-          color === "orange" && "border-orange",
-          color === "green" && "border-green",
-          color === "teal" && "border-teal",
-          color === "success" && "border-success",
-          color === "warning" && "border-warning",
+            color === "primary" && "border-primary",
+            color === "secondary" && "border-secondary",
+            color === "mint" && "border-mint",
+            color === "accent" && "border-accent",
         )}
         initial={{ opacity: 0 }}
         whileHover={interactive ? { opacity: 0.3 } : { opacity: 0 }}
@@ -201,14 +198,14 @@ export function FeatureCardSmall(props: FeatureCardProps) {
       className={cn(
         "group relative overflow-hidden rounded-xl",
         "border border-border/30 bg-surface/50 backdrop-blur-sm",
-        "p-4 hover:border-orange/50 transition-all duration-300",
-        "hover:bg-surface hover:shadow-lg hover:shadow-orange/20",
+        "p-4 hover:border-primary/50 transition-all duration-300",
+        "hover:bg-surface hover:shadow-lg hover:shadow-primary/20",
         props.className
       )}
     >
       <div className="flex items-start gap-3">
         <div className="flex-shrink-0 mt-1">
-          <div className={cn("text-xl", props.color === "orange" && "text-orange", props.color === "green" && "text-green", props.color === "teal" && "text-teal")}>
+          <div className={cn("text-xl", props.color === "primary" && "text-primary", props.color === "secondary" && "text-secondary", props.color === "mint" && "text-mint", props.color === "accent" && "text-accent")}>
             {props.icon}
           </div>
         </div>
@@ -224,3 +221,4 @@ export function FeatureCardSmall(props: FeatureCardProps) {
     </motion.div>
   );
 }
+  

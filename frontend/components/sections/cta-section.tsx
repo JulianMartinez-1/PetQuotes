@@ -53,10 +53,10 @@ export function CTA({
   const variants = {
     default: "bg-surface border border-border/30",
     gradient: cn(
-      "bg-gradient-to-r from-cyan/10 via-transparent to-magenta/10",
-      "border border-gradient-to-r from-cyan/30 to-magenta/30"
+      "bg-gradient-to-r from-secondary/10 via-transparent to-accent/10",
+      "border border-gradient-to-r from-secondary/30 to-accent/30"
     ),
-    minimal: "bg-transparent border-b-2 border-cyan/30 hover:border-cyan/60",
+    minimal: "bg-transparent border-b-2 border-secondary/30 hover:border-secondary/60",
   };
 
   return (
@@ -81,7 +81,7 @@ export function CTA({
           animate={{ rotate: 360 }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-cyan via-transparent to-magenta blur-3xl" />
+          <div className="absolute inset-0 bg-gradient-to-r from-secondary via-transparent to-accent blur-3xl" />
         </motion.div>
       )}
 
@@ -183,8 +183,8 @@ export function InlineCTA({
     <motion.div
       className={cn(
         "relative overflow-hidden rounded-xl p-6",
-        "bg-gradient-to-r from-cyan/5 to-magenta/5",
-        "border border-cyan/20 hover:border-cyan/50",
+        "bg-gradient-to-r from-secondary/5 to-accent/5",
+        "border border-secondary/20 hover:border-secondary/50",
         "transition-all duration-300"
       )}
       whileHover={{ scale: 1.02 }}
@@ -202,8 +202,8 @@ export function InlineCTA({
           <motion.button
             className={cn(
               "flex-shrink-0 p-3 rounded-lg",
-              "bg-cyan/10 text-cyan border border-cyan/30",
-              "hover:bg-cyan/20 hover:border-cyan/50",
+              "bg-secondary/10 text-secondary border border-secondary/30",
+              "hover:bg-secondary/20 hover:border-secondary/50",
               "transition-all duration-300"
             )}
             whileHover={{ scale: 1.1 }}
@@ -216,3 +216,4 @@ export function InlineCTA({
     </motion.div>
   );
 }
+

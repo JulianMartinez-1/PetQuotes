@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #F1F5F9;
+  color: #0F172A;
+  font-family: "Inter", system-ui;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Poppins", system-ui;
+  color: #0F172A;
+}
+
+/* Colores CSS variables para compatibilidad */
+:root {
+  /* Primary */
+  --color-primary: #1D4ED8;
+  --color-primary-hover: #2563EB;
+  --color-primary-dark: #1E40AF;
+  --color-primary-light: #DBEAFE;
+  
+  /* Secondary */
+  --color-secondary: #06B6D4;
+  --color-secondary-hover: #0891B2;
+  --color-secondary-dark: #0E7490;
+  --color-secondary-light: #CFFAFE;
+  
+  /* Mint */
+  --color-mint: #10B981;
+  --color-mint-hover: #059669;
+  --color-mint-dark: #047857;
+  --color-mint-light: #D1FAE5;
+  
+  /* Accent */
+  --color-accent: #FB7185;
+  --color-accent-hover: #F43F5E;
+  --color-accent-dark: #E11D48;
+  --color-accent-light: #FFE4E6;
+  
+  /* Background & Surface */
+  --color-background: #F1F5F9;
+  --color-surface: #FFFFFF;
+  --color-surface-light: #F8FAFC;
+  --color-surface-2: #E2E8F0;
+  
+  /* Text */
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-tertiary: #64748B;
+  --color-text-muted: #94A3B8;
+  
+  /* Semantic */
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+  
+  /* Borders */
+  --color-border: #CBD5E1;
+  --color-border-light: #E2E8F0;
+  --color-border-dark: #94A3B8;
+}
