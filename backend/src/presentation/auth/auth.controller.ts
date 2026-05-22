@@ -5,7 +5,7 @@ import { CurrentUser } from '@shared/decorators';
 import { JwtPayload } from '@shared/types';
 import { RegisterDto, LoginDto, TokenResponseDto } from './auth.dto';
 
-@Controller('api/auth')
+@Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 

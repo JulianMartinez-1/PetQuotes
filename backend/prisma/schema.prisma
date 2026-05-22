@@ -137,6 +137,8 @@ model Pet {
   owner                 User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   appointments          Appointment[]
   medicalHistory        MedicalHistory[]
+  vaccines              Vaccine[]
+  medications           Medication[]
 
   @@index([ownerId])
   @@map("pets")
@@ -330,6 +332,62 @@ model MedicalHistory {
   @@index([petId])
   @@index([appointmentId])
   @@map("medical_history")
+}
+
+// ============================================================
+// VACCINES
+// ============================================================
+
+model Vaccine {
+  id                    String   @id @default(cuid())
+  petId                 String
+  name                  String   // e.g., "Rabies", "DHPP", "FVRCP"
+  dateAdministered      DateTime
+  expiryDate            DateTime?
+  nextDueDate           DateTime?
+  veterinarian          String?
+  clinic                String?
+  batch                 String?
+  notes                 String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  pet                   Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  @@index([petId])
+  @@index([nextDueDate])
+  @@map("vaccines")
+}
+
+// ============================================================
+// MEDICATIONS
+// ============================================================
+
+model Medication {
+  id                    String   @id @default(cuid())
+  petId                 String
+  name                  String   // e.g., "Amoxicillin", "Gabapentin"
+  dosage                String   // e.g., "500mg"
+  frequency             String   // e.g., "Every 8 hours", "Once daily"
+  reason                String?  // e.g., "Infection", "Pain management"
+  startDate             DateTime
+  endDate               DateTime?
+  prescribedBy          String?
+  clinic                String?
+  side_effects          String?
+  notes                 String?
+  status                String   @default("ACTIVE") // ACTIVE, COMPLETED, DISCONTINUED
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  pet                   Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  @@index([petId])
+  @@index([endDate])
+  @@index([status])
+  @@map("medications")
 }
 
 // ============================================================

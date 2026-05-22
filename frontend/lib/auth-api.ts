@@ -36,7 +36,7 @@ export type OAuthProfileCompletionResponse = {
   requiresProfileCompletion: true;
   provider: OAuthProviderId;
   email: string;
-  suggestedFullName: string;
+  name: string;
   completionToken: string;
 };
 

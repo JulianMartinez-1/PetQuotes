@@ -10,6 +10,8 @@ import { AuthModule } from '@presentation/auth/auth.module';
 import { UsersModule } from '@presentation/users/users.module';
 import { PetsModule } from '@presentation/pets/pets.module';
 import { HealthModule } from '@presentation/health/health.module';
+import { VaccineModule } from '@presentation/vaccines/vaccine.module';
+import { MedicationModule } from '@presentation/medications/medication.module';
 
 // TODO: New modules - pending schema alignment
 // import { ClinicModule } from '@presentation/clinics/clinics.module';
@@ -34,6 +36,8 @@ import { HealthModule } from '@presentation/health/health.module';
     UsersModule,
     PetsModule,
     HealthModule,
+    VaccineModule,
+    MedicationModule,
     // TODO: Add new modules after implementing with correct schema fields
     // ClinicModule,
     // AppointmentModule,

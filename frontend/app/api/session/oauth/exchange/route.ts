@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { callAuthBackendRequest, getErrorPayload, normalizeSessionResponse, setSessionCookies } from "@/lib/auth-server";
+import { callAuthBackendRequest, getErrorPayload } from "@/lib/auth-server";
 import { normalizeApiErrorMessage } from "@/lib/error-copy";
-import { setCsrfCookie } from "@/lib/csrf";
 
 export async function POST(request: NextRequest) {
   const body = (await request.json()) as {
@@ -34,9 +33,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: await getErrorPayload(backendResponse) }, { status: backendResponse.status });
   }
 
-  const auth = await backendResponse.json();
-  const response = NextResponse.json(normalizeSessionResponse(auth));
-  setSessionCookies(response, auth);
-  setCsrfCookie(response);
-  return response;
+  // Exchange returns completion token (not login yet)
+  const data = await backendResponse.json();
+  return NextResponse.json(data);
 }

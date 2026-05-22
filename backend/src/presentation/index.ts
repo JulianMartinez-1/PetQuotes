@@ -13,6 +13,10 @@ export * from './pets/pets.dto';
 export * from './health/health.controller';
 export * from './health/health.module';
 
+export * from './vaccines/vaccine.controller';
+
+export * from './medications/medication.controller';
+
 // TODO: New modules pending implementation
 // export * from './clinics/clinics.controller';
 // export * from './clinics/clinics.module';

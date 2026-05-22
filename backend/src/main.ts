@@ -29,8 +29,8 @@ async function bootstrap() {
     }),
   );
 
-  // Prefix for API routes
-  app.setGlobalPrefix('api');
+  // Prefix for API routes - Removed because controllers already specify /api
+  // app.setGlobalPrefix('api');
 
   await app.listen(PORT);
 

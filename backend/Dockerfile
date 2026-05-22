@@ -14,8 +14,11 @@ RUN cd backend && npm ci
 # Copy source code
 COPY backend ./backend
 
-# Build backend
+# Generate Prisma client before build
 WORKDIR /app/backend
+RUN npx prisma generate
+
+# Build backend
 RUN npx tsc -p tsconfig.json && npx tsc-alias -p tsconfig.json
 
 # Production stage

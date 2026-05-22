@@ -8,7 +8,7 @@ import {
   OAuthProvider,
 } from './oauth.dto';
 
-@Controller('api/auth/oauth')
+@Controller('auth/oauth')
 export class OAuthController {
   constructor(private oauthService: OAuthService) {}
 

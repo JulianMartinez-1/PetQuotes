@@ -50,7 +50,7 @@ export default function OAuthCallbackPage() {
       }
 
       try {
-        const redirectUri = `${window.location.origin}/oauth/callback?provider=${encodeURIComponent(params.provider)}`;
+        const redirectUri = `${window.location.origin}/oauth/callback`;
         const response = await exchangeOAuthCode({
           provider: params.provider,
           code: params.code,

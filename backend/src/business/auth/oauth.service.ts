@@ -146,6 +146,7 @@ export class OAuthService {
         email: userInfo.email,
         name: userInfo.name,
         profilePicture: userInfo.picture,
+        requiresProfileCompletion: true,
       };
     } catch (error) {
       throw new BadRequestException(`Failed to exchange OAuth code: ${(error as Error).message}`);

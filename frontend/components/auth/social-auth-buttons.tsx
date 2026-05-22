@@ -31,6 +31,7 @@ function getProviderStyle(providerId: OAuthProvider["id"]): string {
 export function SocialAuthButtons({ contextLabel }: SocialAuthButtonsProps) {
   const [providers, setProviders] = useState<OAuthProvider[]>([]);
   const [loading, setLoading] = useState(true);
+  const [signingIn, setSigningIn] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProviders = async () => {
@@ -53,6 +54,27 @@ export function SocialAuthButtons({ contextLabel }: SocialAuthButtonsProps) {
 
     fetchProviders();
   }, []);
+
+  const handleProviderClick = async (providerId: OAuthProvider["id"]) => {
+    setSigningIn(providerId);
+    try {
+      const response = await fetch(
+        `/api/session/oauth/start?provider=${providerId}&redirectUri=${encodeURIComponent(
+          `${window.location.origin}/oauth/callback`
+        )}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to initiate OAuth flow");
+      }
+
+      const data = (await response.json()) as { authorizationUrl: string };
+      window.location.href = data.authorizationUrl;
+    } catch (error) {
+      console.error("OAuth sign in error:", error);
+      setSigningIn(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -77,13 +99,18 @@ export function SocialAuthButtons({ contextLabel }: SocialAuthButtonsProps) {
           <button
             key={provider.id}
             type="button"
-            className={`flex items-center justify-center gap-2 font-semibold py-3 px-4 text-sm rounded-lg transition-all ${getProviderStyle(provider.id)}`}
-            onClick={() => {
-              window.location.href = `/api/session/oauth/${provider.id}/start`;
-            }}
+            disabled={signingIn === provider.id}
+            className={`flex items-center justify-center gap-2 font-semibold py-3 px-4 text-sm rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed ${getProviderStyle(provider.id)}`}
+            onClick={() => handleProviderClick(provider.id)}
           >
-            <ProviderLogo providerId={provider.id} />
-            <span>{provider.name}</span>
+            {signingIn === provider.id ? (
+              <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
+            ) : (
+              <>
+                <ProviderLogo providerId={provider.id} />
+                <span>{provider.name}</span>
+              </>
+            )}
           </button>
         ))}
       </div>

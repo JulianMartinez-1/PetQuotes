@@ -41,6 +41,7 @@ export class JwtManager {
       accessToken,
       refreshToken,
       expiresIn: decoded.exp - decoded.iat,
+      tokenType: 'Bearer',
     };
   }
 

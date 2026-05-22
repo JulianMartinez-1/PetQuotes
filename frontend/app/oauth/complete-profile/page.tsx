@@ -27,7 +27,7 @@ export default function OAuthCompleteProfilePage() {
     try {
       const parsed = JSON.parse(raw) as OAuthProfileCompletionResponse;
       setContext(parsed);
-      setFullName(parsed.suggestedFullName ?? "");
+      setFullName(parsed.name ?? "");
     } catch {
       setError("No se pudieron recuperar los datos de autenticacion social.");
     }

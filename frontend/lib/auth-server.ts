@@ -41,7 +41,7 @@ export async function callAuthBackendRequest(path: string, options?: { method?: 
   const method = options?.method ?? "POST";
 
   const response = await fetchWithTimeout(
-    `${API_GATEWAY_URL}/api${path}`,
+    `${API_GATEWAY_URL}${path}`,
     {
       method,
       headers: {

@@ -5,7 +5,7 @@ import { CurrentUser } from '@shared/decorators';
 import { JwtPayload } from '@shared/types';
 import { UpdateUserDto, UserResponseDto } from './users.dto';
 
-@Controller('api/users')
+@Controller('users')
 @UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private usersService: UserService) {}

@@ -51,6 +51,7 @@ export class OAuthTokenResponseDto {
   accessToken: string;
   refreshToken: string;
   expiresIn: number;
+  tokenType: string;
   userId: string;
   email: string;
   fullName: string;
@@ -63,4 +64,5 @@ export class OAuthCallbackResponseDto {
   email: string;
   name: string;
   profilePicture?: string;
+  requiresProfileCompletion?: boolean;
 }
