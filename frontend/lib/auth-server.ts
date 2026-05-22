@@ -24,7 +24,7 @@ const API_GATEWAY_URL = process.env.API_BASE_URL ?? process.env.NEXT_PUBLIC_API_
 
 export async function callAuthBackend(path: string, body: unknown) {
   const timeoutMs = Number(process.env.API_PROXY_TIMEOUT_MS ?? 8000);
-  const response = await fetchWithTimeout(`${API_GATEWAY_URL}/api${path}`, {
+  const response = await fetchWithTimeout(`${API_GATEWAY_URL}${path}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -36,7 +36,10 @@ export async function callAuthBackend(path: string, body: unknown) {
   return response;
 }
 
-export async function callAuthBackendRequest(path: string, options?: { method?: "GET" | "POST"; body?: unknown }) {
+export async function callAuthBackendRequest(path: string, options?: {
+  method?: "GET" | "POST" | "PATCH" | "DELETE";
+  body?: unknown;
+}) {
   const timeoutMs = Number(process.env.API_PROXY_TIMEOUT_MS ?? 8000);
   const method = options?.method ?? "POST";
 

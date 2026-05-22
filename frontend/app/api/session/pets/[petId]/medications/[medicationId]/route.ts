@@ -10,7 +10,6 @@ export async function GET(
     const response = await callAuthBackendRequest(
       `/api/pets/${petId}/medications/${medicationId}`,
       { method: 'GET' },
-      request,
     );
     return response;
   } catch (error) {
@@ -31,7 +30,7 @@ export async function PATCH(
     const response = await callAuthBackendRequest(
       `/api/pets/${petId}/medications/${medicationId}`,
       { method: 'PATCH', body: JSON.stringify(body) },
-      request,
+
     );
     return response;
   } catch (error) {
@@ -47,17 +46,22 @@ export async function DELETE(
   context: { params: Promise<{ petId: string; medicationId: string }> },
 ) {
   const { petId, medicationId } = await context.params;
+
   try {
     const response = await callAuthBackendRequest(
       `/api/pets/${petId}/medications/${medicationId}`,
-      { method: 'DELETE' },
-      request,
+      { method: 'DELETE' }
+      
     );
+
     return response;
   } catch (error) {
     return new Response(
       JSON.stringify({ error: 'Failed to delete medication' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } },
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      },
     );
   }
 }

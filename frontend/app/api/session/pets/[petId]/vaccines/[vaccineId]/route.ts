@@ -10,7 +10,6 @@ export async function GET(
     const response = await callAuthBackendRequest(
       `/api/pets/${petId}/vaccines/${vaccineId}`,
       { method: 'GET' },
-      request,
     );
     return response;
   } catch (error) {
@@ -31,7 +30,6 @@ export async function PATCH(
     const response = await callAuthBackendRequest(
       `/api/pets/${petId}/vaccines/${vaccineId}`,
       { method: 'PATCH', body: JSON.stringify(body) },
-      request,
     );
     return response;
   } catch (error) {
@@ -51,7 +49,6 @@ export async function DELETE(
     const response = await callAuthBackendRequest(
       `/api/pets/${petId}/vaccines/${vaccineId}`,
       { method: 'DELETE' },
-      request,
     );
     return response;
   } catch (error) {

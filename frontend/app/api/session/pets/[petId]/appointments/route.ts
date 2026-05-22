@@ -13,8 +13,9 @@ export async function GET(
     
     const response = await callAuthBackendRequest(
       `${baseUrl}${query}`,
-      { method: 'GET' },
-      request,
+      { 
+        method: 'GET' 
+      },
     );
     return response;
   } catch (error) {
@@ -35,7 +36,6 @@ export async function POST(
     const response = await callAuthBackendRequest(
       `/api/pets/${petId}/appointments`,
       { method: 'POST', body: JSON.stringify(body) },
-      request,
     );
     return response;
   } catch (error) {
