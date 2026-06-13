@@ -12,13 +12,13 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 export function Button({ className, variant = "primary", size = "base", isLoading = false, disabled, ...props }: ButtonProps) {
   const variants = {
-    primary: "bg-primary hover:bg-primary-hover text-white shadow-md hover:shadow-lg font-semibold transition-all",
-    secondary: "bg-secondary hover:bg-secondary-hover text-white shadow-md hover:shadow-lg font-semibold transition-all",
-    outline: "border-2 border-primary text-primary hover:bg-primary/10 font-semibold transition-all",
-    ghost: "text-foreground hover:bg-surface-light font-medium transition-colors",
-    danger: "bg-danger hover:bg-danger-dark text-white shadow-md hover:shadow-lg font-semibold transition-all",
-    glow: "bg-primary/10 border border-primary text-primary hover:bg-primary/20 hover:shadow-lg font-semibold transition-all",
-    gradient: "bg-gradient-to-r from-primary to-secondary text-white shadow-lg hover:shadow-xl font-semibold transition-all"
+    primary: "bg-primary hover:bg-primary-hover text-white shadow-md hover:shadow-lg font-semibold transition-all active:shadow-inner",
+    secondary: "bg-secondary hover:bg-secondary-hover text-white shadow-md hover:shadow-lg font-semibold transition-all active:shadow-inner",
+    outline: "border-2 border-primary text-primary hover:bg-primary/10 font-semibold transition-all hover:border-primary-hover",
+    ghost: "text-foreground hover:bg-surface-light font-semibold transition-colors hover:text-primary",
+    danger: "bg-danger hover:bg-danger-dark text-white shadow-md hover:shadow-lg font-semibold transition-all active:shadow-inner",
+    glow: "bg-primary/10 border border-primary text-primary hover:bg-primary/20 hover:shadow-lg font-semibold transition-all hover:border-primary-hover",
+    gradient: "bg-gradient-to-r from-primary to-secondary text-white shadow-lg hover:shadow-xl font-semibold transition-all hover:from-primary-hover hover:to-secondary-hover"
   };
 
   const sizes = {

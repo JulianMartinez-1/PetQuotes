@@ -21,6 +21,7 @@ export default function RegisterPage() {
   const [form, setForm] = useState({ fullName: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
   const [validations, setValidations] = useState({
     name: false,
     email: false,
@@ -60,9 +61,16 @@ export default function RegisterPage() {
     try {
       const response = await registerRequest(payload);
       login({ user: response.user });
-      router.push("/bookings");
+      // Mostrar mensaje de éxito
+      setSuccess(true);
+      setError(null);
+      // Redirigir al inicio después de 3.5 segundos para que vea bien el mensaje
+      setTimeout(() => {
+        router.push("/");
+      }, 3500);
     } catch (err) {
       setError((err as Error).message || "No fue posible crear la cuenta");
+      setSuccess(false);
     } finally {
       setLoading(false);
     }
@@ -274,15 +282,43 @@ export default function RegisterPage() {
                 </motion.div>
               )}
 
+              {/* Success Message */}
+              {success && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className={cn(
+                    "p-4 rounded-lg",
+                    "bg-success/10 border border-success/30 text-success text-sm font-semibold flex items-center gap-3"
+                  )}
+                >
+                  <CheckCircle2 size={20} className="flex-shrink-0" />
+                  <div>
+                    <p>¡Cuenta creada correctamente!</p>
+                    <p className="text-xs opacity-80 mt-1">Redirigiendo al inicio...</p>
+                  </div>
+                </motion.div>
+              )}
+
               {/* Submit Button */}
               <Button
                 type="submit"
-                variant="primary"
+                variant={success ? "secondary" : "primary"}
                 size="lg"
-                disabled={loading || !isFormValid}
+                disabled={loading || !isFormValid || success}
                 className="w-full"
               >
-                {loading ? (
+                {success ? (
+                  <motion.span
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex items-center justify-center gap-2"
+                  >
+                    <CheckCircle2 size={18} />
+                    ¡Listo!
+                  </motion.span>
+                ) : loading ? (
                   <motion.span
                     animate={{ opacity: [1, 0.5, 1] }}
                     transition={{ duration: 1.5, repeat: Infinity }}

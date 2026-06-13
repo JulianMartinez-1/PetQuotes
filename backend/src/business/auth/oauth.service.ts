@@ -218,7 +218,7 @@ export class OAuthService {
     }
 
     // Generate tokens
-    const tokens = this.jwtManager.generateTokens(user.id, user.email, user.role);
+    const tokens = this.jwtManager.generateTokens(user.id, user.email, user.role, user.fullName);
 
     return {
       userId: user.id,

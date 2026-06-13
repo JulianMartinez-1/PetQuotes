@@ -12,19 +12,19 @@ type SocialAuthButtonsProps = {
 };
 
 function getProviderStyle(providerId: OAuthProvider["id"]): string {
-  const baseClass = "w-full text-white hover:shadow-lg";
+  const baseClass = "w-full text-white hover:shadow-lg font-semibold transition-all border border-transparent";
   
   switch (providerId) {
     case "google":
-      return `${baseClass} bg-red-500 hover:bg-red-600`;
+      return `${baseClass} bg-red-600 hover:bg-red-700 focus-visible:ring-2 focus-visible:ring-red-300`;
     case "facebook":
-      return `${baseClass} bg-[#1877F2] hover:bg-[#1565D8]`;
+      return `${baseClass} bg-blue-700 hover:bg-blue-800 focus-visible:ring-2 focus-visible:ring-blue-300`;
     case "github":
-      return `${baseClass} bg-gray-800 hover:bg-gray-900`;
+      return `${baseClass} bg-gray-900 hover:bg-black focus-visible:ring-2 focus-visible:ring-gray-300`;
     case "microsoft":
-      return `${baseClass} bg-[#00A4EF] hover:bg-[#0078D4]`;
+      return `${baseClass} bg-sky-600 hover:bg-sky-700 focus-visible:ring-2 focus-visible:ring-sky-300`;
     default:
-      return `${baseClass} bg-gray-500 hover:bg-gray-600`;
+      return `${baseClass} bg-gray-600 hover:bg-gray-700`;
   }
 }
 

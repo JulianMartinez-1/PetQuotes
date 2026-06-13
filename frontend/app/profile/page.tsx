@@ -17,6 +17,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useRouter } from "next/navigation";
 import { useAuthState } from "@/store/auth-state";
 import { addActivityEvent } from "@/lib/activity-log";
 import {
@@ -39,6 +40,9 @@ export default function ProfilePage() {
   >(12);
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [locatingCity, setLocatingCity] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (!user) return;
@@ -60,6 +64,64 @@ export default function ProfilePage() {
         : null
     );
   }, [user]);
+
+  if (!user) return null;
+
+  // Función para detectar ciudad desde coordenadas
+  const detectCityFromCoordinates = (lat: number, lng: number): string => {
+    // Colombia cities with approximate coordinates
+    const cities = [
+      { name: "Bogota", lat: 4.7110, lng: -74.0721, radius: 0.5 },
+      { name: "Medellin", lat: 6.2442, lng: -75.5812, radius: 0.5 },
+      { name: "Cali", lat: 3.4372, lng: -76.5197, radius: 0.5 },
+    ];
+
+    for (const city of cities) {
+      const distance = Math.sqrt(
+        Math.pow(lat - city.lat, 2) + Math.pow(lng - city.lng, 2)
+      );
+      if (distance < city.radius) {
+        return city.name;
+      }
+    }
+
+    return "Bogota"; // Default fallback
+  };
+
+  // Función para obtener ubicación del usuario
+  const enableGeolocation = async () => {
+    setLocatingCity(true);
+    setLocationError(null);
+
+    if (!("geolocation" in navigator)) {
+      setLocationError("Geolocalización no soportada en tu navegador");
+      setLocatingCity(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        const detectedCity = detectCityFromCoordinates(latitude, longitude);
+        setCity(detectedCity);
+        setLocatingCity(false);
+        addActivityEvent({
+          type: "preferences-updated",
+          title: "Ubicación detectada",
+          description: `Se detectó tu ubicación en ${detectedCity}`,
+        });
+      },
+      (error) => {
+        setLocationError("No se pudo acceder a tu ubicación. Verifica los permisos del navegador.");
+        setLocatingCity(false);
+      }
+    );
+  };
+
+  // Función para ir a clínicas de la ciudad seleccionada
+  const goToClinicsInCity = () => {
+    router.push(`/clinics?city=${city}`);
+  };
 
   if (!user) return null;
 
@@ -275,14 +337,64 @@ export default function ProfilePage() {
                     <MapPin className="inline mr-2 text-secondary" size={16} />
                     Ciudad Principal
                   </label>
-                  <Input
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    placeholder="Bogotá"
-                    variant="default"
-                  />
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <select
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      className={cn(
+                        "flex-1 px-4 py-3 rounded-lg border transition-all",
+                        "bg-surface border-border/30 text-text-primary",
+                        "hover:border-secondary/50 focus:border-secondary focus:ring-secondary/20",
+                        "text-sm font-medium"
+                      )}
+                    >
+                      <option value="Bogota">Bogotá</option>
+                      <option value="Medellin">Medellín</option>
+                      <option value="Cali">Cali</option>
+                    </select>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={enableGeolocation}
+                      disabled={locatingCity}
+                      className={cn(
+                        "px-4 py-3 rounded-lg font-medium transition-all text-sm",
+                        "flex items-center justify-center gap-2",
+                        locatingCity
+                          ? "bg-secondary/20 text-secondary cursor-not-allowed"
+                          : "bg-secondary/10 text-secondary border border-secondary/30 hover:bg-secondary/20 hover:border-secondary/50"
+                      )}
+                    >
+                      <MapPin size={16} />
+                      {locatingCity ? "Detectando..." : "Mi Ubicación"}
+                    </motion.button>
+                  </div>
+                  {locationError && (
+                    <p className="text-xs text-red-500">{locationError}</p>
+                  )}
+                  <p className="text-xs text-text-tertiary">
+                    Selecciona tu ciudad o usa tu ubicación GPS
+                  </p>
                 </motion.div>
               </div>
+
+              {/* Search Clinics Button */}
+              <motion.button
+                variants={itemVariants}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={goToClinicsInCity}
+                className={cn(
+                  "mt-6 w-full px-4 py-3 rounded-lg font-medium transition-all",
+                  "flex items-center justify-center gap-2",
+                  "bg-gradient-to-r from-secondary/20 to-accent/20",
+                  "border border-secondary/30 hover:border-secondary/50",
+                  "text-secondary hover:from-secondary/30 hover:to-accent/30"
+                )}
+              >
+                <MapPin size={18} />
+                Buscar Veterinarias en {city}
+              </motion.button>
             </Card>
 
             {/* Notification Preferences */}
@@ -424,7 +536,8 @@ export default function ProfilePage() {
               onClick={onSaveProfile}
               variant="primary"
               size="lg"
-              className="gap-2 group"
+              className="gap-2 group !text-black"
+              
             >
               <Save size={20} />
               <span>Guardar Cambios</span>

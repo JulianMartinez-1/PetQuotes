@@ -2,6 +2,7 @@ export type ActivityEventType =
   | "booking-created"
   | "booking-updated"
   | "profile-updated"
+  | "profile-photo-updated"
   | "preferences-updated"
   | "auth-login"
   | "auth-logout";

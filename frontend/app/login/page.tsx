@@ -1,10 +1,10 @@
-"use client";
+  "use client";
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowLeft, Mail, Lock } from "lucide-react";
+import { ArrowLeft, Mail, Lock, CheckCircle2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -20,10 +20,14 @@ export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
+    
+    console.clear();
+    console.log("[Login] ===== INICIANDO LOGIN =====");
 
     const payload = {
       email: form.email.trim().toLowerCase(),
@@ -38,11 +42,42 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
+      console.log("[Login] Llamando loginRequest con:", payload.email);
       const response = await loginRequest(payload);
+      console.log("[Login] ✅ loginRequest exitoso!");
+      console.log("[Login] Usuario recibido:", response.user);
+      
+      console.log("[Login] Llamando login()...");
       login({ user: response.user });
-      router.push("/bookings");
+      
+      setSuccess(true);
+      setError(null);
+      
+      console.log("[Login] Esperando a que localStorage se actualice...");
+      
+      // Esperar que localStorage esté actualizado
+      const maxWaitTime = 1500;
+      const startTime = Date.now();
+      
+      const waitForStorage = setInterval(() => {
+        const saved = localStorage.getItem("auth_user");
+        const elapsed = Date.now() - startTime;
+        
+        if (saved) {
+          clearInterval(waitForStorage);
+          console.log("[Login] ✅ localStorage actualizado después de", elapsed, "ms");
+          console.log("[Login] 🚀 Redirigiendo a /...");
+          router.push("/");
+        } else if (elapsed > maxWaitTime) {
+          clearInterval(waitForStorage);
+          console.log("[Login] ⚠️ Timeout esperando localStorage, redirigiendo de todas formas");
+          router.push("/");
+        }
+      }, 50);
     } catch (err) {
+      console.error("[Login] ❌ Error:", err);
       setError((err as Error).message || "No fue posible iniciar sesión");
+      setSuccess(false);
     } finally {
       setLoading(false);
     }
@@ -135,6 +170,7 @@ export default function LoginPage() {
                   className="pl-12"
                   variant="default"
                   required
+                  autoComplete="email"
                 />
               </div>
 
@@ -149,6 +185,7 @@ export default function LoginPage() {
                   className="pl-12"
                   variant="default"
                   required
+                  autoComplete="current-password"
                 />
               </div>
 
@@ -166,15 +203,41 @@ export default function LoginPage() {
                 </motion.div>
               )}
 
+              {/* Success Message */}
+              {success && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className={cn(
+                    "p-4 rounded-lg",
+                    "bg-success/10 border border-success/30 text-success text-sm font-semibold flex items-center gap-3"
+                  )}
+                >
+                  <CheckCircle2 size={20} className="flex-shrink-0" />
+                  <div>
+                    <p>¡Sesión iniciada correctamente!</p>
+                    <p className="text-xs opacity-80 mt-1">Redirigiendo al inicio...</p>
+                  </div>
+                </motion.div>
+              )}
+
               {/* Submit Button */}
               <Button
                 type="submit"
                 variant="primary"
                 size="lg"
-                disabled={loading}
-                className="w-full"
+                disabled={loading || success}
+                className="w-full text-black"
               >
-                {loading ? (
+                {success ? (
+                  <motion.span
+                    animate={{ opacity: [1, 0.5, 1] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  >
+                    ¡Listo!
+                  </motion.span>
+                ) : loading ? (
                   <motion.span
                     animate={{ opacity: [1, 0.5, 1] }}
                     transition={{ duration: 1.5, repeat: Infinity }}

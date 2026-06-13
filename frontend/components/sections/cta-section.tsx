@@ -132,7 +132,7 @@ export function CTA({
               <Button
                 variant="primary"
                 size="lg"
-                className="gap-2 group"
+                className="gap-2 group !text-black"
               >
                 {primaryText}
                 <motion.span

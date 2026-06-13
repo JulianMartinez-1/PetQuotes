@@ -17,6 +17,7 @@ export interface LoginResult {
   accessToken: string;
   refreshToken: string;
   expiresIn: number;
+  tokenType: string;
 }
 
 export interface RegisterResult extends LoginResult {}
@@ -53,7 +54,7 @@ export class AuthService {
     });
 
     // Generate tokens
-    const tokens = this.jwtManager.generateTokens(user.id, user.email, user.role);
+    const tokens = this.jwtManager.generateTokens(user.id, user.email, user.role, user.fullName);
 
     return {
       userId: user.id,
@@ -102,7 +103,7 @@ export class AuthService {
     }
 
     // Generate tokens
-    const tokens = this.jwtManager.generateTokens(user.id, user.email, user.role);
+    const tokens = this.jwtManager.generateTokens(user.id, user.email, user.role, user.fullName);
 
     return {
       userId: user.id,
@@ -133,7 +134,7 @@ export class AuthService {
       throw new EntityNotFoundException('User', userId);
     }
 
-    const tokens = this.jwtManager.generateTokens(user.id, user.email, user.role);
+    const tokens = this.jwtManager.generateTokens(user.id, user.email, user.role, user.fullName);
 
     return {
       userId: user.id,

@@ -5,6 +5,8 @@ import { QueryProvider } from "@/components/query-provider";
 import { AppShell } from "@/components/layout/app-shell";
 import { AppStateProvider } from "@/store/app-state";
 import { AuthStateProvider } from "@/store/auth-state";
+import { GeolocationProvider } from "@/contexts/geolocation-context";
+import { GoogleMapsProvider } from "@/contexts/google-maps-provider";
 import { ScrollIndicator, SmoothScroller } from "@/components/sections/scroll-effects";
 import { ScrollProgressBar } from "@/components/animations/page-transitions";
 import { WebVitalsScript } from "@/components/performance/web-vitals-script";
@@ -28,13 +30,17 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <SmoothScroller />
 
         {/* Providers */}
-        <QueryProvider>
-          <AppStateProvider>
-            <AuthStateProvider>
-              <AppShell>{children}</AppShell>
-            </AuthStateProvider>
-          </AppStateProvider>
-        </QueryProvider>
+        <GoogleMapsProvider>
+          <QueryProvider>
+            <GeolocationProvider>
+              <AppStateProvider>
+                <AuthStateProvider>
+                  <AppShell>{children}</AppShell>
+                </AuthStateProvider>
+              </AppStateProvider>
+            </GeolocationProvider>
+          </QueryProvider>
+        </GoogleMapsProvider>
 
         {/* Chat Widget */}
         <ChatWidget />

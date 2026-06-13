@@ -18,7 +18,7 @@ type AuthStateContextValue = {
   logout: () => void;
 };
 
-const REFRESH_INTERVAL_MS = 8 * 60 * 1000;
+const REFRESH_INTERVAL_MS = 5 * 60 * 1000; // Reducido a 5 minutos para refrescar más frecuentemente
 const AuthStateContext = createContext<AuthStateContextValue | null>(null);
 
 export function AuthStateProvider({ children }: PropsWithChildren) {
@@ -26,44 +26,74 @@ export function AuthStateProvider({ children }: PropsWithChildren) {
   const [isHydrated, setIsHydrated] = useState(false);
 
   const syncAuth = useCallback((payload: { user: AuthUser }) => {
-    setUser(payload.user);
+    try {
+      console.log("[Auth] syncAuth llamado con usuario:", payload.user);
+      setUser(payload.user);
+      if (typeof window !== "undefined") {
+        const serialized = JSON.stringify(payload.user);
+        localStorage.setItem("auth_user", serialized);
+        console.log("[Auth] Guardado en localStorage, verificando:", localStorage.getItem("auth_user"));
+      }
+    } catch (err) {
+      console.error("[Auth] Error en syncAuth:", err);
+    }
   }, []);
 
   const clearAuth = useCallback(() => {
+    console.log("[Auth] clearAuth llamado");
     setUser(null);
+    localStorage.removeItem("auth_user");
   }, []);
 
+  // Initial load from localStorage
   useEffect(() => {
+    console.log("[Auth] useEffect bootstrap ejecutado");
     let mounted = true;
 
     const bootstrap = async () => {
       try {
-        const response = await refreshRequest();
-        if (!mounted) return;
-        syncAuth({ user: response.user });
-      } catch {
-        if (!mounted) return;
-        clearAuth();
+        console.log("[Auth] bootstrap iniciado");
+        // Restaurar desde localStorage si existe
+        const savedUser = localStorage.getItem("auth_user");
+        console.log("[Auth] localStorage.getItem('auth_user'):", savedUser);
+        
+        if (savedUser) {
+          try {
+            const parsedUser = JSON.parse(savedUser) as AuthUser;
+            if (mounted) {
+              console.log("[Auth] Usuario restaurado de localStorage:", parsedUser.email);
+              setUser(parsedUser);
+            }
+          } catch (err) {
+            console.log("[Auth] Error parseando localStorage:", err);
+            localStorage.removeItem("auth_user");
+          }
+        } else {
+          console.log("[Auth] No hay usuario en localStorage");
+        }
       } finally {
-        if (mounted) setIsHydrated(true);
+        if (mounted) {
+          console.log("[Auth] Bootstrap completado, estableciendo isHydrated=true");
+          setIsHydrated(true);
+        }
       }
     };
 
     void bootstrap();
-
-    return () => {
-      mounted = false;
+    return () => { 
+      console.log("[Auth] Cleanup del bootstrap useEffect");
+      mounted = false; 
     };
-  }, [clearAuth, syncAuth]);
+  }, []); // Empty dependency - solo ejecuta al montar
 
   const refreshSession = useCallback(async () => {
     try {
       const response = await refreshRequest();
       syncAuth({ user: response.user });
     } catch {
-      clearAuth();
+      // Si refresh falla, mantiene la sesión actual sin limpiarla
     }
-  }, [clearAuth, syncAuth]);
+  }, [syncAuth]);
 
   useEffect(() => {
     if (!isHydrated || !user) return;
@@ -76,6 +106,7 @@ export function AuthStateProvider({ children }: PropsWithChildren) {
   }, [isHydrated, refreshSession, user]);
 
   const login = ({ user: nextUser }: { user: AuthUser }) => {
+    console.log("[Auth] login() llamado con:", nextUser.email);
     syncAuth({ user: nextUser });
   };
 

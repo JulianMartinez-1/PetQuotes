@@ -18,8 +18,37 @@ export async function POST(request: NextRequest) {
   }
 
   const auth = await backendResponse.json();
-  const response = NextResponse.json(normalizeSessionResponse(auth));
+  const sessionData = normalizeSessionResponse(auth);
+  
+  console.log("[Login API] ✅ Backend response OK");
+  console.log(`[Login API] Usuario: ${sessionData.user.email}`);
+  console.log(`[Login API] Access token recibido: ${auth.accessToken?.substring(0, 20)}...`);
+  console.log(`[Login API] Refresh token recibido: ${auth.refreshToken?.substring(0, 20)}...`);
+  
+  // Crear respuesta con JSON
+  const response = NextResponse.json(sessionData, {
+    status: 200,
+    headers: {
+      "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+      "Pragma": "no-cache",
+      "Expires": "0",
+      "X-Login-Success": "true",
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  });
+  
+  // Establecer las cookies en la respuesta
+  console.log("[Login API] Estableciendo cookies...");
   setSessionCookies(response, auth);
   setCsrfCookie(response);
+  
+  // Verificar que las cookies se establecieron
+  const setCookieHeaders = response.headers.getSetCookie();
+  console.log(`[Login API] ✅ ${setCookieHeaders.length} Set-Cookie headers establecidos`);
+  setCookieHeaders.forEach((header, index) => {
+    const cookieName = header.split("=")[0];
+    console.log(`[Login API] Cookie ${index + 1}: ${cookieName}`);
+  });
+  
   return response;
 }

@@ -71,6 +71,10 @@ const config: Config = {
         background: "#F1F5F9",
         surface: "#FFFFFF",
         foreground: "#0F172A",
+        // Status colors
+        success: "#22C55E",
+        warning: "#F59E0B",
+        danger: "#EF4444",
       },
     }
   },

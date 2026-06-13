@@ -26,6 +26,7 @@ export class TokenResponseDto {
   accessToken: string;
   refreshToken: string;
   expiresIn: number;
+  tokenType: string;
   userId: string;
   email: string;
   fullName: string;

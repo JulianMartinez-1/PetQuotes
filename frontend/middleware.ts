@@ -13,28 +13,37 @@ export async function middleware(request: NextRequest) {
   }
 
   const accessToken = request.cookies.get(AUTH_COOKIE_NAMES.access)?.value;
+  
+  console.log(`[Middleware] Ruta protegida: ${pathname}`);
+  console.log(`[Middleware] Cookie presente: ${!!accessToken}`);
+  
+  // Si no hay token, permitir acceso pero dejar que el cliente se encargue
+  // El AuthGuard del lado del cliente redirigirá si es necesario
   if (!accessToken) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("next", pathname);
-    return NextResponse.redirect(loginUrl);
+    console.log(`[Middleware] ⚠️ Sin access token en ${pathname}, pero permitiendo acceso al cliente`);
+    return NextResponse.next();
   }
 
+  // Verificar que el token es válido
   const jwtSecret = process.env.JWT_ACCESS_SECRET;
   if (!jwtSecret) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    console.log("[Middleware] JWT_ACCESS_SECRET no configurado");
+    return NextResponse.next();
   }
 
   const payload = await verifyJwtHs256(accessToken, jwtSecret);
   if (!payload) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("next", pathname);
-    return NextResponse.redirect(loginUrl);
+    console.log("[Middleware] Token JWT inválido, pero permitiendo acceso al cliente");
+    return NextResponse.next();
   }
 
+  // Verificar rol si es necesario
   if (!payload.role || !rule.roles.includes(payload.role)) {
+    console.log(`[Middleware] Rol no autorizado: ${payload.role}, redirigiendo a inicio`);
     return NextResponse.redirect(new URL("/", request.url));
   }
 
+  console.log(`[Middleware] ✅ Acceso permitido para ${pathname}, rol: ${payload.role}`);
   return NextResponse.next();
 }
 

@@ -12,9 +12,9 @@ import { PetsModule } from '@presentation/pets/pets.module';
 import { HealthModule } from '@presentation/health/health.module';
 import { VaccineModule } from '@presentation/vaccines/vaccine.module';
 import { MedicationModule } from '@presentation/medications/medication.module';
+import { ClinicsModule } from '@presentation/clinics/clinics.module';
 
 // TODO: New modules - pending schema alignment
-// import { ClinicModule } from '@presentation/clinics/clinics.module';
 // import { AppointmentModule } from '@presentation/appointments/appointments.module';
 // import { ProfessionalModule } from '@presentation/professionals/professionals.module';
 // import { NotificationModule } from '@presentation/notifications/notifications.module';
@@ -38,8 +38,8 @@ import { MedicationModule } from '@presentation/medications/medication.module';
     HealthModule,
     VaccineModule,
     MedicationModule,
+    ClinicsModule,
     // TODO: Add new modules after implementing with correct schema fields
-    // ClinicModule,
     // AppointmentModule,
     // ProfessionalModule,
     // NotificationModule,

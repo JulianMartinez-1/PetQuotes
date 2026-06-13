@@ -8,6 +8,7 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAppState } from "@/store/app-state";
 import { useAuthState } from "@/store/auth-state";
+import { Footer } from "./footer";
 
 const NAV_ITEMS = [
   { href: "/", label: "Inicio" },
@@ -55,14 +56,14 @@ export function AppShell({ children }: PropsWithChildren) {
                   <p className="text-sm font-bold text-white">{user?.fullName}</p>
                   <p className="text-xs text-gray-400">Mi perfil</p>
                 </Link>
-                <Button variant="ghost" type="button" onClick={logout}>
+                <Button variant="secondary" type="button" onClick={logout}>
                   Cerrar sesión
                 </Button>
               </>
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="ghost">Entrar</Button>
+                  <Button variant="secondary">Entrar</Button>
                 </Link>
                 <Link href="/register">
                   <Button variant="secondary">Crear cuenta</Button>
@@ -131,9 +132,7 @@ export function AppShell({ children }: PropsWithChildren) {
 
       <main id="main-content" className="flex-1 py-6" tabIndex={-1}>{children}</main>
 
-      <footer className="mt-8 border-t border-border/20 bg-slate-900">
-        <div className="page-container py-6 text-base font-bold text-white">© {new Date().getFullYear()} PET QUOTES · Reservas veterinarias inteligentes</div>
-      </footer>
+      <Footer />
     </div>
   );
 }

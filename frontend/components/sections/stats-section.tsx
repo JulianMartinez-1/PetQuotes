@@ -143,8 +143,6 @@ export function StatsGrid({
                     separator=","
                     prefix={stat.prefix}
                     suffix={stat.suffix}
-                    enableScrollSpy={true}
-                    scrollSpyOnce={true}
                   />
                 </motion.div>
 
@@ -232,8 +230,6 @@ export function StatCard({
                 start={0}
                 end={value}
                 duration={2.75}
-                enableScrollSpy={true}
-                scrollSpyOnce={true}
               />
             ) : (
               value

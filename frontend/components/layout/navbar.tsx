@@ -3,8 +3,8 @@
 import { useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { Menu, X, LogOut, Settings } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X, LogOut, Settings, User } from "lucide-react";
 import { useAuthState } from "@/store/auth-state";
 import { useDarkMode } from "@/hooks/useAnimations";
 import { DURATIONS } from "@/constants/animations";
@@ -16,8 +16,10 @@ export function NavBar() {
   const router = useRouter();
   const { isAuthenticated, user, logout } = useAuthState();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const { isDark, toggleDarkMode } = useDarkMode();
   const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = async () => {
     await logout();
@@ -118,33 +120,104 @@ export function NavBar() {
               </motion.button>
 
               {/* Auth Actions */}
-              {isAuthenticated ? (
-                <div className="hidden sm:flex items-center gap-3">
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleLogout}
-                      className="gap-2 text-base font-bold"
-                    >
-                      <LogOut size={16} />
-                      <span className="hidden sm:inline">Logout</span>
-                    </Button>
-                  </motion.div>
+              {isAuthenticated && user ? (
+                <div className="relative">
+                  <motion.button
+                    onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                    className={cn(
+                      "flex items-center gap-2 px-3 py-2 rounded-lg",
+                      "bg-secondary/10 hover:bg-secondary/20 border border-secondary/30",
+                      "transition-all duration-300"
+                    )}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className={cn(
+                        "w-8 h-8 rounded-full bg-gradient-to-br",
+                        "from-secondary to-accent flex items-center justify-center",
+                        "text-white font-bold text-sm"
+                      )}>
+                        {user.fullName.charAt(0).toUpperCase()}
+                      </div>
+                      <span className="hidden sm:inline text-sm font-bold text-white truncate max-w-[150px]">
+                        {user.fullName}
+                      </span>
+                    </div>
+                  </motion.button>
+
+                  {/* Profile Dropdown Menu */}
+                  <AnimatePresence>
+                    {profileMenuOpen && (
+                      <motion.div
+                        ref={profileMenuRef}
+                        className={cn(
+                          "absolute right-0 mt-2 w-48 rounded-lg",
+                          "bg-surface border border-border/30 shadow-xl shadow-black/20",
+                          "z-50"
+                        )}
+                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <div className="p-3 border-b border-border/30">
+                          <p className="text-sm font-bold text-text-primary">{user.fullName}</p>
+                          <p className="text-xs text-text-secondary">{user.email}</p>
+                        </div>
+                        <div className="p-2 space-y-2">
+                          <motion.div
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                          >
+                            <Link href="/profile">
+                              <button
+                                onClick={() => setProfileMenuOpen(false)}
+                                className={cn(
+                                  "w-full flex items-center gap-2 px-3 py-2 rounded-lg",
+                                  "text-sm font-bold text-text-primary",
+                                  "hover:bg-primary/20 transition-colors"
+                                )}
+                              >
+                                <User size={16} />
+                                Mi Perfil
+                              </button>
+                            </Link>
+                          </motion.div>
+                          <motion.button
+                            onClick={() => {
+                              handleLogout();
+                              setProfileMenuOpen(false);
+                            }}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className={cn(
+                              "w-full flex items-center gap-2 px-3 py-2 rounded-lg",
+                              "text-sm font-bold text-danger",
+                              "hover:bg-danger/20 transition-colors"
+                            )}
+                          >
+                            <LogOut size={16} />
+                            Cerrar Sesion
+                          </motion.button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               ) : (
                 <div className="hidden sm:flex items-center gap-2">
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Link href="/login">
                       <Button variant="outline" size="sm" className="text-base font-bold">
-                        Login
+                        Entrar
                       </Button>
                     </Link>
                   </motion.div>
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Link href="/register">
                       <Button variant="primary" size="sm" className="text-base font-bold">
-                        Sign Up
+                        Crear cuenta
                       </Button>
                     </Link>
                   </motion.div>

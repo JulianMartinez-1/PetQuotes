@@ -3,9 +3,8 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
-import { Search, MapPin, ArrowRight } from "lucide-react";
+import { Search, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ServiceCard } from "@/components/ui/service-card";
 import { StatsGrid } from "@/components/sections/stats-section";
@@ -13,36 +12,51 @@ import { CTA } from "@/components/sections/cta-section";
 import { TestimonialsGrid } from "@/components/sections/testimonials-section";
 import { PlayfulPets, PetsParade, FloatingPets } from "@/components/animations/pet-animations";
 import { ScrollReactivePets } from "@/components/animations/scroll-reactive-pets";
+import { AdvancedSearch } from "@/components/search/advanced-search";
 import { DURATIONS } from "@/constants/animations";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 export default function HomePage() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSelectCity = (city: string) => {
+    router.push(`/clinics?city=${city}`);
+  };
+
+  const handleSelectNeighborhood = (neighborhood: string, city: string) => {
+    router.push(`/clinics?city=${city}&neighborhood=${neighborhood}`);
+  };
+
+  const handleSelectClinic = (clinicId: string) => {
+    router.push(`/clinics/${clinicId}`);
+  };
 
   const services = [
     {
-      icon: "█",
+      icon: "🩺",
       title: "Consulta Veterinaria",
       description: "Diagnósticos y tratamientos de expertos",
       href: "/services/consulta-veterinaria",
       color: "primary" as const,
     },
     {
-      icon: "█",
+      icon: "✂️",
       title: "Baño & Grooming",
       description: "Cuidado profesional para tu mascota",
       href: "/services/bano-grooming",
       color: "mint" as const,
     },
     {
-      icon: "█",
+      icon: "💉",
       title: "Vacunación",
       description: "Inmunización completa y segura",
       href: "/services/vacunacion",
       color: "secondary" as const,
     },
     {
-      icon: "█",
+      icon: "✨",
       title: "Estética",
       description: "Belleza y bienestar para tu pet",
       href: "/services/estetica",
@@ -190,37 +204,21 @@ export default function HomePage() {
               <PlayfulPets count={3} className="justify-center gap-12" />
             </motion.div>
 
-            {/* Search Bar */}
+            {/* Search Bar with Advanced Features */}
             <motion.div
-              className="flex flex-col sm:flex-row gap-4 justify-center max-w-2xl mx-auto"
+              className="flex flex-col gap-4 justify-center max-w-2xl mx-auto"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: DURATIONS.base / 1000 }}
             >
-              <div className="flex-1 relative group">
-                <MapPin
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-primary opacity-60"
-                  size={20}
-                />
-                <Input
-                  type="text"
-                  placeholder="Tu ubicación o zona..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 h-14 text-base shadow-lg"
-                  variant="default"
-                />
-              </div>
-              <Link href="/clinics">
-                <Button
-                  variant="primary"
-                  size="lg"
-                  className="h-14 gap-3 w-full sm:w-auto shadow-lg shadow-primary/20"
-                >
-                  <Search size={20} />
-                  <span>Buscar</span>
-                </Button>
-              </Link>
+              <AdvancedSearch
+                value={searchQuery}
+                onChange={setSearchQuery}
+                onSelectCity={handleSelectCity}
+                onSelectNeighborhood={handleSelectNeighborhood}
+                onSelectClinic={handleSelectClinic}
+                placeholder="Busca por barrio, ciudad, clínica o servicio..."
+              />
             </motion.div>
 
             {/* CTA Button */}
@@ -234,7 +232,7 @@ export default function HomePage() {
                 <Button
                   variant="gradient"
                   size="lg"
-                  className="gap-3 px-8"
+                  className="gap-3 px-8 !text-black"
                 >
                   Explorar Clínicas
                   <motion.span

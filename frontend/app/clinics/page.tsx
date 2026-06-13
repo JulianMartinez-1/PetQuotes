@@ -3,9 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Route } from "next";
-import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo, useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Building2,
   MapPin,
@@ -20,30 +20,122 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CATALOG_PAGE_SIZE, CLINIC_CATALOG } from "@/lib/clinic-catalog";
+import { ClinicDetailModal } from "@/components/map/clinic-detail-modal";
+import { getClinicsFromStorage } from "@/lib/clinic-storage";
+import { searchNearByClinics } from "@/lib/clinics-api";
+import { CLINIC_CATALOG } from "@/lib/clinic-catalog";
 import { DURATIONS } from "@/constants/animations";
 import { cn } from "@/lib/utils";
+
+const CATALOG_PAGE_SIZE = 4;
 
 type SortMode = "rating" | "distance";
 
 export default function ClinicsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [query, setQuery] = useState("");
   const [selectedCity, setSelectedCity] = useState("all");
   const [openNowOnly, setOpenNowOnly] = useState(false);
   const [sortMode, setSortMode] = useState<SortMode>("rating");
   const [page, setPage] = useState(1);
   const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
+  const [clinicsData, setClinicsData] = useState<typeof CLINIC_CATALOG>(CLINIC_CATALOG);
+  const [loading, setLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("");
+  const [locationError, setLocationError] = useState<string | null>(null);
+  
+  // Estados para el modal de clínica individual
+  const [selectedClinic, setSelectedClinic] = useState<typeof CLINIC_CATALOG[0] | null>(null);
+
+  // Solicitar geolocalización y cargar clínicas cercanas
+  useEffect(() => {
+    const loadNearByClinics = async () => {
+      try {
+        // Pedir permiso de geolocalización
+        if (!navigator.geolocation) {
+          setLocationError("Tu navegador no soporta geolocalización");
+          return;
+        }
+
+        console.log("🔄 Solicitando permiso de geolocalización...");
+
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            console.log(`✅ Permiso CONCEDIDO. Ubicación: ${latitude}, ${longitude}`);
+            
+            // Ahora SÍ mostrar loading, después de que se concedió el permiso
+            setLoading(true);
+            setLoadingMessage("Buscando veterinarias cerca...");
+            
+            // Buscar clínicas cercanas
+            const nearbyClinics = await searchNearByClinics(latitude, longitude, 10);
+            console.log(`📡 Respuesta API completa:`, nearbyClinics);
+            console.log(`📡 Respuesta API: ${nearbyClinics?.length || 0} clínicas`);
+            console.log(`📡 Tipos de datos:`, nearbyClinics?.[0]);
+            
+            if (nearbyClinics && nearbyClinics.length > 0) {
+              console.log(`✅ Encontradas ${nearbyClinics.length} veterinarias cercanas`);
+              console.log(`📍 Primer clinic:`, nearbyClinics[0]);
+              setClinicsData(nearbyClinics);
+              setLoading(false);
+            } else {
+              console.log("⚠️ No se encontraron veterinarias cercanas en API");
+              console.log("📍 Usando fallback de clinicas locales...");
+              setLocationError("Mostrando veterinarias cercanas disponibles");
+              // Mantener el CLINIC_CATALOG inicial como fallback - NO cambiar clinicsData
+              setLoading(false);
+            }
+          },
+          (error) => {
+            console.warn(`❌ Permiso DENEGADO o error: ${error.message} (código: ${error.code})`);
+            let errorMsg = "No se pudo obtener tu ubicación";
+            
+            if (error.code === 1) {
+              errorMsg = "Permiso de ubicación denegado. Habilítalo en la configuración del navegador.";
+            } else if (error.code === 2) {
+              errorMsg = "No se pudo determinar tu ubicación. Intenta nuevamente.";
+            } else if (error.code === 3) {
+              errorMsg = "La solicitud de ubicación tardó demasiado.";
+            }
+            
+            setLocationError(errorMsg);
+          },
+          {
+            enableHighAccuracy: false,
+            timeout: 10000,
+            maximumAge: 0,
+          }
+        );
+      } catch (error) {
+        console.error("❌ Error inesperado:", error);
+        setLocationError(
+          error instanceof Error ? error.message : "Error desconocido"
+        );
+      }
+    };
+
+    loadNearByClinics();
+  }, []);
+
+  // Preseleccionar ciudad desde URL si viene en los params
+  useEffect(() => {
+    const cityParam = searchParams.get("city");
+    if (cityParam && ["Bogota", "Medellin", "Cali"].includes(cityParam)) {
+      setSelectedCity(cityParam);
+    }
+  }, [searchParams]);
 
   const cityOptions = useMemo(
-    () => ["all", ...new Set(CLINIC_CATALOG.map((item) => item.city))],
-    []
+    () => ["all", ...new Set(clinicsData.map((item) => item.city))],
+    [clinicsData]
   );
 
   const filtered = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
-    const base = CLINIC_CATALOG.filter((item) => {
+    const base = clinicsData.filter((item) => {
       const matchesCity = selectedCity === "all" || item.city === selectedCity;
       const matchesOpenNow = !openNowOnly || item.openNow;
       const matchesQuery =
@@ -63,7 +155,7 @@ export default function ClinicsPage() {
     });
 
     return sorted;
-  }, [openNowOnly, query, selectedCity, sortMode]);
+  }, [openNowOnly, query, selectedCity, sortMode, clinicsData]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / CATALOG_PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
@@ -95,6 +187,46 @@ export default function ClinicsPage() {
 
   return (
     <main className="overflow-hidden">
+      {/* Loading State */}
+      {loading && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-dark/80 backdrop-blur-sm z-50 flex items-center justify-center"
+        >
+          <motion.div className="flex flex-col items-center gap-4">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              className="w-12 h-12 border-4 border-secondary/30 border-t-secondary rounded-full"
+            />
+            <p className="text-white text-center text-sm font-medium">{loadingMessage}</p>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* Error State */}
+      {locationError && !loading && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed top-0 left-0 right-0 bg-red-500/90 text-white p-4 z-50 text-center"
+        >
+          <p className="font-medium">📍 {locationError}</p>
+          <p className="text-sm mt-1">Activa los permisos de ubicación para ver veterinarias cercanas</p>
+        </motion.div>
+      )}
+
+      {/* Clinic Detail Modal */}
+      <AnimatePresence>
+        {selectedClinic && (
+          <ClinicDetailModal
+            clinic={selectedClinic}
+            onClose={() => setSelectedClinic(null)}
+          />
+        )}
+      </AnimatePresence>
       {/* Hero Section */}
       <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden pt-16 pb-12">
         {/* Background Gradients */}
@@ -132,6 +264,15 @@ export default function ClinicsPage() {
             <p className="text-xl text-text-secondary max-w-2xl mx-auto">
               Compara clínicas verificadas, compara precios y disponibilidad con total confianza
             </p>
+
+            {/* Admin Link */}
+            <div className="mt-6">
+              <Link href="/admin/clinics">
+                <Badge className="px-4 py-2 bg-secondary/10 border-secondary/50 hover:bg-secondary/20 cursor-pointer transition-all inline-block">
+                  🔧 Panel de Administración
+                </Badge>
+              </Link>
+            </div>
           </motion.div>
 
           {/* Stats Row */}
@@ -180,7 +321,7 @@ export default function ClinicsPage() {
             <h2 className="text-lg font-bold text-text-primary">Filtros</h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
             {/* Search Input */}
             <div className="relative lg:col-span-2">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary/40 size-5" />
@@ -266,7 +407,10 @@ export default function ClinicsPage() {
             >
               {paginated.map((clinic) => (
                 <motion.div key={clinic.id} variants={itemVariants}>
-                  <Card className="overflow-hidden group h-full flex flex-col hover:border-secondary/50 transition-all">
+                  <Card 
+                    className="overflow-hidden group h-full flex flex-col hover:border-secondary/50 transition-all cursor-pointer"
+                    onClick={() => setSelectedClinic(clinic)}
+                  >
                     {/* Image Container */}
                     <div className="relative overflow-hidden h-48">
                       <Image
@@ -355,7 +499,8 @@ export default function ClinicsPage() {
                           variant="primary"
                           size="sm"
                           className="flex-1"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setNavigatingTo(clinic.id);
                             router.push(`/clinics/${clinic.id}` as Route);
                           }}
@@ -363,7 +508,7 @@ export default function ClinicsPage() {
                         >
                           {navigatingTo === clinic.id ? "Abriendo..." : "Ver Ficha"}
                         </Button>
-                        <Link href="/bookings" className="flex-1">
+                        <Link href="/bookings" className="flex-1" onClick={(e) => e.stopPropagation()}>
                           <Button variant="secondary" size="sm" className="w-full">
                             Reservar
                           </Button>

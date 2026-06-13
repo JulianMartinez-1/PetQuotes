@@ -15,12 +15,13 @@ export class JwtManager {
     this.refreshExpiresIn = this.configService.get<string>('JWT_REFRESH_EXPIRATION') || '7d';
   }
 
-  generateTokens(userId: string, email: string, role: string) {
+  generateTokens(userId: string, email: string, role: string, fullName?: string) {
     const accessToken = jwt.sign(
       {
         sub: userId,
         email,
         role,
+        fullName: fullName || email.split('@')[0],
       } as JwtPayload,
       this.secret,
       { expiresIn: this.expiresIn as any },
