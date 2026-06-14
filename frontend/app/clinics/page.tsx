@@ -28,8 +28,63 @@ import { DURATIONS } from "@/constants/animations";
 import { cn } from "@/lib/utils";
 
 const CATALOG_PAGE_SIZE = 4;
+const CLINICS_CACHE_KEY = "clinics_nearby_cache";
+const CLINICS_CACHE_TTL = 30 * 60 * 1000; // 30 minutos
 
 type SortMode = "rating" | "distance";
+
+interface ClinicsCache {
+  data: typeof CLINIC_CATALOG;
+  timestamp: number;
+  latitude: number;
+  longitude: number;
+}
+
+// Funciones de utilidad para cacheo
+function getCachedClinics(latitude: number, longitude: number): typeof CLINIC_CATALOG | null {
+  try {
+    if (typeof window === "undefined") return null;
+    
+    const cached = localStorage.getItem(CLINICS_CACHE_KEY);
+    if (!cached) return null;
+
+    const parsed: ClinicsCache = JSON.parse(cached);
+    const now = Date.now();
+    const isExpired = now - parsed.timestamp > CLINICS_CACHE_TTL;
+    
+    // Verificar si el caché es para la misma ubicación (tolerancia de 0.1 grados)
+    const isSameLocation = 
+      Math.abs(parsed.latitude - latitude) < 0.1 && 
+      Math.abs(parsed.longitude - longitude) < 0.1;
+
+    if (isExpired || !isSameLocation) {
+      localStorage.removeItem(CLINICS_CACHE_KEY);
+      return null;
+    }
+
+    console.log("✅ Usando clínicas desde caché (edad:", Math.round((now - parsed.timestamp) / 1000), "seg)");
+    return parsed.data;
+  } catch (error) {
+    console.warn("Error al leer caché:", error);
+    return null;
+  }
+}
+
+function setCachedClinics(clinics: typeof CLINIC_CATALOG, latitude: number, longitude: number): void {
+  try {
+    if (typeof window === "undefined") return;
+    
+    const cache: ClinicsCache = {
+      data: clinics,
+      timestamp: Date.now(),
+      latitude,
+      longitude,
+    };
+    localStorage.setItem(CLINICS_CACHE_KEY, JSON.stringify(cache));
+  } catch (error) {
+    console.warn("Error al guardar caché:", error);
+  }
+}
 
 export default function ClinicsPage() {
   const router = useRouter();
@@ -44,9 +99,15 @@ export default function ClinicsPage() {
   const [loading, setLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   
   // Estados para el modal de clínica individual
   const [selectedClinic, setSelectedClinic] = useState<typeof CLINIC_CATALOG[0] | null>(null);
+
+  // Handler para cuando una imagen falla
+  const handleImageError = (clinicId: string) => {
+    setFailedImages(prev => new Set([...prev, clinicId]));
+  };
 
   // Solicitar geolocalización y cargar clínicas cercanas
   useEffect(() => {
@@ -65,6 +126,15 @@ export default function ClinicsPage() {
             const { latitude, longitude } = position.coords;
             console.log(`✅ Permiso CONCEDIDO. Ubicación: ${latitude}, ${longitude}`);
             
+            // ✅ NUEVO: Verificar si hay caché válido
+            const cachedClinics = getCachedClinics(latitude, longitude);
+            if (cachedClinics && cachedClinics.length > 0) {
+              console.log(`✅ Clinicas cargadas desde caché (${cachedClinics.length} resultados)`);
+              setClinicsData(cachedClinics);
+              setLoading(false);
+              return;
+            }
+            
             // Ahora SÍ mostrar loading, después de que se concedió el permiso
             setLoading(true);
             setLoadingMessage("Buscando veterinarias cerca...");
@@ -79,6 +149,8 @@ export default function ClinicsPage() {
               console.log(`✅ Encontradas ${nearbyClinics.length} veterinarias cercanas`);
               console.log(`📍 Primer clinic:`, nearbyClinics[0]);
               setClinicsData(nearbyClinics);
+              // ✅ NUEVO: Guardar en caché
+              setCachedClinics(nearbyClinics, latitude, longitude);
               setLoading(false);
             } else {
               console.log("⚠️ No se encontraron veterinarias cercanas en API");
@@ -184,6 +256,9 @@ export default function ClinicsPage() {
       transition: { duration: DURATIONS.base / 1000 },
     },
   };
+
+  // Re-animar cuando las clínicas cambian
+  const animationKey = useMemo(() => clinicsData.map(c => c.id).join(','), [clinicsData]);
 
   return (
     <main className="overflow-hidden">
@@ -399,10 +474,11 @@ export default function ClinicsPage() {
         {paginated.length > 0 ? (
           <>
             <motion.div
+              key={animationKey}
               variants={containerVariants}
               initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
+              animate="visible"
+              viewport={{ once: false, amount: 0.2 }}
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
             >
               {paginated.map((clinic) => (
@@ -412,14 +488,22 @@ export default function ClinicsPage() {
                     onClick={() => setSelectedClinic(clinic)}
                   >
                     {/* Image Container */}
-                    <div className="relative overflow-hidden h-48">
-                      <Image
-                        src={clinic.image}
-                        alt={clinic.name}
-                        width={1200}
-                        height={600}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
+                    <div className="relative overflow-hidden h-48 bg-gradient-to-br from-secondary/20 to-accent/20">
+                      {failedImages.has(clinic.id) ? (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-secondary/10 to-accent/10">
+                          <Building2 size={48} className="text-text-tertiary/50" />
+                        </div>
+                      ) : (
+                        <Image
+                          src={clinic.image}
+                          alt={clinic.name}
+                          width={1200}
+                          height={600}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          onError={() => handleImageError(clinic.id)}
+                          loading="lazy"
+                        />
+                      )}
 
                       {/* Status Badge */}
                       <div className="absolute top-4 right-4">
@@ -498,7 +582,7 @@ export default function ClinicsPage() {
                         <Button
                           variant="primary"
                           size="sm"
-                          className="flex-1"
+                          className="flex-1 text-black"
                           onClick={(e) => {
                             e.stopPropagation();
                             setNavigatingTo(clinic.id);
@@ -509,7 +593,7 @@ export default function ClinicsPage() {
                           {navigatingTo === clinic.id ? "Abriendo..." : "Ver Ficha"}
                         </Button>
                         <Link href="/bookings" className="flex-1" onClick={(e) => e.stopPropagation()}>
-                          <Button variant="secondary" size="sm" className="w-full">
+                          <Button variant="secondary" size="sm" className="w-full text-black">
                             Reservar
                           </Button>
                         </Link>

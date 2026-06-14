@@ -64,83 +64,146 @@ export class ClinicsService {
   /**
    * Busca veterinarias cercanas a las coordenadas del usuario
    */
-  async searchClinicsByCoordinates(
-    latitude: number,
-    longitude: number,
-    radiusKm: number = 5,
-  ): Promise<ClinicCatalogItem[]> {
-    try {
-      if (!this.googleMapsApiKey) {
-        this.logger.warn('⚠️ Google Maps API Key no configurada, usando fallback');
-        // Usar fallback si no hay API key
-        return await this.fallbackService.getClinicsWithFallback('all');
-      }
+async searchClinicsByCoordinates(
+  latitude: number,
+  longitude: number,
+  radiusKm: number = 5,
+): Promise<ClinicCatalogItem[]> {
+  try {
+    if (!this.googleMapsApiKey) {
+      this.logger.warn('⚠️ Google Maps API Key no configurada, usando fallback');
+      return await this.fallbackService.getClinicsWithFallback('all');
+    }
 
-      this.logger.log(`📍 Buscando clínicas cercanas a (${latitude}, ${longitude}), radio: ${radiusKm}km`);
-      
-      const radiusMeters = radiusKm * 1000;
-      
-      const response = await this.googleMapsClient.get('/place/nearbysearch/json', {
+    this.logger.log(
+      `📍 Buscando clínicas cercanas a (${latitude}, ${longitude}), radio: ${radiusKm}km`,
+    );
+
+    const radiusMeters = radiusKm * 1000;
+
+    const response = await this.googleMapsClient.get(
+      '/place/nearbysearch/json',
+      {
         params: {
           location: `${latitude},${longitude}`,
           radius: radiusMeters,
-          keyword: 'veterinary',
-          type: 'veterinary_care',
+          keyword: 'veterinaria',
           key: this.googleMapsApiKey,
           language: 'es',
         },
-      });
+      },
+    );
 
-      if (!response.data.results || response.data.results.length === 0) {
-        this.logger.warn(`⚠️ No se encontraron clínicas cercanas en Google Places, usando fallback`);
-        // Usar fallback si no hay resultados
-        const fallbackClinics = await this.fallbackService.getClinicsWithFallback();
-        
-        // Filtrar y ordenar fallback por distancia
-        const clinicsWithDistance = fallbackClinics.map((clinic) => ({
-          ...clinic,
-          distanceKm: this.calculateDistance(
-            { lat: clinic.latitude, lng: clinic.longitude },
-            { lat: latitude, lng: longitude }
-          ),
-        }));
-        
-        clinicsWithDistance.sort((a, b) => a.distanceKm - b.distanceKm);
-        return clinicsWithDistance;
-      }
+    this.logger.log(
+      `📡 Google Places Status: ${response.data.status}`,
+    );
 
-      const clinicsRaw = response.data.results.slice(0, 20); // Limitar a 20 resultados
-      
-      // Procesar resultados
-      const clinics = await Promise.all(
-        clinicsRaw.map((place) => 
-          this.transformPlaceToClinic(place, this.getCityName(latitude, longitude))
-        ),
+    this.logger.log(
+      `📡 Google Places Response:\n${JSON.stringify(
+        response.data,
+        null,
+        2,
+      )}`,
+    );
+
+    if (response.data.status !== 'OK') {
+      this.logger.warn(
+        `⚠️ Google Places devolvió status: ${response.data.status}`,
       );
 
-      const validClinics = clinics.filter((clinic) => clinic !== null) as ClinicCatalogItem[];
-      
-      // Ordenar por distancia
-      validClinics.sort((a, b) => a.distanceKm - b.distanceKm);
-      
-      this.logger.log(`✅ Encontradas ${validClinics.length} clínicas cercanas`);
-      return validClinics;
-    } catch (error) {
-      this.logger.error(`❌ Error buscando clínicas cercanas:`, error);
-      // Usar fallback en caso de error
-      const fallbackClinics = await this.fallbackService.getClinicsWithFallback();
+      if (response.data.error_message) {
+        this.logger.error(
+          `❌ Error Google: ${response.data.error_message}`,
+        );
+      }
+    }
+
+    if (
+      !response.data.results ||
+      response.data.results.length === 0
+    ) {
+      this.logger.warn(
+        '⚠️ No se encontraron clínicas cercanas en Google Places, usando fallback',
+      );
+
+      const fallbackClinics =
+        await this.fallbackService.getClinicsWithFallback();
+
       const clinicsWithDistance = fallbackClinics.map((clinic) => ({
         ...clinic,
         distanceKm: this.calculateDistance(
-          { lat: clinic.latitude, lng: clinic.longitude },
-          { lat: latitude, lng: longitude }
+          {
+            lat: clinic.latitude,
+            lng: clinic.longitude,
+          },
+          {
+            lat: latitude,
+            lng: longitude,
+          },
         ),
       }));
-      
-      clinicsWithDistance.sort((a, b) => a.distanceKm - b.distanceKm);
+
+      clinicsWithDistance.sort(
+        (a, b) => a.distanceKm - b.distanceKm,
+      );
+
       return clinicsWithDistance;
     }
+
+    const clinicsRaw = response.data.results.slice(0, 20);
+
+    const clinics = await Promise.all(
+      clinicsRaw.map((place) =>
+        this.transformPlaceToClinic(
+          place,
+          this.getCityName(latitude, longitude),
+        ),
+      ),
+    );
+
+    const validClinics = clinics.filter(
+      (clinic) => clinic !== null,
+    ) as ClinicCatalogItem[];
+
+    validClinics.sort(
+      (a, b) => a.distanceKm - b.distanceKm,
+    );
+
+    this.logger.log(
+      `✅ Encontradas ${validClinics.length} clínicas reales desde Google Places`,
+    );
+
+    return validClinics;
+  } catch (error: any) {
+    this.logger.error(
+      '❌ Error buscando clínicas cercanas:',
+      error?.response?.data || error,
+    );
+
+    const fallbackClinics =
+      await this.fallbackService.getClinicsWithFallback();
+
+    const clinicsWithDistance = fallbackClinics.map((clinic) => ({
+      ...clinic,
+      distanceKm: this.calculateDistance(
+        {
+          lat: clinic.latitude,
+          lng: clinic.longitude,
+        },
+        {
+          lat: latitude,
+          lng: longitude,
+        },
+      ),
+    }));
+
+    clinicsWithDistance.sort(
+      (a, b) => a.distanceKm - b.distanceKm,
+    );
+
+    return clinicsWithDistance;
   }
+}
 
   /**
    * Obtiene el nombre de la ciudad más cercana a unas coordenadas
