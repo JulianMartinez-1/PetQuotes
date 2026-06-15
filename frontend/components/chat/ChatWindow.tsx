@@ -166,10 +166,10 @@ export default function ChatWindow({ onClose }: { onClose: () => void }) {
               className={cn(
                 "max-w-xs px-4 py-2 rounded-lg text-sm leading-relaxed",
                 msg.type === "user"
-                  ? "bg-primary text-white rounded-br-none"
+                  ? "bg-primary-600 text-white rounded-br-none dark:bg-primary-600"
                   : msg.type === "error"
                     ? "bg-red-500/10 text-red-700 border border-red-500/30 rounded-bl-none flex items-start gap-2"
-                    : "bg-surface-secondary text-text-primary border border-border/30 rounded-bl-none"
+                    : "bg-slate-100 text-text-primary border border-border-light rounded-bl-none dark:bg-dark-surface dark:text-white"
               )}
             >
               {msg.type === "error" && <AlertCircle size={16} className="mt-0.5 flex-shrink-0" />}
@@ -185,7 +185,7 @@ export default function ChatWindow({ onClose }: { onClose: () => void }) {
             className="flex justify-start"
           >
             <div className="bg-surface-secondary border border-border/30 rounded-bl-none rounded-lg px-4 py-2 flex items-center gap-2">
-              <Loader className="animate-spin text-primary" size={18} />
+              <Loader className="animate-spin text-primary-600 dark:text-primary-400" size={18} />
               <span className="text-sm text-text-secondary">El asistente está escribiendo...</span>
             </div>
           </motion.div>
@@ -223,16 +223,16 @@ export default function ChatWindow({ onClose }: { onClose: () => void }) {
           }}
           placeholder="Escribe tu pregunta..."
           disabled={loading}
-          className="flex-1 px-3 py-2 bg-slate-700 border border-primary/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          className="flex-1 px-3 py-2 bg-slate-700 border border-primary-600/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-primary-600 focus:ring-1 focus:ring-primary-600/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all dark:bg-dark-surface-2 dark:border-primary-600/20 dark:focus:ring-primary-400/30"
         />
         <button
           onClick={handleSendMessage}
           disabled={loading || !input.trim()}
           className={cn(
-            "px-3 py-2 bg-primary rounded-lg text-white font-medium transition-all",
+            "px-3 py-2 bg-primary-600 rounded-lg text-white font-medium transition-all dark:bg-primary-600",
             loading || !input.trim()
               ? "opacity-50 cursor-not-allowed"
-              : "hover:bg-primary/90 active:scale-95"
+              : "hover:bg-primary-700 active:scale-95 dark:hover:bg-primary-500"
           )}
           aria-label="Enviar mensaje"
         >

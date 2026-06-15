@@ -14,7 +14,10 @@ import { ChatWidget } from "@/components/chat/ChatWidget";
 
 export const metadata: Metadata = {
   title: "PET QUOTES | SaaS veterinario",
-  description: "Plataforma para agendar citas de mascotas entre clientes y veterinarias"
+  description: "Plataforma para agendar citas de mascotas entre clientes y veterinarias",
+  icons: {
+    icon: "/Logo2.png"
+  }
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

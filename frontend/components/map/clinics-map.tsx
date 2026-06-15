@@ -579,7 +579,7 @@ function ClinicInfoCard({ clinic }: { clinic: Clinic }) {
         {clinic.services?.slice(0, 2).map((service) => (
           <span
             key={service}
-            className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded"
+            className="text-xs bg-primary-600/20 text-primary-600 px-2 py-0.5 rounded dark:bg-primary-600/30 dark:text-primary-300"
           >
             {service}
           </span>

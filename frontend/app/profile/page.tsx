@@ -17,6 +17,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { UserPets } from "@/components/pets";
 import { useRouter } from "next/navigation";
 import { useAuthState } from "@/store/auth-state";
 import { addActivityEvent } from "@/lib/activity-log";
@@ -563,6 +564,19 @@ export default function ProfilePage() {
                 </span>
               </p>
             )}
+          </motion.div>
+
+          {/* Pets Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: DURATIONS.base / 1000 }}
+            viewport={{ once: true }}
+            className="mt-12"
+          >
+            <Card>
+              {user && <UserPets userId={user.id} />}
+            </Card>
           </motion.div>
 
           {/* Info Card */}

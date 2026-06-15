@@ -120,9 +120,10 @@ model RefreshSession {
 model Pet {
   id                    String   @id @default(cuid())
   ownerId               String
-  name                  String
+  name                  String?
   species               String   // dog, cat, rabbit, bird, etc.
   breed                 String?
+  age                   String?  // Age in years (e.g., "3", "1.5")
   birthDate             DateTime?
   weight                Float?   // kg
   microchip             String?  @unique

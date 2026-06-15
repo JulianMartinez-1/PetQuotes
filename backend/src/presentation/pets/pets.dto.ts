@@ -1,15 +1,21 @@
-import { IsString, IsOptional, IsNumber, IsBoolean, IsDateString } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsBoolean, IsDateString, IsNotEmpty } from 'class-validator';
 
 export class CreatePetDto {
+  @IsOptional()
   @IsString()
-  name: string;
+  name?: string;
 
   @IsString()
+  @IsNotEmpty()
   species: string;
 
   @IsOptional()
   @IsString()
   breed?: string;
+
+  @IsOptional()
+  @IsString()
+  age?: string; // Age in years
 
   @IsOptional()
   @IsDateString()
@@ -34,12 +40,19 @@ export class CreatePetDto {
   @IsOptional()
   @IsString()
   notes?: string;
+
+  // This will be handled by the controller via @UseInterceptors(FileInterceptor('profileImage'))
+  // File type is handled in the controller, not in the DTO
 }
 
 export class UpdatePetDto {
   @IsOptional()
   @IsString()
   name?: string;
+
+  @IsOptional()
+  @IsString()
+  age?: string;
 
   @IsOptional()
   @IsString()
@@ -69,9 +82,10 @@ export class UpdatePetDto {
 export class PetResponseDto {
   id: string;
   ownerId: string;
-  name: string;
+  name: string | null;
   species: string;
   breed: string | null;
+  age: string | null;
   birthDate: Date | null;
   weight: number | null;
   microchip: string | null;

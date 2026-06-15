@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Plus, Edit2, Trash2, PawPrint, AlertCircle } from "lucide-react";
+import { Plus, Edit2, Trash2, PawPrint, AlertCircle, Upload, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,7 @@ interface Pet {
   species: "Perro" | "Gato" | "Otro";
   breed?: string;
   dateOfBirth?: string;
-  photo?: string;
+  profileImage?: string;
 }
 
 interface PetManagementProps {
@@ -30,22 +30,38 @@ export const PetManagement: React.FC<PetManagementProps> = ({
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [formData, setFormData] = useState<Pet>({
     name: "",
     species: "Perro",
   });
 
+  // Obtener el ID real del usuario autenticado
+  const getAuthUserId = () => {
+    try {
+      const authUser = localStorage.getItem("auth_user");
+      if (authUser) {
+        const user = JSON.parse(authUser);
+        return user.id;
+      }
+    } catch (e) {
+      console.error("Error parsing auth_user:", e);
+    }
+    return userId || "default";
+  };
+
   useEffect(() => {
     loadPets();
-  }, [userId]);
+  }, []);
 
   useEffect(() => {
     onPetsChange?.(pets);
-  }, [pets]);
+  }, [pets, onPetsChange]);
 
   const loadPets = () => {
-    // Cargar mascotas del localStorage
-    const saved = localStorage.getItem(`pets_${userId}`);
+    // Cargar mascotas del localStorage usando el ID del usuario autenticado
+    const authUserId = getAuthUserId();
+    const saved = localStorage.getItem(`pets_${authUserId}`);
     if (saved) {
       try {
         setPets(JSON.parse(saved));
@@ -56,8 +72,9 @@ export const PetManagement: React.FC<PetManagementProps> = ({
   };
 
   const savePets = (updatedPets: Pet[]) => {
+    const authUserId = getAuthUserId();
     setPets(updatedPets);
-    localStorage.setItem(`pets_${userId}`, JSON.stringify(updatedPets));
+    localStorage.setItem(`pets_${authUserId}`, JSON.stringify(updatedPets));
   };
 
   const handleAddPet = () => {
@@ -84,7 +101,7 @@ export const PetManagement: React.FC<PetManagementProps> = ({
         savePets([...pets, newPet]);
       }
 
-      setFormData({ name: "", species: "Perro" });
+      setFormData({ name: "", species: "Perro", profileImage: undefined });
       setShowForm(false);
       setLoading(false);
     }, 500);
@@ -106,7 +123,63 @@ export const PetManagement: React.FC<PetManagementProps> = ({
   const handleCancel = () => {
     setShowForm(false);
     setEditingId(null);
-    setFormData({ name: "", species: "Perro" });
+    setFormData({ name: "", species: "Perro", profileImage: undefined });
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer.items) {
+      e.dataTransfer.dropEffect = "copy";
+    }
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Solo cambiar a false si salimos completamente del elemento
+    if (e.currentTarget === e.target) {
+      setIsDragging(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      
+      // Validar que sea imagen
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const result = event.target?.result as string;
+          setFormData({ ...formData, profileImage: result });
+        };
+        reader.onerror = () => {
+          alert("Error al leer el archivo");
+        };
+        reader.readAsDataURL(file);
+      } else {
+        alert("Por favor arrastra un archivo de imagen válido (PNG, JPG, GIF, WebP)");
+      }
+    }
+  };
+
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const result = event.target?.result as string;
+        setFormData({ ...formData, profileImage: result });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const containerVariants = {
@@ -235,6 +308,66 @@ export const PetManagement: React.FC<PetManagementProps> = ({
               />
             </div>
 
+            {/* Photo Upload with Drag and Drop */}
+            <div>
+              <label className="block text-sm font-semibold text-text-primary mb-2">
+                Foto (Opcional)
+              </label>
+              
+              {formData.profileImage ? (
+                <div className="relative w-full">
+                  <img
+                    src={formData.profileImage}
+                    alt="Preview"
+                    className="w-full h-40 object-cover rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, profileImage: undefined })}
+                    className={cn(
+                      "absolute -top-2 -right-2 p-1 rounded-full transition-all",
+                      "bg-danger text-white hover:bg-danger/80"
+                    )}
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ) : (
+                <div
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  className={cn(
+                    "w-full p-8 rounded-lg border-2 border-dashed transition-all",
+                    "flex flex-col items-center justify-center gap-4",
+                    isDragging
+                      ? "border-secondary bg-secondary/10 scale-105"
+                      : "border-border/30 bg-surface hover:border-secondary/50 hover:bg-secondary/5"
+                  )}
+                >
+                  <Upload size={32} className="text-secondary" />
+                  <div className="text-center">
+                    <p className="font-semibold text-text-primary">
+                      Arrastra tu foto aquí
+                    </p>
+                    <p className="text-sm text-text-tertiary mt-2">
+                      PNG, JPG, GIF o WebP
+                    </p>
+                  </div>
+                  <p className="text-xs text-text-tertiary mt-2">o</p>
+                  <label className="px-4 py-2 bg-secondary text-white rounded-lg cursor-pointer hover:bg-secondary/90 transition-all text-sm font-semibold">
+                    Selecciona un archivo
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileInput}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+              )}
+            </div>
+
             {/* Buttons */}
             <div className="flex gap-3 pt-4">
               <Button
@@ -288,7 +421,16 @@ export const PetManagement: React.FC<PetManagementProps> = ({
                 "bg-surface border-border/30 hover:border-secondary/50"
               )}
             >
-              <div className="flex items-start justify-between">
+              <div className="flex items-start justify-between gap-4">
+                {/* Pet Photo */}
+                {pet.profileImage && (
+                  <img
+                    src={pet.profileImage}
+                    alt={pet.name}
+                    className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
+                  />
+                )}
+                
                 <div className="flex-1">
                   <h4 className="font-semibold text-text-primary flex items-center gap-2">
                     {pet.species === "Perro" && "🐕"}

@@ -65,23 +65,19 @@ export function Footer() {
             className="md:col-span-1"
           >
             <Link href="/">
-              <div className="flex items-center gap-3 mb-6 group cursor-pointer">
-                <div className={cn(
-                  "w-16 h-16 rounded-full bg-gradient-to-br",
-                  "from-blue-500 to-cyan-500 flex items-center justify-center",
-                  "text-white font-bold text-2xl",
-                  "shadow-lg shadow-blue-500/40 group-hover:shadow-blue-500/60",
-                  "transition-all duration-300 flex-shrink-0"
-                )}>
-                  PQ
-                </div>
-                <div>
+              <div className="flex flex-col items-center gap-4 mb-6 group cursor-pointer">
+                <img 
+                  src="/Logo.png" 
+                  alt="PetQuotes Logo" 
+                  className="w-32 h-32 object-contain flex-shrink-0"
+                />
+                <div className="text-center">
                   <span className={cn(
-                    "font-black text-xl text-white block"
+                    "font-black text-3xl text-white block"
                   )}>
                     PetQuotes
                   </span>
-                  <span className="text-xs text-blue-300">Clínica Veterinaria</span>
+                  <span className="text-sm text-blue-300">Clínica Veterinaria</span>
                 </div>
               </div>
             </Link>

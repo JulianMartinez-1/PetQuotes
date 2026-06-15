@@ -32,6 +32,7 @@ export function NavBar() {
     { href: "/clinics" as const, label: "Clinics", gradient: false },
     ...(isAuthenticated ? [
       { href: "/bookings" as const, label: "My Bookings", gradient: false },
+      { href: "/pets" as const, label: "My Pets", gradient: false },
       { href: "/profile" as const, label: "Profile", gradient: false },
     ] : []),
   ];

@@ -138,7 +138,7 @@ export function FeatureCard({
         {/* Title */}
         <h3 className={cn(
           "text-2xl font-bold text-text-primary mb-3",
-          "group-hover:text-primary transition-colors duration-300"
+          "group-hover:text-primary-600 transition-colors duration-300 dark:text-white dark:group-hover:text-primary-400"
         )}>
           {title}
         </h3>

@@ -133,13 +133,13 @@ export function SpecializedClinics({
                       {/* Header with Rating */}
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
-                          <h3 className="text-lg font-bold text-text-primary group-hover:text-primary transition-colors">
+                          <h3 className="text-lg font-bold text-text-primary group-hover:text-primary-600 transition-colors dark:text-white dark:group-hover:text-primary-400">
                             {clinic.name}
                           </h3>
                           {clinic.isVerified && (
                             <div className="flex items-center gap-1 mt-2">
-                              <div className="w-2 h-2 rounded-full bg-green" />
-                              <span className="text-xs font-semibold text-green">
+                              <div className="w-2 h-2 rounded-full bg-success" />
+                              <span className="text-xs font-semibold text-success">
                                 Verificada
                               </span>
                             </div>

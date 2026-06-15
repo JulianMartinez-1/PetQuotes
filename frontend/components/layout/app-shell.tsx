@@ -13,6 +13,7 @@ import { Footer } from "./footer";
 const NAV_ITEMS = [
   { href: "/", label: "Inicio" },
   { href: "/clinics", label: "Clínicas" },
+  { href: "/pets", label: "Mis Mascotas" },
   { href: "/profile", label: "Perfil" },
   { href: "/activity", label: "Actividad" },
   { href: "/bookings", label: "Reservas" }
@@ -39,7 +40,7 @@ export function AppShell({ children }: PropsWithChildren) {
                   key={item.href}
                   href={item.href}
                   className={`rounded-lg px-3 py-2 text-base font-bold transition ${
-                    active ? "bg-primary text-white" : "text-white hover:text-primary hover:bg-slate-800"
+                    active ? "bg-primary-600 text-white" : "text-white hover:text-primary-300 hover:bg-slate-700"
                   }`}
                 >
                   {item.label}
@@ -83,18 +84,23 @@ export function AppShell({ children }: PropsWithChildren) {
         </div>
 
         {mobileMenuOpen && (
-          <div className="border-t border-border/20 bg-slate-800 md:hidden">
+          <div className="border-t border-border-dark/20 bg-slate-800 md:hidden">
             <div className="page-container grid gap-1 py-3">
-              {NAV_ITEMS.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="rounded-lg px-3 py-2 text-base font-bold text-white hover:bg-slate-700 hover:text-primary"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
+              {NAV_ITEMS.map((item) => {
+                const active = pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`rounded-lg px-3 py-2 text-base font-bold transition ${
+                      active ? "bg-primary-600 text-white" : "text-white hover:bg-slate-700 hover:text-primary-300"
+                    }`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
               {!isAuthenticated ? (
                 <>
                   <Link href="/login" className="rounded-lg px-3 py-2 text-sm font-semibold text-gray-400 hover:bg-slate-700 hover:text-white" onClick={() => setMobileMenuOpen(false)}>

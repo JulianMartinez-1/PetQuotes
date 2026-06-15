@@ -6,9 +6,10 @@ import { EntityNotFoundException } from '@shared/exceptions';
 
 export interface CreatePetInput {
   ownerId: string;
-  name: string;
+  name?: string;
   species: string;
   breed?: string;
+  age?: string;
   birthDate?: Date;
   weight?: number;
   microchip?: string;
@@ -21,6 +22,7 @@ export interface CreatePetInput {
 export interface UpdatePetInput {
   name?: string;
   breed?: string;
+  age?: string;
   birthDate?: Date;
   weight?: number;
   microchip?: string;
@@ -65,6 +67,7 @@ export class PetRepository extends BaseRepository<Pet, CreatePetInput, UpdatePet
         name: data.name,
         species: data.species,
         breed: data.breed,
+        age: data.age,
         birthDate: data.birthDate,
         weight: data.weight,
         microchip: data.microchip,
