@@ -132,11 +132,11 @@ export function Footer() {
                 <Phone size={18} className="text-blue-400 mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="text-slate-400 text-xs font-semibold mb-1">Línea de atención</p>
-                  <a href="tel:+576043223781" className={cn(
+                  <a href="tel:6043223781" className={cn(
                     "text-white font-bold text-sm",
                     "hover:text-blue-300 transition-colors duration-300"
                   )}>
-                    +57 604 322 3781
+                     604 322 3781
                   </a>
                 </div>
               </li>
@@ -144,11 +144,11 @@ export function Footer() {
                 <MessageCircle size={18} className="text-green-400 mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="text-slate-400 text-xs font-semibold mb-1">WhatsApp</p>
-                  <a href="https://wa.me/573233695028" className={cn(
+                  <a href="https://wa.me/573136537799" className={cn(
                     "text-white font-bold text-sm",
                     "hover:text-green-300 transition-colors duration-300"
                   )} target="_blank" rel="noopener noreferrer">
-                    (+57) 323 369 5028
+                    (+57) 313 653 7799
                   </a>
                 </div>
               </li>
