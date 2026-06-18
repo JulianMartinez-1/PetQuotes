@@ -52,7 +52,7 @@ export function UserPets({ userId }: UserPetsProps) {
   const fetchPets = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/pets");
+      const response = await fetch("/api/session/pets");
       if (!response.ok) {
         throw new Error("Failed to fetch pets");
       }

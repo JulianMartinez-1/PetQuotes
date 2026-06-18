@@ -13,7 +13,7 @@ import {
 import { MedicationService } from '@business/medications/medication.service';
 import { JwtAuthGuard } from '@shared/guards/jwt-auth.guard';
 
-@Controller('api/pets/:petId/medications')
+@Controller('pets/:petId/medications')
 @UseGuards(JwtAuthGuard)
 export class MedicationController {
   constructor(private medicationService: MedicationService) {}

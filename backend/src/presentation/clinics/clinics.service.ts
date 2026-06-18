@@ -8,7 +8,7 @@ import { ClinicsWithFallbackService } from './clinics-fallback.service';
 export class ClinicsService {
   private readonly logger = new Logger(ClinicsService.name);
   private readonly googleMapsClient: AxiosInstance;
-  private readonly googleMapsApiKey: string;
+  private googleMapsApiKey: string | undefined;
   
   // Coordenadas centrales de las ciudades
   private readonly cityCoordinates = {
@@ -21,7 +21,7 @@ export class ClinicsService {
     private readonly configService: ConfigService,
     private readonly fallbackService: ClinicsWithFallbackService,
   ) {
-    this.googleMapsApiKey = this.configService.get<string>('GOOGLE_MAPS_API_KEY');
+    this.googleMapsApiKey = this.configService.get<string | undefined>('GOOGLE_MAPS_API_KEY');
     
     this.logger.log(`Google Maps API Key: ${this.googleMapsApiKey ? '✅ Configurada' : '❌ No configurada'}`);
     
@@ -153,7 +153,7 @@ async searchClinicsByCoordinates(
     const clinicsRaw = response.data.results.slice(0, 20);
 
     const clinics = await Promise.all(
-      clinicsRaw.map((place) =>
+      clinicsRaw.map((place: any) =>
         this.transformPlaceToClinic(
           place,
           this.getCityName(latitude, longitude),
@@ -259,7 +259,7 @@ async searchClinicsByCoordinates(
       const clinics = await Promise.all(
         response.data.results
           .slice(0, 10) // Limitar a 10 resultados por ciudad
-          .map((place) => this.transformPlaceToClinic(place, city)),
+          .map((place: any) => this.transformPlaceToClinic(place, city)),
       );
 
       const validClinics = clinics.filter((clinic) => clinic !== null) as ClinicCatalogItem[];

@@ -5,6 +5,7 @@ import { QueryProvider } from "@/components/query-provider";
 import { AppShell } from "@/components/layout/app-shell";
 import { AppStateProvider } from "@/store/app-state";
 import { AuthStateProvider } from "@/store/auth-state";
+import { PetsStateProvider } from "@/store/pets-state";
 import { GeolocationProvider } from "@/contexts/geolocation-context";
 import { GoogleMapsProvider } from "@/contexts/google-maps-provider";
 import { ScrollIndicator, SmoothScroller } from "@/components/sections/scroll-effects";
@@ -38,7 +39,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <GeolocationProvider>
               <AppStateProvider>
                 <AuthStateProvider>
-                  <AppShell>{children}</AppShell>
+                  <PetsStateProvider>
+                    <AppShell>{children}</AppShell>
+                  </PetsStateProvider>
                 </AuthStateProvider>
               </AppStateProvider>
             </GeolocationProvider>

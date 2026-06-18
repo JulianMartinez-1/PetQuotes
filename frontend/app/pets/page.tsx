@@ -1,60 +1,26 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { AddPetForm, PetsList } from "@/components/pets";
 import { useAuthState } from "@/store/auth-state";
-
-interface Pet {
-  id: string;
-  name?: string;
-  age?: string;
-  species: string;
-  breed?: string;
-  weight?: string;
-  profileImage?: string;
-  notes?: string;
-  createdAt?: string;
-}
+import { usePetsState } from "@/store/pets-state";
 
 export default function PetsPage() {
   const router = useRouter();
   const { isAuthenticated } = useAuthState();
-  const [pets, setPets] = useState<Pet[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { pets, isLoading, error: petsError, removePet, refreshPets } = usePetsState();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchPets();
-    }
-  }, [isAuthenticated]);
-
-  const fetchPets = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch("/api/pets");
-      if (!response.ok) {
-        throw new Error("Failed to fetch pets");
-      }
-      const data = await response.json();
-      setPets(data.items || []);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error fetching pets");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [error, setError] = useState<string | null>(petsError);
 
   const handleAddPet = async (formData: FormData) => {
     try {
       setIsSubmitting(true);
-      const response = await fetch("/api/pets", {
+      setError(null);
+      const response = await fetch("/api/session/pets", {
         method: "POST",
         body: formData,
       });
@@ -64,11 +30,12 @@ export default function PetsPage() {
         throw new Error(errorData.message || "Failed to add pet");
       }
 
-      const newPet = await response.json();
-      setPets((prev) => [newPet, ...prev]);
+      // Refrescar la lista de mascotas desde el servidor
+      await refreshPets();
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error adding pet");
+      const message = err instanceof Error ? err.message : "Error adding pet";
+      setError(message);
       throw err;
     } finally {
       setIsSubmitting(false);
@@ -77,7 +44,7 @@ export default function PetsPage() {
 
   const handleDeletePet = async (petId: string) => {
     try {
-      const response = await fetch(`/api/pets/${petId}`, {
+      const response = await fetch(`/api/session/pets/${petId}`, {
         method: "DELETE",
       });
 
@@ -85,9 +52,10 @@ export default function PetsPage() {
         throw new Error("Failed to delete pet");
       }
 
-      setPets((prev) => prev.filter((p) => p.id !== petId));
+      removePet(petId);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error deleting pet");
+      const message = err instanceof Error ? err.message : "Error deleting pet";
+      setError(message);
       throw err;
     }
   };
@@ -147,7 +115,7 @@ export default function PetsPage() {
 
           {/* List Tab */}
           <TabsContent value="list" className="space-y-6">
-            {loading ? (
+            {isLoading ? (
               <motion.div
                 className="flex items-center justify-center py-12"
                 initial={{ opacity: 0 }}
@@ -169,7 +137,7 @@ export default function PetsPage() {
                 <PetsList
                   pets={pets}
                   onDelete={handleDeletePet}
-                  isLoading={loading}
+                  isLoading={isLoading}
                 />
               </motion.div>
             )}

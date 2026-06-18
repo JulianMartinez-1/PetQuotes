@@ -26,6 +26,7 @@ interface ClinicDetailModalProps {
     description?: string;
   };
   onClose: () => void;
+  onReservar?: () => void;
 }
 
 const mapContainerStyle = {
@@ -33,7 +34,7 @@ const mapContainerStyle = {
   height: "100%",
 };
 
-export function ClinicDetailModal({ clinic, onClose }: ClinicDetailModalProps) {
+export function ClinicDetailModal({ clinic, onClose, onReservar }: ClinicDetailModalProps) {
   const [error, setError] = useState<string | null>(null);
   const mapRef = useRef<GoogleMap | null>(null);
 
@@ -178,7 +179,11 @@ export function ClinicDetailModal({ clinic, onClose }: ClinicDetailModalProps) {
 
             {/* Action Buttons */}
             <div className="space-y-2">
-              <Button variant="primary" className="w-full">
+              <Button 
+                variant="primary" 
+                className="w-full"
+                onClick={onReservar || onClose}
+              >
                 Reservar Cita
               </Button>
               <Button variant="secondary" className="w-full" onClick={onClose}>

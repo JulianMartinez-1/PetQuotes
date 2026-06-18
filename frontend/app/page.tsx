@@ -178,7 +178,7 @@ export default function HomePage() {
                 stiffness: 100,
               }}
             >
-              Veterinarios Premium
+              Veterinarias Premium
               <br />
               en Tus Manos
             </motion.h1>

@@ -28,7 +28,7 @@ interface MulterFile {
   size: number;
 }
 
-@Controller('api/pets')
+@Controller('pets')
 @UseGuards(JwtAuthGuard)
 export class PetsController {
   constructor(private petsService: PetsService) {}
@@ -71,25 +71,46 @@ export class PetsController {
     @UploadedFile() file: MulterFile | undefined,
     @CurrentUser() user: JwtPayload,
   ): Promise<PetResponseDto> {
+    console.log("[createPet] Received DTO:", JSON.stringify(dto, null, 2));
+    console.log("[createPet] File present:", !!file, "Size:", file?.size);
+    console.log("[createPet] Current user:", user.sub);
+    
+    // Validate required fields
+    if (!dto.species || dto.species.trim() === '') {
+      throw new BadRequestException('species is required');
+    }
+    
+    if (!dto.age || dto.age.trim() === '') {
+      throw new BadRequestException('age is required');
+    }
+    
     // Convert file to base64 if provided
     let profileImage: string | undefined;
     if (file) {
       profileImage = file.buffer.toString('base64');
     }
 
+    console.log("[createPet] Passed validation, creating pet...");
+
+    // Add data URI prefix to base64 image for proper display
+    let profileImageWithPrefix: string | undefined;
+    if (profileImage) {
+      profileImageWithPrefix = `data:image/jpeg;base64,${profileImage}`;
+    }
+
     return this.petsService.createPet(user.sub, {
       ownerId: user.sub,
-      name: dto.name,
-      species: dto.species,
-      breed: dto.breed,
-      age: dto.age,
+      name: dto.name && dto.name.trim() ? dto.name : undefined,
+      species: dto.species.trim(),
+      breed: dto.breed && dto.breed.trim() ? dto.breed : undefined,
+      age: dto.age.trim(),
       birthDate: dto.birthDate ? new Date(dto.birthDate) : undefined,
-      weight: dto.weight ? parseFloat(String(dto.weight)) : undefined,
-      microchip: dto.microchip,
-      vaccinesUpToDate: dto.vaccinesUpToDate,
-      bloodType: dto.bloodType,
-      notes: dto.notes,
-      profileImage,
+      weight: dto.weight && dto.weight.trim() ? parseFloat(dto.weight) : undefined,
+      microchip: dto.microchip && dto.microchip.trim() ? dto.microchip : undefined,
+      vaccinesUpToDate: dto.vaccinesUpToDate ? dto.vaccinesUpToDate === 'true' : undefined,
+      bloodType: dto.bloodType && dto.bloodType.trim() ? dto.bloodType : undefined,
+      notes: dto.notes && dto.notes.trim() ? dto.notes : undefined,
+      profileImage: profileImageWithPrefix,
     });
   }
 
@@ -109,18 +130,19 @@ export class PetsController {
     // Convert file to base64 if provided
     let profileImage: string | undefined;
     if (file) {
-      profileImage = file.buffer.toString('base64');
+      const base64 = file.buffer.toString('base64');
+      profileImage = `data:image/jpeg;base64,${base64}`;
     }
 
     return this.petsService.updatePet(petId, user.sub, {
-      name: dto.name,
-      breed: dto.breed,
-      age: dto.age,
+      name: dto.name && dto.name.trim() ? dto.name : undefined,
+      breed: dto.breed && dto.breed.trim() ? dto.breed : undefined,
+      age: dto.age && dto.age.trim() ? dto.age : undefined,
       birthDate: dto.birthDate ? new Date(dto.birthDate) : undefined,
-      weight: dto.weight ? parseFloat(String(dto.weight)) : undefined,
-      vaccinesUpToDate: dto.vaccinesUpToDate,
-      bloodType: dto.bloodType,
-      notes: dto.notes,
+      weight: dto.weight && dto.weight.trim() ? parseFloat(dto.weight) : undefined,
+      vaccinesUpToDate: dto.vaccinesUpToDate ? dto.vaccinesUpToDate === 'true' : undefined,
+      bloodType: dto.bloodType && dto.bloodType.trim() ? dto.bloodType : undefined,
+      notes: dto.notes && dto.notes.trim() ? dto.notes : undefined,
       profileImage,
     });
   }

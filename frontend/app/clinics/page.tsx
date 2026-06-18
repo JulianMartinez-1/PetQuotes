@@ -15,11 +15,13 @@ import {
   Clock,
   ChevronLeft,
   ChevronRight,
+  X,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ClinicBookingModal } from "@/components/clinics/clinic-booking-modal";
 import { ClinicDetailModal } from "@/components/map/clinic-detail-modal";
 import { getClinicsFromStorage } from "@/lib/clinic-storage";
 import { searchNearByClinics } from "@/lib/clinics-api";
@@ -103,6 +105,8 @@ export default function ClinicsPage() {
   
   // Estados para el modal de clínica individual
   const [selectedClinic, setSelectedClinic] = useState<typeof CLINIC_CATALOG[0] | null>(null);
+  const [showClinicDetail, setShowClinicDetail] = useState(false);
+  const [showBookingModal, setShowBookingModal] = useState(false);
 
   // Handler para cuando una imagen falla
   const handleImageError = (clinicId: string) => {
@@ -293,12 +297,30 @@ export default function ClinicsPage() {
         </motion.div>
       )}
 
+      {/* Clinic Booking Modal */}
+      <AnimatePresence>
+        {selectedClinic && showBookingModal && (
+          <ClinicBookingModal
+            isOpen={true}
+            clinic={selectedClinic}
+            onClose={() => setShowBookingModal(false)}
+          />
+        )}
+      </AnimatePresence>
+
       {/* Clinic Detail Modal */}
       <AnimatePresence>
-        {selectedClinic && (
+        {selectedClinic && showClinicDetail && (
           <ClinicDetailModal
-            clinic={selectedClinic}
-            onClose={() => setSelectedClinic(null)}
+            clinic={{
+              ...selectedClinic,
+              distanceKm: selectedClinic.distanceKm || 0,
+            }}
+            onClose={() => setShowClinicDetail(false)}
+            onReservar={() => {
+              setShowClinicDetail(false);
+              setShowBookingModal(true);
+            }}
           />
         )}
       </AnimatePresence>
@@ -485,7 +507,10 @@ export default function ClinicsPage() {
                 <motion.div key={clinic.id} variants={itemVariants}>
                   <Card 
                     className="overflow-hidden group h-full flex flex-col hover:border-secondary/50 transition-all cursor-pointer"
-                    onClick={() => setSelectedClinic(clinic)}
+                    onClick={() => {
+                      setSelectedClinic(clinic);
+                      setShowClinicDetail(true);
+                    }}
                   >
                     {/* Image Container */}
                     <div className="relative overflow-hidden h-48 bg-gradient-to-br from-secondary/20 to-accent/20">
@@ -575,28 +600,6 @@ export default function ClinicsPage() {
                             </Badge>
                           )}
                         </div>
-                      </div>
-
-                      {/* Buttons */}
-                      <div className="flex gap-3">
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          className="flex-1 text-black"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setNavigatingTo(clinic.id);
-                            router.push(`/clinics/${clinic.id}` as Route);
-                          }}
-                          disabled={navigatingTo === clinic.id}
-                        >
-                          {navigatingTo === clinic.id ? "Abriendo..." : "Ver Ficha"}
-                        </Button>
-                        <Link href="/bookings" className="flex-1" onClick={(e) => e.stopPropagation()}>
-                          <Button variant="secondary" size="sm" className="w-full text-black">
-                            Reservar
-                          </Button>
-                        </Link>
                       </div>
                     </div>
                   </Card>

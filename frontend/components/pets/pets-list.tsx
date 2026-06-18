@@ -74,9 +74,20 @@ export function PetsList({ pets, onDelete, onEdit, isLoading = false }: PetsList
     );
   }
 
+  // Helper function to ensure image has data URI prefix
+  const getImageUrl = (image?: string): string | undefined => {
+    if (!image) return undefined;
+    if (image.startsWith('data:')) return image;
+    // If it's just base64, add prefix
+    if (image.match(/^[A-Za-z0-9+/=]+$/)) return `data:image/jpeg;base64,${image}`;
+    return image;
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {pets.map((pet, index) => (
+      {pets.map((pet, index) => {
+        const imageUrl = getImageUrl(pet.profileImage);
+        return (
         <motion.div
           key={pet.id}
           className="bg-white dark:bg-dark-surface rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow"
@@ -85,12 +96,15 @@ export function PetsList({ pets, onDelete, onEdit, isLoading = false }: PetsList
           transition={{ delay: index * 0.1, duration: 0.3 }}
         >
           {/* Pet Image */}
-          {pet.profileImage ? (
+          {imageUrl ? (
             <div className="relative w-full h-48 bg-gray-200 dark:bg-gray-700 overflow-hidden">
               <img
-                src={pet.profileImage}
+                src={imageUrl}
                 alt={pet.name || "Pet"}
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                onError={(e) => {
+                  console.log('[PetsList] Image load error:', pet.name, pet.id);
+                }}
               />
               <div className="absolute top-2 right-2 bg-white/90 dark:bg-dark-bg/90 rounded-full p-2">
                 <Heart
@@ -172,7 +186,8 @@ export function PetsList({ pets, onDelete, onEdit, isLoading = false }: PetsList
             </div>
           </div>
         </motion.div>
-      ))}
+        );
+      })}
     </div>
   );
 }

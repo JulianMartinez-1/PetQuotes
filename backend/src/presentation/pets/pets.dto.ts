@@ -1,13 +1,13 @@
-import { IsString, IsOptional, IsNumber, IsBoolean, IsDateString, IsNotEmpty } from 'class-validator';
+import { IsString, IsOptional, IsDateString } from 'class-validator';
 
 export class CreatePetDto {
   @IsOptional()
   @IsString()
   name?: string;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  species: string;
+  species?: string;
 
   @IsOptional()
   @IsString()
@@ -15,23 +15,23 @@ export class CreatePetDto {
 
   @IsOptional()
   @IsString()
-  age?: string; // Age in years
+  age?: string;
 
   @IsOptional()
   @IsDateString()
   birthDate?: string;
 
   @IsOptional()
-  @IsNumber()
-  weight?: number;
+  @IsString()
+  weight?: string;
 
   @IsOptional()
   @IsString()
   microchip?: string;
 
   @IsOptional()
-  @IsBoolean()
-  vaccinesUpToDate?: boolean;
+  @IsString()
+  vaccinesUpToDate?: string;
 
   @IsOptional()
   @IsString()
@@ -63,12 +63,12 @@ export class UpdatePetDto {
   birthDate?: string;
 
   @IsOptional()
-  @IsNumber()
-  weight?: number;
+  @IsString()
+  weight?: string;
 
   @IsOptional()
-  @IsBoolean()
-  vaccinesUpToDate?: boolean;
+  @IsString()
+  vaccinesUpToDate?: string;
 
   @IsOptional()
   @IsString()
