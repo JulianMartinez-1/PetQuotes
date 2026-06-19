@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
   let backendResponse: Response;
 
   try {
-    backendResponse = await callAuthBackendRequest(`/auth/oauth/${body.provider}/exchange`, {
+    backendResponse = await callAuthBackendRequest(`/api/auth/oauth/${body.provider}/exchange`, {
       method: "POST",
       body: {
         code: body.code,

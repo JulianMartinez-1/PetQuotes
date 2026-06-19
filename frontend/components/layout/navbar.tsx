@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,6 +20,17 @@ export function NavBar() {
   const { isDark, toggleDarkMode } = useDarkMode();
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const profileMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (user) {
+      console.log("[NavBar] 👤 Usuario actualizado:", {
+        email: user.email,
+        role: user.role,
+        fullName: user.fullName,
+        isAdmin: user.role === 'ADMIN'
+      });
+    }
+  }, [user]);
 
   const handleLogout = async () => {
     await logout();
@@ -165,6 +176,7 @@ export function NavBar() {
                         <div className="p-3 border-b border-border/30">
                           <p className="text-sm font-bold text-text-primary">{user.fullName}</p>
                           <p className="text-xs text-text-secondary">{user.email}</p>
+                          <p className="text-xs text-text-secondary mt-1">Role: {user.role || 'undefined'}</p>
                         </div>
                         <div className="p-2 space-y-2">
                           <motion.div
@@ -185,6 +197,27 @@ export function NavBar() {
                               </button>
                             </Link>
                           </motion.div>
+
+                          {user.role === 'ADMIN' && (
+                            <motion.div
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                            >
+                              <Link href="/admin/analytics">
+                                <button
+                                  onClick={() => setProfileMenuOpen(false)}
+                                  className={cn(
+                                    "w-full flex items-center gap-2 px-3 py-2 rounded-lg",
+                                    "text-sm font-bold text-secondary",
+                                    "hover:bg-secondary/20 transition-colors"
+                                  )}
+                                >
+                                  📊 Analíticas
+                                </button>
+                              </Link>
+                            </motion.div>
+                          )}
+
                           <motion.button
                             onClick={() => {
                               handleLogout();

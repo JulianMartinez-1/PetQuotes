@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     backendResponse = await callAuthBackend("/api/auth/login", body);
   } catch (err) {
     console.error("[Login API] ❌ Error llamando backend:", err);
-    return NextResponse.json({ message: normalizeApiErrorMessage(504, "upstream timeout") }, { status: 504 });
+    return NextResponse.json({ message: normalizeApiErrorMessage(504, "upstream timeout", "/api/session/login") }, { status: 504 });
   }
 
   if (!backendResponse.ok) {

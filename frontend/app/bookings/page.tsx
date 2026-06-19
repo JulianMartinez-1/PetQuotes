@@ -401,7 +401,15 @@ export default function BookingsPage() {
                           "bg-success/10 border-success/30 text-success text-sm font-semibold"
                         )}
                       >
-                        ✓ Reserva confirmada con éxito
+                        <div className="flex items-start gap-3">
+                          <CheckCircle size={20} className="flex-shrink-0 mt-0.5" />
+                          <div>
+                            <p className="font-bold mb-1">✓ Tu cita está por confirmar</p>
+                            <p className="text-xs text-success/80 leading-relaxed">
+                              Recibirás un mensaje en tu correo electrónico para confirmar la reserva de tu mascota.
+                            </p>
+                          </div>
+                        </div>
                       </motion.div>
                     )}
 
@@ -460,13 +468,16 @@ export default function BookingsPage() {
                     initial={{ scale: 0.95, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     className={cn(
-                      "mt-6 p-4 rounded-lg",
-                      "bg-success/10 border border-success/30 text-center"
+                      "mt-6 p-4 rounded-lg text-center",
+                      "bg-success/10 border border-success/30"
                     )}
                   >
                     <CheckCircle className="mx-auto mb-2 text-success" size={24} />
-                    <p className="text-sm font-semibold text-success">
-                      ¡Cita Reservada!
+                    <p className="text-sm font-semibold text-success mb-1">
+                      ¡Cita Por Confirmar!
+                    </p>
+                    <p className="text-xs text-success/80">
+                      Revisa tu correo para confirmar
                     </p>
                   </motion.div>
                 )}

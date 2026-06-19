@@ -58,9 +58,17 @@ export function SocialAuthButtons({ contextLabel }: SocialAuthButtonsProps) {
   const handleProviderClick = async (providerId: OAuthProvider["id"]) => {
     setSigningIn(providerId);
     try {
+      // Store provider in sessionStorage - important for callback page to identify the provider
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("oauthProvider", providerId);
+      }
+
+      // Use clean callback URL (without query params) - must match Google/OAuth provider config
+      const cleanCallbackUrl = `${window.location.origin}/oauth/callback`;
+
       const response = await fetch(
         `/api/session/oauth/start?provider=${providerId}&redirectUri=${encodeURIComponent(
-          `${window.location.origin}/oauth/callback`
+          cleanCallbackUrl
         )}`
       );
 

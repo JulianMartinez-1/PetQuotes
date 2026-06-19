@@ -15,20 +15,23 @@ export class AppointmentsController {
     @Body() dto: CreateAppointmentDto,
   ): Promise<AppointmentResponseDto> {
     try {
-      console.log('[createAppointment] Request:', {
-        clientId: req.user.sub,
-        clinicId: dto.clinicId,
-        petId: dto.petId,
-        service: dto.service,
-        date: dto.date,
-        time: dto.time,
-        notes: dto.notes,
+      console.log('[createAppointment] DTO recibido:', JSON.stringify(dto, null, 2));
+      console.log('[createAppointment] Request user:', {
+        sub: req.user.sub,
+        email: req.user.email,
+        role: req.user.role,
       });
 
       // Parse date and time into ISO string
       const [hours, minutes] = dto.time.split(':').map(Number);
       const appointmentDate = new Date(`${dto.date}T00:00:00Z`);
       appointmentDate.setHours(hours, minutes);
+
+      console.log('[createAppointment] Fecha parseada:', {
+        input: dto.date,
+        time: dto.time,
+        parsed: appointmentDate.toISOString(),
+      });
 
       const appointment = await this.appointmentsService.createAppointment({
         clientId: req.user.sub,
@@ -42,7 +45,11 @@ export class AppointmentsController {
       console.log('[createAppointment] Success:', appointment.id);
       return appointment;
     } catch (error) {
-      console.error('[createAppointment] Error:', error);
+      console.error('[createAppointment] Error completo:', {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        error,
+      });
       throw error;
     }
   }

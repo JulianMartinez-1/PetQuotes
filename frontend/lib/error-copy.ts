@@ -44,11 +44,15 @@ export function parseErrorPayload(rawBody: string): unknown {
   }
 }
 
-export function normalizeApiErrorMessage(status: number, rawMessage?: string): string {
+export function normalizeApiErrorMessage(status: number, rawMessage?: string, path?: string): string {
   const message = (rawMessage ?? "").trim();
   const lower = message.toLowerCase();
 
   if (status === 401 || lower.includes("missing access token") || lower.includes("token") || lower.includes("unauthorized")) {
+    // Si es error de login, mostrar mensaje específico de credenciales inválidas
+    if (path === "/api/session/login") {
+      return "Email o contraseña incorrectos. Intenta nuevamente.";
+    }
     return "Tu sesion vencio. Inicia sesion nuevamente para continuar.";
   }
 

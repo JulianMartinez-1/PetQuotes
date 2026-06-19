@@ -16,13 +16,13 @@ export type ClinicCatalogItem = {
 
 export const CLINIC_CATALOG: ClinicCatalogItem[] = [
   {
-    id: "vet-prime",
+    id: "cmqjxaro400035izhpyc9vp2q",
     name: "Vet Prime",
     city: "Bogota",
     neighborhood: "Chapinero",
     latitude: 4.7380,
     longitude: -74.0520,
-    services: ["Consulta", "Vacunacion", "Laboratorio"],
+    services: ["Consulta General", "Vacunacion", "Laboratorio"],
     rating: 4.9,
     distanceKm: 1.8,
     openNow: true,
@@ -37,7 +37,7 @@ export const CLINIC_CATALOG: ClinicCatalogItem[] = [
     neighborhood: "Usaquen",
     latitude: 4.7230,
     longitude: -74.0150,
-    services: ["Consulta", "Grooming", "Urgencias"],
+    services: ["Consulta General", "Grooming", "Urgencias"],
     rating: 4.8,
     distanceKm: 2.4,
     openNow: true,
@@ -46,18 +46,18 @@ export const CLINIC_CATALOG: ClinicCatalogItem[] = [
     phone: "+57 (1) 2345 6789"
   },
   {
-    id: "petcare-norte",
+    id: "cmqjxarr4000c5izhjyjm1sgo",
     name: "PetCare Norte",
     city: "Bogota",
     neighborhood: "Suba",
-    latitude: 4.7290,
-    longitude: -74.0750,
-    services: ["Consulta", "Estetica", "Vacunacion"],
+    latitude: 4.7650,
+    longitude: -74.0320,
+    services: ["Cirugias", "Traumatologia", "Radiologia"],
     rating: 4.7,
     distanceKm: 3.1,
-    openNow: false,
-    image: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=1200&auto=format&fit=crop",
-    description: "Clinica de barrio con agenda flexible y excelentes tiempos de respuesta.",
+    openNow: true,
+    image: "https://images.unsplash.com/photo-1569457613066-ce10d1a3fe34?q=80&w=1200&auto=format&fit=crop",
+    description: "Centro especializado en cirugia y traumatologia de mascotas pequeñas.",
     phone: "+57 (1) 4567 8901"
   },
   {

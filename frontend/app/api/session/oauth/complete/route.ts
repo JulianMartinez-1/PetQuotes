@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
   let backendResponse: Response;
 
   try {
-    backendResponse = await callAuthBackendRequest(`/auth/oauth/${body.provider}/complete`, {
+    backendResponse = await callAuthBackendRequest(`/api/auth/oauth/${body.provider}/complete`, {
       method: "POST",
       body: {
         completionToken: body.completionToken,

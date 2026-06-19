@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const response = await callAuthBackendRequest(
-      `/auth/oauth/${provider}/start?redirectUri=${encodeURIComponent(callbackRedirectUri)}`,
+      `/api/auth/oauth/${provider}/start?redirectUri=${encodeURIComponent(callbackRedirectUri)}`,
       { method: "GET" }
     );
 

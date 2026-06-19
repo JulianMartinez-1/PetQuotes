@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsDateString } from 'class-validator';
+import { IsString, IsOptional, Matches } from 'class-validator';
 
 export class CreateAppointmentDto {
   @IsString()
@@ -10,10 +10,12 @@ export class CreateAppointmentDto {
   @IsString()
   service: string;
 
-  @IsDateString()
+  @IsString()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'date must be in format YYYY-MM-DD' })
   date: string;
 
   @IsString()
+  @Matches(/^\d{2}:\d{2}$/, { message: 'time must be in format HH:mm' })
   time: string;
 
   @IsOptional()

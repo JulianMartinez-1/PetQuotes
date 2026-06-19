@@ -3,7 +3,8 @@ import { callAuthBackendRequest } from "@/lib/auth-server";
 
 export async function GET(request: NextRequest, context: { params: Promise<{ provider: string }> }) {
   const { provider } = await context.params;
-  const callbackUri = `${request.nextUrl.origin}/oauth/callback?provider=${encodeURIComponent(provider)}`;
+  // Use clean callback URL (no query params) - must match OAuth provider config exactly
+  const callbackUri = `${request.nextUrl.origin}/oauth/callback`;
   const query = new URLSearchParams({ redirectUri: callbackUri }).toString();
 
   try {

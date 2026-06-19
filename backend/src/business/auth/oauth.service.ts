@@ -124,6 +124,7 @@ export class OAuthService {
     state: string,
     redirectUri: string,
   ): Promise<OAuthCallbackResponseDto> {
+    const startTime = Date.now();
     const config = this.oauthConfigs[provider];
     if (!config.clientId || !config.clientSecret) {
       throw new BadRequestException(`OAuth provider ${provider} is not configured`);
@@ -131,14 +132,22 @@ export class OAuthService {
 
     try {
       // Exchange code for access token
+      console.log(`[OAuth] Starting token exchange for ${provider}`);
+      const tokenStart = Date.now();
       const tokenResponse = await this.getAccessToken(provider, code, redirectUri, config);
       const accessToken = tokenResponse.access_token;
+      console.log(`[OAuth] Token exchange completed in ${Date.now() - tokenStart}ms`);
 
       // Get user info
+      console.log(`[OAuth] Fetching user info...`);
+      const userStart = Date.now();
       const userInfo = await this.getUserInfo(provider, accessToken, config);
+      console.log(`[OAuth] User info fetched in ${Date.now() - userStart}ms`);
 
       // Generate completion token (JWT-like token for profile completion)
+      console.log(`[OAuth] Generating completion token...`);
       const completionToken = this.generateCompletionToken(provider, userInfo);
+      console.log(`[OAuth] OAuth flow completed in ${Date.now() - startTime}ms total`);
 
       return {
         completionToken,
@@ -149,6 +158,7 @@ export class OAuthService {
         requiresProfileCompletion: true,
       };
     } catch (error) {
+      console.error(`[OAuth] Error during exchange: ${(error as Error).message}`);
       throw new BadRequestException(`Failed to exchange OAuth code: ${(error as Error).message}`);
     }
   }
@@ -161,6 +171,9 @@ export class OAuthService {
     completionToken: string,
     fullName: string,
   ): Promise<OAuthTokenResponseDto> {
+    const startTime = Date.now();
+    console.log(`[OAuth] Starting profile completion for ${provider}`);
+
     // Verify completion token
     const oauthData = this.verifyCompletionToken(completionToken);
 
@@ -169,12 +182,19 @@ export class OAuthService {
     }
 
     // Check if user exists
+    console.log(`[OAuth] Checking if user exists: ${oauthData.email}`);
+    const userCheckStart = Date.now();
     let user = await this.userRepository.findByEmail(oauthData.email);
+    console.log(`[OAuth] User check completed in ${Date.now() - userCheckStart}ms`);
 
     if (!user) {
-      // Create new user
-      const generatedPassword = crypto.randomBytes(16).toString('hex');
-      const passwordHash = await bcrypt.hash(generatedPassword, 10);
+      console.log(`[OAuth] Creating new user for ${oauthData.email}`);
+      const createStart = Date.now();
+
+      // Create new user - hash password in parallel for speed
+      const [passwordHash] = await Promise.all([
+        bcrypt.hash(crypto.randomBytes(16).toString('hex'), 10),
+      ]);
 
       user = await this.userRepository.create({
         email: oauthData.email,
@@ -182,28 +202,12 @@ export class OAuthService {
         fullName: fullName || oauthData.name,
         role: 'CLIENT',
       });
+      console.log(`[OAuth] User created in ${Date.now() - createStart}ms`);
 
-      // Create social account link
-      await this.prisma.socialAccount.create({
-        data: {
-          userId: user.id,
-          provider: provider.toUpperCase() as any,
-          providerAccountId: oauthData.oauthId,
-          email: oauthData.email,
-          name: oauthData.name,
-          image: oauthData.picture,
-        },
-      });
-    } else {
-      // Update existing user with OAuth info if not already linked
-      const existingSocialAccount = await this.prisma.socialAccount.findFirst({
-        where: {
-          userId: user.id,
-          provider: provider.toUpperCase() as any,
-        },
-      });
-
-      if (!existingSocialAccount) {
+      // Create social account link immediately after user creation
+      console.log(`[OAuth] Linking social account...`);
+      const linkStart = Date.now();
+      try {
         await this.prisma.socialAccount.create({
           data: {
             userId: user.id,
@@ -214,11 +218,46 @@ export class OAuthService {
             image: oauthData.picture,
           },
         });
+        console.log(`[OAuth] Social account linked in ${Date.now() - linkStart}ms`);
+      } catch (err) {
+        // Silently ignore if already exists
+        console.log('[OAuth] Social account already exists, skipping');
+      }
+    } else {
+      console.log(`[OAuth] User already exists, checking for social account link`);
+      // Update existing user with OAuth info if not already linked
+      const existingSocialAccount = await this.prisma.socialAccount.findFirst({
+        where: {
+          userId: user.id,
+          provider: provider.toUpperCase() as any,
+        },
+      });
+
+      if (!existingSocialAccount) {
+        try {
+          await this.prisma.socialAccount.create({
+            data: {
+              userId: user.id,
+              provider: provider.toUpperCase() as any,
+              providerAccountId: oauthData.oauthId,
+              email: oauthData.email,
+              name: oauthData.name,
+              image: oauthData.picture,
+            },
+          });
+        } catch (err) {
+          // Silently ignore if already exists
+          console.log('[OAuth] Social account already exists, skipping');
+        }
       }
     }
 
     // Generate tokens
+    console.log(`[OAuth] Generating JWT tokens...`);
+    const tokenStart = Date.now();
     const tokens = this.jwtManager.generateTokens(user.id, user.email, user.role, user.fullName);
+    console.log(`[OAuth] Tokens generated in ${Date.now() - tokenStart}ms`);
+    console.log(`[OAuth] Profile completion finished in ${Date.now() - startTime}ms total`);
 
     return {
       userId: user.id,

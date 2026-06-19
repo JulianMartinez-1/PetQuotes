@@ -89,22 +89,40 @@ export function ClinicBookingModal({
 
     setIsSubmitting(true);
     try {
+      const payload = {
+        clinicId: clinic.id,
+        petId: selectedPetId,
+        service: selectedService,
+        date: selectedDate,
+        time: selectedTime,
+        notes,
+      };
+      
+      console.log("[ClinicBookingModal] Enviando payload:", payload);
+      
       const response = await fetch("/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          clinicId: clinic.id,
-          petId: selectedPetId,
-          service: selectedService,
-          date: selectedDate,
-          time: selectedTime,
-          notes,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        console.error("Error creating booking:", response.statusText);
-        alert("Error al crear la reserva");
+        let errorMessage = response.statusText;
+        try {
+          const contentType = response.headers.get("content-type");
+          if (contentType?.includes("application/json")) {
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorData.error || response.statusText;
+          } else {
+            const text = await response.text();
+            console.error("[ClinicBookingModal] Raw response body:", text);
+            errorMessage = text || response.statusText;
+          }
+        } catch (e) {
+          console.error("[ClinicBookingModal] Error parsing error response:", e);
+        }
+        console.error("[ClinicBookingModal] Error creating booking:", response.status, errorMessage);
+        alert("Error al crear la reserva: " + errorMessage);
         return;
       }
 
@@ -493,9 +511,9 @@ export function ClinicBookingModal({
               exit={{ scale: 0.95, opacity: 0 }}
             >
               <div className="mb-4 text-5xl">✅</div>
-              <h3 className="text-2xl font-bold text-text-primary mb-4">¡Tu cita está registrada!</h3>
+              <h3 className="text-2xl font-bold text-text-primary mb-4">Tu reserva se ha programado</h3>
               <p className="text-text-secondary mb-4 leading-relaxed">
-                Su cita está a la espera de ser confirmada, recibirás mensaje para confirmarlo.
+                Recibirá su mensaje con la confirmación.
               </p>
               <div className="mt-6 text-sm text-text-tertiary">
                 {clinic.name}

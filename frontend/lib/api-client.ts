@@ -80,7 +80,7 @@ export async function requestJson<T>(path: string, options: RequestOptions = {})
       signal: controller.signal
     });
   } catch {
-    throw new Error(normalizeApiErrorMessage(0, "network"));
+    throw new Error(normalizeApiErrorMessage(0, "network", normalizedPath));
   } finally {
     clearTimeout(timeout);
   }
@@ -120,7 +120,7 @@ export async function requestJson<T>(path: string, options: RequestOptions = {})
     const body = await response.text();
     const payload = parseErrorPayload(body);
     const rawMessage = extractErrorMessage(payload);
-    throw new Error(normalizeApiErrorMessage(response.status, rawMessage));
+    throw new Error(normalizeApiErrorMessage(response.status, rawMessage, normalizedPath));
   }
 
   return response.json() as Promise<T>;
