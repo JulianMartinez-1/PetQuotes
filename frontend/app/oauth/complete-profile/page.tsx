@@ -62,7 +62,7 @@ export default function OAuthCompleteProfilePage() {
 
       sessionStorage.removeItem("oauthProfileCompletion");
       login({ user: response.user });
-      router.replace("/bookings");
+      router.replace("/");
     } catch (err) {
       setError((err as Error).message || "No se pudo completar el perfil social");
     } finally {

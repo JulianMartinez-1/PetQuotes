@@ -21,7 +21,11 @@ export class ClinicsService {
     private readonly configService: ConfigService,
     private readonly fallbackService: ClinicsWithFallbackService,
   ) {
-    this.googleMapsApiKey = this.configService.get<string | undefined>('GOOGLE_MAPS_API_KEY');
+    // GOOGLE_PLACES_API_KEY is a server-side key with no HTTP-referrer restriction.
+    // Falls back to GOOGLE_MAPS_API_KEY if the dedicated key is not set.
+    this.googleMapsApiKey =
+      this.configService.get<string | undefined>('GOOGLE_PLACES_API_KEY') ??
+      this.configService.get<string | undefined>('GOOGLE_MAPS_API_KEY');
     
     if (this.googleMapsApiKey) {
       this.logger.log(`✅ Google Maps API Key configurada (primeros 10 caracteres): ${this.googleMapsApiKey.substring(0, 10)}...`);

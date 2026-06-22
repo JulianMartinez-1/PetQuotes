@@ -4,9 +4,11 @@ import { normalizeApiErrorMessage } from "@/lib/error-copy";
 import { setCsrfCookie } from "@/lib/csrf";
 
 const OAUTH_STATE_COOKIE = "pq_oauth_state";
+const OAUTH_PROVIDER_COOKIE = "pq_oauth_provider";
 
-function clearStateCookie(response: NextResponse) {
+function clearOAuthCookies(response: NextResponse) {
   response.cookies.set(OAUTH_STATE_COOKIE, "", { maxAge: 0, path: "/" });
+  response.cookies.set(OAUTH_PROVIDER_COOKIE, "", { maxAge: 0, path: "/" });
 }
 
 export async function POST(request: NextRequest) {
@@ -51,7 +53,7 @@ export async function POST(request: NextRequest) {
       { message: await getErrorPayload(backendResponse) },
       { status: backendResponse.status }
     );
-    clearStateCookie(errorResp);
+    clearOAuthCookies(errorResp);
     return errorResp;
   }
 
@@ -60,7 +62,7 @@ export async function POST(request: NextRequest) {
   // Returning user: backend issued tokens directly — set cookies and return session
   if (data.requiresProfileCompletion === false && data.accessToken) {
     const sessionResponse = NextResponse.json(normalizeSessionResponse(data));
-    clearStateCookie(sessionResponse);
+    clearOAuthCookies(sessionResponse);
     setSessionCookies(sessionResponse, data);
     setCsrfCookie(sessionResponse);
     return sessionResponse;
@@ -68,6 +70,6 @@ export async function POST(request: NextRequest) {
 
   // New user: pass through the completionToken for the profile-completion step
   const passThrough = NextResponse.json(data);
-  clearStateCookie(passThrough);
+  clearOAuthCookies(passThrough);
   return passThrough;
 }

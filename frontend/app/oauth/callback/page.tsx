@@ -18,14 +18,14 @@ export default function OAuthCallbackPage() {
   const hasExchangedRef = useRef(false);
 
   const params = useMemo(() => {
-    // Provider might come from URL params (set by us) or from sessionStorage (as fallback)
     let provider = (searchParams.get("provider") ?? "") as OAuthProviderId;
-    
-    // If not in URL params, try to get from sessionStorage
+
     if (!provider && typeof window !== "undefined") {
-      provider = (sessionStorage.getItem("oauthProvider") ?? "") as OAuthProviderId;
+      // Prefer the server-set cookie (more reliable than sessionStorage across redirects)
+      const cookieMatch = document.cookie.match(/(?:^|;\s*)pq_oauth_provider=([^;]+)/);
+      provider = ((cookieMatch?.[1] ?? sessionStorage.getItem("oauthProvider") ?? "")) as OAuthProviderId;
     }
-    
+
     const code = searchParams.get("code") ?? "";
     const state = searchParams.get("state") ?? "";
     const oauthError = searchParams.get("error") ?? "";

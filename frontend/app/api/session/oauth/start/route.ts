@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { callAuthBackendRequest } from "@/lib/auth-server";
 
 const OAUTH_STATE_COOKIE = "pq_oauth_state";
+const OAUTH_PROVIDER_COOKIE = "pq_oauth_provider";
+
+const cookieBase = (maxAge: number) => ({
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  path: "/",
+  maxAge,
+});
 
 export async function GET(request: NextRequest) {
   const provider = request.nextUrl.searchParams.get("provider");
@@ -25,16 +33,11 @@ export async function GET(request: NextRequest) {
 
     const data = (await response.json()) as { authorizationUrl: string; state: string };
 
-    // Store state in httpOnly cookie so we can validate it on the callback.
-    // This prevents CSRF attacks on the OAuth flow.
     const result = NextResponse.json({ authorizationUrl: data.authorizationUrl });
-    result.cookies.set(OAUTH_STATE_COOKIE, data.state, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 10 * 60, // 10 minutes — same TTL as the completionToken
-    });
+    // httpOnly: state is only read server-side in the exchange route
+    result.cookies.set(OAUTH_STATE_COOKIE, data.state, { ...cookieBase(10 * 60), httpOnly: true });
+    // NOT httpOnly: the callback page reads this via document.cookie to identify the provider
+    result.cookies.set(OAUTH_PROVIDER_COOKIE, provider, { ...cookieBase(10 * 60), httpOnly: false });
     return result;
   } catch (error) {
     console.error("OAuth start error:", error);
