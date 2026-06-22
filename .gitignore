@@ -58,3 +58,19 @@ docker-data/
 
 # Misc
 *.pem
+
+# Screenshots generated during development / testing sessions
+*.png
+*.jpg
+!frontend/public/**/*.png
+!frontend/public/**/*.jpg
+!frontend/public/**/*.webp
+
+# Playwright MCP session files
+.playwright-mcp/
+
+# Compiled Prisma seed artifacts (seed.ts compiles here during dev)
+backend/prisma/seed.js
+backend/prisma/seed.js.map
+backend/prisma/seed.d.ts
+backend/prisma/seed.d.ts.map
