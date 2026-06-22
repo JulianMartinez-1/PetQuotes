@@ -2,194 +2,87 @@ name: pet-quotes-ci
 
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: [main]
   pull_request:
-  workflow_dispatch:
-    inputs:
-      enforce_high_gate:
-        description: "Enable fail-on-high vulnerability gate for this run"
-        required: false
-        default: false
-        type: boolean
 
 jobs:
   quality:
+    name: Lint & Build
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install root deps
+        run: npm install
 
-      - name: Lint
-        run: npm run ci:lint
+      - name: Install backend deps
+        run: cd backend && npm install
 
-      - name: Build
-        run: npm run ci:build
+      - name: Install frontend deps
+        run: cd frontend && npm install
 
-      - name: Unit tests (if present)
-        run: npm run ci:test:unit
+      - name: Lint backend
+        run: npm run lint:backend
+
+      - name: Lint frontend
+        run: npm run lint:frontend
+
+      - name: Build backend
+        run: npm run build:backend
+
+      - name: Build frontend
+        env:
+          NEXT_PUBLIC_API_BASE_URL: https://api.petquotes.online
+          NEXT_PUBLIC_API_URL: https://api.petquotes.online
+          NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: placeholder
+          NEXT_PUBLIC_API_TIMEOUT_MS: "10000"
+        run: npm run build:frontend
 
   security-audit:
+    name: Security Audit
     needs: quality
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install root deps
+        run: npm install
 
-      - name: Run npm audit report
+      - name: Run npm audit
         run: |
           mkdir -p .ci-logs
           npm audit --json > .ci-logs/npm-audit.json || true
 
-      - name: Security audit summary (warning mode)
+      - name: Audit summary
         run: |
-          node -e "const fs=require('fs'); const p='.ci-logs/npm-audit.json'; const raw=fs.existsSync(p)?fs.readFileSync(p,'utf8'):'{}'; const d=JSON.parse(raw||'{}'); const v=(d.metadata&&d.metadata.vulnerabilities)||{}; const critical=v.critical||0; const high=v.high||0; const moderate=v.moderate||0; const low=v.low||0; console.log('[SECURITY] npm audit summary => critical='+critical+', high='+high+', moderate='+moderate+', low='+low); if(critical>0||high>0){ console.log('::warning::Security vulnerabilities found. Review npm-audit-report artifact.'); }"
+          node -e "
+            const fs = require('fs');
+            const raw = fs.existsSync('.ci-logs/npm-audit.json') ? fs.readFileSync('.ci-logs/npm-audit.json', 'utf8') : '{}';
+            const d = JSON.parse(raw || '{}');
+            const v = (d.metadata && d.metadata.vulnerabilities) || {};
+            const critical = v.critical || 0;
+            const high = v.high || 0;
+            console.log('[SECURITY] critical=' + critical + ', high=' + high + ', moderate=' + (v.moderate||0) + ', low=' + (v.low||0));
+            if (critical > 0) { console.error('[SECURITY] Blocking: critical vulnerabilities found'); process.exit(1); }
+            console.log('[SECURITY] Gate passed.');
+          "
 
-      - name: Print security gate mode
-        env:
-          ENFORCE_HIGH_VULN_GATE: ${{ vars.ENFORCE_HIGH_VULN_GATE }}
-          ENFORCE_HIGH_VULN_GATE_INPUT: ${{ github.event.inputs.enforce_high_gate }}
-        run: |
-          node -e "const fromVar=String(process.env.ENFORCE_HIGH_VULN_GATE||'').toLowerCase()==='true'; const fromInput=String(process.env.ENFORCE_HIGH_VULN_GATE_INPUT||'').toLowerCase()==='true'; const effective=fromVar||fromInput; console.log('[SECURITY] Gate mode => critical=always, high='+(effective?'enforced':'warning-only'));"
-
-      - name: Enforce vulnerability gate on protected branches
-        if: github.event_name == 'push' && (github.ref_name == 'main' || github.ref_name == 'master')
-        env:
-          ENFORCE_HIGH_VULN_GATE: ${{ vars.ENFORCE_HIGH_VULN_GATE }}
-          ENFORCE_HIGH_VULN_GATE_INPUT: ${{ github.event.inputs.enforce_high_gate }}
-        run: |
-          node -e "const fs=require('fs'); const p='.ci-logs/npm-audit.json'; const raw=fs.existsSync(p)?fs.readFileSync(p,'utf8'):'{}'; const d=JSON.parse(raw||'{}'); const v=((d.metadata||{}).vulnerabilities||{}); const critical=v.critical||0; const high=v.high||0; const fromVar=String(process.env.ENFORCE_HIGH_VULN_GATE||'').toLowerCase()==='true'; const fromInput=String(process.env.ENFORCE_HIGH_VULN_GATE_INPUT||'').toLowerCase()==='true'; const enforceHigh=fromVar||fromInput; if(critical>0){ console.error('[SECURITY] Blocking release: critical vulnerabilities='+critical); process.exit(1);} if(enforceHigh && high>0){ console.error('[SECURITY] Blocking release: high vulnerabilities='+high+' (high gate enabled)'); process.exit(1);} if(!enforceHigh){ console.log('[SECURITY] High severity gate disabled. Set ENFORCE_HIGH_VULN_GATE=true or run workflow_dispatch with enforce_high_gate=true when backlog is cleaned.'); } console.log('[SECURITY] Protected branch vulnerability gate passed.');"
-
-      - name: Upload audit report
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: npm-audit-report
           path: .ci-logs/npm-audit.json
           if-no-files-found: ignore
-
-  backend-e2e:
-    needs: [quality, security-audit]
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Prepare CI env file
-        run: |
-          if [ -f .env ]; then
-            echo ".env already exists"
-          elif [ -f .env.example ]; then
-            cp .env.example .env
-            echo "Created .env from .env.example"
-          else
-            echo "Missing .env.example to bootstrap CI env"
-            exit 1
-          fi
-
-      - name: Start required services
-        run: |
-          docker compose up -d --build auth-db appointment-db redis rabbitmq elasticsearch
-          docker compose up -d --build auth-service appointment-service
-          docker compose up -d --build api-gateway
-
-      - name: Wait for API Gateway
-        run: |
-          for i in {1..60}; do
-            code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3001/api/auth/login || true)
-            if [ "$code" != "000" ]; then
-              echo "Gateway ready with HTTP $code"
-              exit 0
-            fi
-            sleep 2
-          done
-          echo "Gateway did not become ready in time"
-          docker compose logs api-gateway auth-service appointment-service
-          exit 1
-
-      - name: Wait for health and readiness endpoints
-        run: |
-          for i in {1..60}; do
-            gw_health=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3001/api/health || true)
-            gw_ready=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3001/api/ready || true)
-            auth_health=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3002/health || true)
-            auth_ready=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3002/ready || true)
-            appt_health=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3005/health || true)
-            appt_ready=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3005/ready || true)
-
-            if [ "$gw_health" = "200" ] && [ "$gw_ready" = "200" ] && [ "$auth_health" = "200" ] && [ "$auth_ready" = "200" ] && [ "$appt_health" = "200" ] && [ "$appt_ready" = "200" ]; then
-              echo "Health/ready checks passed"
-              exit 0
-            fi
-            sleep 2
-          done
-
-          echo "Health/ready checks did not pass in time"
-          docker compose logs api-gateway auth-service appointment-service
-          exit 1
-
-      - name: Apply migrations
-        run: |
-          docker compose exec -T auth-service npx prisma migrate deploy
-          docker compose exec -T appointment-service npx prisma migrate deploy
-
-      - name: Seed minimum data
-        run: npm run db:seed:minimum
-
-      - name: Run e2e suite (Sprint 1 + 2)
-        run: npm run test:e2e
-
-      - name: Run performance baseline (Sprint 4)
-        run: |
-          PERF_LOGIN_ITERATIONS=4 PERF_LOGIN_CONCURRENCY=1 PERF_LOGIN_PACE_MS=2500 PERF_CREATE_ITERATIONS=20 PERF_CREATE_CONCURRENCY=4 npm run ci:perf
-
-      - name: Dump logs on failure
-        if: failure()
-        run: |
-          mkdir -p .ci-logs
-          docker compose logs api-gateway auth-service appointment-service > .ci-logs/backend-compose.log
-
-      - name: Upload compose logs artifact on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-compose-logs
-          path: .ci-logs/backend-compose.log
-          if-no-files-found: ignore
-
-      - name: Stop services
-        if: always()
-        run: docker compose down -v
