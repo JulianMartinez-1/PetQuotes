@@ -20,6 +20,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Lowercase owner
+        run: echo "OWNER_LC=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_ENV
+
       - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
@@ -33,7 +36,7 @@ jobs:
           context: .
           file: backend/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/pet-quotes-backend:latest
+          tags: ghcr.io/${{ env.OWNER_LC }}/pet-quotes-backend:latest
 
       - name: Build and push analytics-service
         uses: docker/build-push-action@v5
@@ -41,7 +44,7 @@ jobs:
           context: ./analytics-service
           file: analytics-service/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/pet-quotes-analytics:latest
+          tags: ghcr.io/${{ env.OWNER_LC }}/pet-quotes-analytics:latest
 
   deploy:
     name: Deploy to Droplet
