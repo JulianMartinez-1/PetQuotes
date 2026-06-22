@@ -43,18 +43,26 @@ export class NotificationService {
       timeZone: 'America/Bogota',
     });
 
+    const isDev = this.config.get<string>('NODE_ENV') !== 'production';
+    const recipient = isDev
+      ? (this.config.get<string>('RESEND_FROM_EMAIL') ?? data.to)
+      : data.to;
+    const subject = isDev
+      ? `[DEV → ${data.to}] ✅ Cita confirmada — ${data.clinicName}`
+      : `✅ Cita confirmada — ${data.clinicName}`;
+
     try {
       const { error } = await this.resend.emails.send({
         from: `PetQuotes <${from}>`,
-        to: data.to,
-        subject: `✅ Cita confirmada — ${data.clinicName}`,
+        to: recipient,
+        subject,
         html: this.buildHtml({ ...data, dateStr, timeStr }),
       });
 
       if (error) {
-        this.logger.error(`Resend returned error for ${data.to}: ${error.message}`);
+        this.logger.error(`Resend error for ${recipient}: ${error.message}`);
       } else {
-        this.logger.log(`Confirmation email sent to ${data.to}`);
+        this.logger.log(`Confirmation email sent to ${recipient}${isDev ? ` (dev redirect from ${data.to})` : ''}`);
       }
     } catch (err) {
       this.logger.error(`Failed to send confirmation email to ${data.to}`, err);

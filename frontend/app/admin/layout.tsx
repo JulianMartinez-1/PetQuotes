@@ -4,13 +4,12 @@ import { PropsWithChildren } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ChevronLeft, BarChart3, Building2, ClipboardList } from "lucide-react";
+import { ChevronLeft, Building2, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuthState } from "@/store/auth-state";
 
 const NAV_ITEMS = [
-  { href: "/admin/analytics", label: "Analítica", icon: BarChart3 },
   { href: "/admin/clinics", label: "Clínicas", icon: Building2 },
   { href: "/admin/reservas", label: "Reservas", icon: ClipboardList },
 ];

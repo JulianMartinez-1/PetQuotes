@@ -211,25 +211,6 @@ export function NavBar() {
                             </Link>
                           </motion.div>
 
-                          {user.role === 'ADMIN' && (
-                            <motion.div
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                            >
-                              <Link href="/admin/analytics">
-                                <button
-                                  onClick={() => setProfileMenuOpen(false)}
-                                  className={cn(
-                                    "w-full flex items-center gap-2 px-3 py-2 rounded-lg",
-                                    "text-sm font-bold text-secondary",
-                                    "hover:bg-secondary/20 transition-colors"
-                                  )}
-                                >
-                                  📊 Analíticas
-                                </button>
-                              </Link>
-                            </motion.div>
-                          )}
 
                           <motion.button
                             onClick={() => {

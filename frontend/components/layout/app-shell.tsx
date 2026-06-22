@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import { usePathname } from "next/navigation";
 import type { PropsWithChildren } from "react";
-import { Menu, X, MapPin, BarChart3, Moon, Sun } from "lucide-react";
+import { Menu, X, MapPin, Moon, Sun } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useAppState } from "@/store/app-state";
@@ -63,20 +63,6 @@ export function AppShell({ children }: PropsWithChildren) {
                 </Link>
               );
             })}
-            {user?.role === "ADMIN" && (
-              <Link
-                href="/admin/analytics"
-                className={cn(
-                  "flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150",
-                  pathname.startsWith("/admin/analytics")
-                    ? "bg-primary-50 text-primary-700 font-semibold dark:bg-primary-900/30 dark:text-primary-300"
-                    : "text-text-secondary hover:text-text-primary hover:bg-surface-light"
-                )}
-              >
-                <BarChart3 size={14} />
-                Analítica
-              </Link>
-            )}
           </nav>
 
           {/* Right side actions */}
@@ -205,21 +191,6 @@ export function AppShell({ children }: PropsWithChildren) {
                     </>
                   ) : (
                     <>
-                      {user?.role === "ADMIN" && (
-                        <Link
-                          href="/admin/analytics"
-                          className={cn(
-                            "flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                            pathname.startsWith("/admin/analytics")
-                              ? "bg-primary-50 text-primary-700 font-semibold dark:bg-primary-900/30 dark:text-primary-300"
-                              : "text-text-secondary hover:bg-surface-light hover:text-text-primary"
-                          )}
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <BarChart3 size={14} />
-                          Analítica
-                        </Link>
-                      )}
                       <Link
                         href="/profile"
                         className="rounded-lg px-3 py-2.5 text-sm font-medium text-text-secondary hover:bg-surface-light hover:text-text-primary transition-colors"

@@ -8,6 +8,7 @@ import {
   UseGuards,
   InternalServerErrorException,
   ServiceUnavailableException,
+  Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
@@ -27,6 +28,7 @@ import { AnalyticsFiltersDto } from './analytics.dto';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('ADMIN')
 export class AnalyticsController {
+  private readonly logger = new Logger(AnalyticsController.name);
   private readonly analyticsUrl: string;
 
   constructor(
@@ -36,23 +38,28 @@ export class AnalyticsController {
     this.analyticsUrl =
       this.configService.get<string>('ANALYTICS_SERVICE_URL') ||
       'http://analytics-service:3009';
+    this.logger.log(`Analytics URL: ${this.analyticsUrl}`);
   }
 
   private async proxy(path: string, params: Record<string, any>, auth: string) {
     const cleanParams = Object.fromEntries(
       Object.entries(params).filter(([, v]) => v !== undefined && v !== null && v !== ''),
     );
+    const targetUrl = `${this.analyticsUrl}/analytics/${path}`;
 
     try {
       const response = await firstValueFrom(
         this.httpService
-          .get(`${this.analyticsUrl}/analytics/${path}`, {
+          .get(targetUrl, {
             params: cleanParams,
             headers: { Authorization: auth },
           })
           .pipe(
             timeout(15000),
             catchError((err: AxiosError) => {
+              this.logger.error(
+                `Analytics proxy error [${path}]: code=${err.code} status=${err.response?.status} msg=${err.message}`,
+              );
               if (err.code === 'ECONNREFUSED' || err.code === 'ECONNRESET') {
                 throw new ServiceUnavailableException(
                   'El servicio de analítica no está disponible',
@@ -65,6 +72,7 @@ export class AnalyticsController {
       return response.data;
     } catch (err: any) {
       if (err?.status) throw err;
+      this.logger.error(`Analytics outer catch [${path}]: ${err?.constructor?.name} ${err?.message}`);
       throw new InternalServerErrorException(
         `Error al consultar el servicio de analítica: ${err?.message ?? 'unknown'}`,
       );
@@ -87,6 +95,7 @@ export class AnalyticsController {
     @Query() filters: AnalyticsFiltersDto,
     @Headers('authorization') auth: string,
   ) {
+    this.logger.log(`getDashboard called, auth present: ${!!auth}`);
     return this.proxy('summary', { start_date: filters.startDate, end_date: filters.endDate }, auth);
   }
 

@@ -39,9 +39,12 @@ RUN npm ci --only=production
 COPY --from=builder /app/backend/dist ./dist
 COPY backend/prisma ./prisma
 COPY backend/tsconfig.json ./tsconfig.json
+COPY backend/docker-entrypoint.sh ./docker-entrypoint.sh
 
 # Generate Prisma client
 RUN npx prisma generate
+
+RUN chmod +x docker-entrypoint.sh
 
 EXPOSE 3001
 
@@ -49,4 +52,4 @@ EXPOSE 3001
 HEALTHCHECK --interval=15s --timeout=5s --retries=5 --start-period=20s \
   CMD wget --quiet --tries=1 --spider http://localhost:3001/api/health || exit 1
 
-CMD ["node", "dist/main.js"]
+ENTRYPOINT ["sh", "docker-entrypoint.sh"]
