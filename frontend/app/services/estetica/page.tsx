@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, Info } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Info, Sparkles, Wind, Palette, Gem } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SpecializedClinics } from "@/components/sections/specialized-clinics-api";
 import { ScrollReactivePets } from "@/components/animations/scroll-reactive-pets";
@@ -30,22 +30,22 @@ export default function Estetica() {
 
   const treatments = [
     {
-      icon: "█",
+      Icon: Sparkles,
       title: "Tratamientos de Pelaje",
       description: "Mascarillas hidratantes y acondicionamientos de lujo para pelaje brillante",
     },
     {
-      icon: "█",
+      Icon: Wind,
       title: "Masajes Relajantes",
       description: "Masajes terapéuticos que reducen estrés y mejoran la circulación",
     },
     {
-      icon: "█",
+      Icon: Palette,
       title: "Coloración Segura",
       description: "Tintes dermatológicamente seguros para cambios de color creativos",
     },
     {
-      icon: "█",
+      Icon: Gem,
       title: "Tratamientos Especiales",
       description: "Hidratación profunda, botox capilar y tratamientos anti-edad",
     },
@@ -130,12 +130,14 @@ export default function Estetica() {
             transition={{ duration: 0.6 }}
           >
             <div className="flex items-center gap-4 mb-4">
-              <div className="text-5xl">█</div>
+              <div className="w-14 h-14 rounded-2xl bg-accent-50 flex items-center justify-center">
+                <Sparkles size={28} className="text-accent-600" />
+              </div>
               <h1 className="text-4xl sm:text-5xl font-black text-warning">
                 Estética
               </h1>
             </div>
-            <p className="text-lg text-textSecondary max-w-2xl">
+            <p className="text-lg text-text-secondary max-w-2xl">
               Servicios de lujo y bienestar para que tu mascota brille y se sienta increíble
             </p>
           </motion.div>
@@ -154,12 +156,12 @@ export default function Estetica() {
         >
           <motion.div variants={itemVariants} className="mb-12">
             <h2 className="text-3xl font-black text-warning mb-6">¿Qué es la Estética para Mascotas?</h2>
-            <p className="text-lg text-textSecondary leading-relaxed mb-4">
+            <p className="text-lg text-text-secondary leading-relaxed mb-4">
               La estética para mascotas va más allá de la higiene básica. Es un servicio integral de belleza
               y bienestar que incluye tratamientos especializados, diseños creativos y terapias relajantes
               para mantener a tu mascota luciendo y sintiéndose de lo mejor.
             </p>
-            <p className="text-lg text-textSecondary leading-relaxed">
+            <p className="text-lg text-text-secondary leading-relaxed">
               Desde mascarillas capilares premium hasta sesiones de spa completas, nuestros estetas certificados
               utilizan técnicas profesionales y productos de calidad para transformar a tu pet en una verdadera
               superstar.
@@ -188,10 +190,12 @@ export default function Estetica() {
           >
             {treatments.map((treatment, idx) => (
               <motion.div key={idx} variants={itemVariants}>
-                <div className="bg-white rounded-2xl border-2 border-warning/20 p-8 hover:shadow-lg transition-shadow">
-                  <div className="text-4xl mb-4">{treatment.icon}</div>
-                  <h3 className="text-xl font-bold text-warning mb-3">{treatment.title}</h3>
-                  <p className="text-textSecondary leading-relaxed">{treatment.description}</p>
+                <div className="bg-surface rounded-2xl border border-accent-100 dark:border-border p-8 hover:shadow-lg hover:border-accent-200 transition-all card-hover">
+                  <div className="w-12 h-12 rounded-xl bg-accent-50 dark:bg-accent-900/30 flex items-center justify-center mb-5">
+                    <treatment.Icon size={24} className="text-accent-600 dark:text-accent-400" />
+                  </div>
+                  <h3 className="text-lg font-bold text-text-primary mb-2">{treatment.title}</h3>
+                  <p className="text-text-secondary leading-relaxed text-sm">{treatment.description}</p>
                 </div>
               </motion.div>
             ))}
@@ -214,7 +218,7 @@ export default function Estetica() {
             {services.map((service, idx) => (
               <motion.div key={idx} variants={itemVariants} className="flex items-start gap-3">
                 <CheckCircle2 size={24} className="text-warning flex-shrink-0 mt-1" />
-                <span className="text-lg text-textSecondary">{service}</span>
+                <span className="text-lg text-text-secondary">{service}</span>
               </motion.div>
             ))}
           </div>
@@ -236,7 +240,7 @@ export default function Estetica() {
             {benefits.map((benefit, idx) => (
               <motion.div key={idx} variants={itemVariants} className="flex items-start gap-3">
                 <CheckCircle2 size={24} className="text-warning flex-shrink-0 mt-1" />
-                <span className="text-lg text-textSecondary">{benefit}</span>
+                <span className="text-lg text-text-secondary">{benefit}</span>
               </motion.div>
             ))}
           </div>
@@ -248,13 +252,13 @@ export default function Estetica() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false, amount: 0.3 }}
           transition={{ duration: 0.6 }}
-          className="bg-purple-50 border-l-4 border-purple-500 rounded-r-lg p-6 mb-20"
+          className="bg-purple-50 dark:bg-surface border-l-4 border-purple-500 rounded-r-lg p-6 mb-20"
         >
           <div className="flex gap-4">
-            <Info className="text-purple-600 flex-shrink-0 mt-1" size={24} />
+            <Info className="text-purple-600 dark:text-purple-400 flex-shrink-0 mt-1" size={24} />
             <div>
-              <h3 className="font-bold text-purple-900 mb-2">Nota Importante</h3>
-              <p className="text-purple-800">
+              <h3 className="font-bold text-text-primary mb-2">Nota Importante</h3>
+              <p className="text-text-secondary">
                 Los tratamientos estéticos son personalizables según el tipo de pelaje, raza y preferencias
                 de tu mascota. Consulta con nuestros expertos para determinar el mejor plan para tu pet.
               </p>
@@ -271,7 +275,7 @@ export default function Estetica() {
       />
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-warning to-warning-dark text-white">
+      <section className="py-20 bg-gradient-to-r from-warning to-amber-600 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}

@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
   const refreshToken = getRefreshTokenFromRequest(request);
 
   if (refreshToken) {
-    await callAuthBackend("/auth/logout", { refreshToken });
+    await callAuthBackend("/api/auth/logout", { refreshToken });
   }
 
   const response = NextResponse.json({ success: true });

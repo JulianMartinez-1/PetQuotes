@@ -7,14 +7,14 @@ const API_GATEWAY_URL = process.env.API_BASE_URL ?? process.env.NEXT_PUBLIC_API_
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { petId: string } }
+  { params }: { params: Promise<{ petId: string }> }
 ) {
   const accessToken = request.cookies.get(AUTH_COOKIE_NAMES.access)?.value;
   if (!accessToken) {
     return NextResponse.json({ message: normalizeApiErrorMessage(401, "missing access token") }, { status: 401 });
   }
 
-  const petId = params.petId;
+  const { petId } = await params;
   const timeoutMs = Number(process.env.API_PROXY_TIMEOUT_MS ?? 8000);
   let upstream: Response;
 
@@ -55,14 +55,14 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { petId: string } }
+  { params }: { params: Promise<{ petId: string }> }
 ) {
   const accessToken = request.cookies.get(AUTH_COOKIE_NAMES.access)?.value;
   if (!accessToken) {
     return NextResponse.json({ message: normalizeApiErrorMessage(401, "missing access token") }, { status: 401 });
   }
 
-  const petId = params.petId;
+  const { petId } = await params;
   const contentType = request.headers.get("content-type") ?? "";
 
   const timeoutMs = Number(process.env.API_PROXY_TIMEOUT_MS ?? 8000);
@@ -70,7 +70,7 @@ export async function PUT(
 
   try {
     let body: any;
-    
+
     if (contentType.includes("multipart/form-data")) {
       body = await request.formData();
     } else {
@@ -114,14 +114,14 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { petId: string } }
+  { params }: { params: Promise<{ petId: string }> }
 ) {
   const accessToken = request.cookies.get(AUTH_COOKIE_NAMES.access)?.value;
   if (!accessToken) {
     return NextResponse.json({ message: normalizeApiErrorMessage(401, "missing access token") }, { status: 401 });
   }
 
-  const petId = params.petId;
+  const { petId } = await params;
 
   const timeoutMs = Number(process.env.API_PROXY_TIMEOUT_MS ?? 8000);
   let upstream: Response;

@@ -36,31 +36,48 @@ export function AddPetForm({ onSubmit, isLoading = false }: AddPetFormProps) {
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
+  const processFile = (file: File) => {
     if (!file.type.startsWith("image/")) {
       setError("Por favor selecciona una imagen válida");
       return;
     }
-
-    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       setError("La imagen no puede ser mayor a 5MB");
       return;
     }
-
     setFormData((prev) => ({ ...prev, profileImage: file }));
     const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreview(reader.result as string);
-    };
+    reader.onloadend = () => setPreview(reader.result as string);
     reader.readAsDataURL(file);
     setError(null);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) processFile(file);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) processFile(file);
   };
 
   const handleRemoveImage = () => {
@@ -142,30 +159,42 @@ export function AddPetForm({ onSubmit, isLoading = false }: AddPetFormProps) {
 
       {error && (
         <motion.div
-          className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          className="mb-4 p-4 bg-danger/10 border border-danger/30 rounded-lg"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
         >
-          <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
+          <p className="text-danger text-sm font-medium">{error}</p>
         </motion.div>
       )}
 
       {success && (
         <motion.div
-          className="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          className="mb-4 p-4 bg-success/10 border border-success/30 rounded-lg flex items-center gap-3"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0 }}
         >
-          <p className="text-green-700 dark:text-green-300 text-sm">
-            ¡Mascota agregada exitosamente!
-          </p>
+          <Plus size={18} className="text-success flex-shrink-0" />
+          <p className="text-success text-sm font-semibold">¡Mascota agregada exitosamente!</p>
         </motion.div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Image Upload Section */}
-        <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center bg-gray-50 dark:bg-dark-bg hover:border-primary hover:bg-primary/5 transition-all duration-300">
+        <div
+          onDragOver={handleDragOver}
+          onDragEnter={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          onClick={() => !preview && fileInputRef.current?.click()}
+          className={cn(
+            "border-2 border-dashed rounded-xl p-6 text-center transition-all duration-300",
+            isDragging
+              ? "border-primary bg-primary/10 scale-[1.01]"
+              : "border-border dark:border-gray-600 bg-surface-light dark:bg-dark-bg hover:border-primary-400 hover:bg-primary/5",
+            !preview && "cursor-pointer"
+          )}
+        >
           {preview ? (
             <div className="relative inline-block">
               <img
@@ -175,7 +204,7 @@ export function AddPetForm({ onSubmit, isLoading = false }: AddPetFormProps) {
               />
               <button
                 type="button"
-                onClick={handleRemoveImage}
+                onClick={(e) => { e.stopPropagation(); handleRemoveImage(); }}
                 className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-1 rounded-full transition-colors"
               >
                 <X size={16} />
@@ -183,12 +212,15 @@ export function AddPetForm({ onSubmit, isLoading = false }: AddPetFormProps) {
             </div>
           ) : (
             <div>
-              <Upload size={32} className="mx-auto text-gray-400 mb-2" />
-              <p className="text-gray-700 dark:text-gray-300 font-semibold mb-1">
-                Carga la foto de tu mascota
+              <Upload
+                size={32}
+                className={cn("mx-auto mb-3 transition-colors", isDragging ? "text-primary" : "text-text-muted")}
+              />
+              <p className="text-text-primary font-semibold mb-1">
+                {isDragging ? "¡Suelta la imagen aquí!" : "Arrastra la foto aquí"}
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                (Requerido - PNG, JPG, máx 5MB)
+              <p className="text-sm text-text-secondary mb-4">
+                o haz clic para seleccionarla — PNG, JPG, máx 5 MB
               </p>
             </div>
           )}
@@ -199,21 +231,23 @@ export function AddPetForm({ onSubmit, isLoading = false }: AddPetFormProps) {
             onChange={handleImageChange}
             className="hidden"
           />
-          <Button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            variant="outline"
-            size="sm"
-          >
-            {preview ? "Cambiar foto" : "Seleccionar foto"}
-          </Button>
+          {preview && (
+            <Button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+              variant="outline"
+              size="sm"
+            >
+              Cambiar foto
+            </Button>
+          )}
         </div>
 
         {/* Form Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Name - Optional */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-semibold text-text-primary mb-2">
               Nombre (Opcional)
             </label>
             <Input
@@ -228,18 +262,19 @@ export function AddPetForm({ onSubmit, isLoading = false }: AddPetFormProps) {
 
           {/* Age - Required */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-              Edad (Años) <span className="text-red-500">*</span>
+            <label className="block text-sm font-semibold text-text-primary mb-2">
+              Edad (Años) <span className="text-danger">*</span>
             </label>
             <Input
               type="number"
               name="age"
               value={formData.age}
               onChange={handleChange}
+              onWheel={(e) => (e.target as HTMLInputElement).blur()}
               placeholder="Ej: 3"
               min="0"
-              max="50"
-              step="0.1"
+              max="100"
+              step="1"
               className="w-full"
               required
             />
@@ -247,7 +282,7 @@ export function AddPetForm({ onSubmit, isLoading = false }: AddPetFormProps) {
 
           {/* Species */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-semibold text-text-primary mb-2">
               Tipo de Mascota
             </label>
             <select
@@ -255,9 +290,10 @@ export function AddPetForm({ onSubmit, isLoading = false }: AddPetFormProps) {
               value={formData.species}
               onChange={handleChange}
               className={cn(
-                "w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600",
-                "bg-white dark:bg-dark-bg text-gray-900 dark:text-white",
-                "focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                "w-full h-11 px-4 rounded-lg border transition-all outline-none",
+                "bg-surface border-border text-text-primary",
+                "focus:border-secondary-500 focus:ring-2 focus:ring-secondary-300",
+                "dark:bg-dark-surface dark:border-gray-600 dark:text-white"
               )}
             >
               <option value="dog">Perro</option>
@@ -271,7 +307,7 @@ export function AddPetForm({ onSubmit, isLoading = false }: AddPetFormProps) {
 
           {/* Breed - Optional */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-semibold text-text-primary mb-2">
               Raza (Opcional)
             </label>
             <Input
@@ -286,7 +322,7 @@ export function AddPetForm({ onSubmit, isLoading = false }: AddPetFormProps) {
 
           {/* Weight - Optional */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-semibold text-text-primary mb-2">
               Peso (kg) (Opcional)
             </label>
             <Input
@@ -315,10 +351,10 @@ export function AddPetForm({ onSubmit, isLoading = false }: AddPetFormProps) {
             placeholder="Ej: Tiene alergia a ciertos alimentos, le encanta jugar, etc."
             rows={3}
             className={cn(
-              "w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600",
-              "bg-white dark:bg-dark-bg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400",
-              "focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent",
-              "resize-none"
+              "w-full px-4 py-3 rounded-lg border transition-all outline-none resize-none",
+              "bg-surface border-border text-text-primary placeholder:text-text-muted",
+              "focus:border-secondary-500 focus:ring-2 focus:ring-secondary-300",
+              "dark:bg-dark-surface dark:border-gray-600 dark:text-white"
             )}
           />
         </div>

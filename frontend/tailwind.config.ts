@@ -28,7 +28,7 @@ const config: Config = {
           hover: "#2563EB",
         },
         "primary-hover": "#2563EB",
-        // Secondary - secondary brillante
+        // Secondary - Cyan brillante
         secondary: {
           50: "#ECFDFD",
           100: "#CFFAFE",
@@ -76,30 +76,36 @@ const config: Config = {
           hover: "#F43F5E",
         },
         "accent-hover": "#F43F5E",
-        // Background & Surface
-        background: "#F1F5F9",
-        "surface": "#FFFFFF",
-        "surface-light": "#F8FAFC",
-        "surface-2": "#E2E8F0",
-        foreground: "#0F172A",
-        // Text colors
-        "text-primary": "#0F172A",
-        "text-secondary": "#475569",
-        "text-tertiary": "#64748B",
-        "text-muted": "#94A3B8",
-        // Border colors
-        "border": "#CBD5E1",
-        "border-light": "#E2E8F0",
-        "border-dark": "#94A3B8",
-        // Status colors
+
+        // ── Semantic tokens — dark-mode aware via CSS variables ──────────
+        // body bg, page background
+        background: "rgb(var(--tw-c-bg) / <alpha-value>)",
+        // card / panel backgrounds
+        "surface":       "rgb(var(--tw-c-surface) / <alpha-value>)",
+        "surface-light": "rgb(var(--tw-c-surface-light) / <alpha-value>)",
+        "surface-2":     "rgb(var(--tw-c-surface-2) / <alpha-value>)",
+        // base text color (mirrors body color)
+        foreground: "rgb(var(--tw-c-fg) / <alpha-value>)",
+        // text hierarchy
+        "text-primary":   "rgb(var(--tw-c-text-p) / <alpha-value>)",
+        "text-secondary": "rgb(var(--tw-c-text-s) / <alpha-value>)",
+        "text-tertiary":  "rgb(var(--tw-c-text-t) / <alpha-value>)",
+        "text-muted":     "rgb(var(--tw-c-text-m) / <alpha-value>)",
+        // borders
+        "border":       "rgb(var(--tw-c-bdr) / <alpha-value>)",
+        "border-light": "rgb(var(--tw-c-bdr-lt) / <alpha-value>)",
+        "border-dark":  "rgb(var(--tw-c-bdr-dk) / <alpha-value>)",
+
+        // Status colors (same in both modes)
         success: "#22C55E",
         warning: "#F59E0B",
         danger: "#EF4444",
         "danger-dark": "#DC2626",
-        // Dark mode colors
-        "dark-bg": "#0F172A",
-        "dark-surface": "#1E293B",
-        "dark-surface-2": "#334155",
+
+        // Explicit dark-mode overlay colors (not responsive — always dark)
+        "dark-bg":       "#0F172A",
+        "dark-surface":  "#1E293B",
+        "dark-surface-2":"#334155",
       },
     }
   },
@@ -107,4 +113,3 @@ const config: Config = {
 };
 
 export default config;
-

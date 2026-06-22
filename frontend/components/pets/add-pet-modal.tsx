@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { X, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Modal } from "@/components/ui/modal";
 import { cn } from "@/lib/utils";
 
 interface AddPetModalProps {
@@ -149,56 +149,22 @@ export function AddPetModal({ isOpen, onClose, onPetAdded }: AddPetModalProps) {
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Overlay */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
-            onClick={handleClose}
-          />
+    <Modal
+      open={isOpen}
+      title="Agregar nueva mascota"
+      onClose={handleClose}
+      maxWidth="max-w-2xl"
+      className="max-h-[90vh] overflow-y-auto"
+    >
+      <p className="text-sm text-text-secondary -mt-3 mb-5">
+        Registra los datos de tu compañero
+      </p>
 
-          {/* Modal */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div
-              className={cn(
-                "w-full max-w-2xl max-h-[90vh] overflow-y-auto",
-                "rounded-2xl border border-border/30",
-                "bg-white dark:bg-dark-surface shadow-2xl"
-              )}
-            >
-              {/* Header */}
-              <div className="flex items-center justify-between border-b border-border/20 px-6 py-4 sticky top-0 bg-white dark:bg-dark-surface z-10">
-                <div>
-                  <h2 className="text-xl font-semibold text-text-primary">
-                    Agregar nueva mascota
-                  </h2>
-                  <p className="text-sm text-text-secondary">
-                    Registra los datos de tu compañero
-                  </p>
-                </div>
-                <button
-                  onClick={handleClose}
-                  className="rounded-full p-2 hover:bg-surface-hover transition-colors"
-                >
-                  <X className="h-5 w-5 text-text-secondary" />
-                </button>
-              </div>
-
-              {/* Formulario */}
-              <form onSubmit={handleSubmit} className="p-6 space-y-5">
+      {/* Formulario */}
+      <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Foto de perfil */}
                 <div>
-                  <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Foto de perfil</label>
+                  <label className="block text-sm font-semibold text-text-primary mb-1">Foto de perfil</label>
                   <div className="mt-1 flex items-center gap-4">
                     <div className="w-20 h-20 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
                       {previewUrl ? (
@@ -239,7 +205,7 @@ export function AddPetModal({ isOpen, onClose, onPetAdded }: AddPetModalProps) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Nombre */}
                   <div>
-                    <label htmlFor="name" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    <label htmlFor="name" className="block text-sm font-semibold text-text-primary mb-1">
                       Nombre *
                     </label>
                     <Input
@@ -254,7 +220,7 @@ export function AddPetModal({ isOpen, onClose, onPetAdded }: AddPetModalProps) {
 
                   {/* Especie */}
                   <div>
-                    <label htmlFor="species" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    <label htmlFor="species" className="block text-sm font-semibold text-text-primary mb-1">
                       Especie *
                     </label>
                     <select
@@ -262,8 +228,10 @@ export function AddPetModal({ isOpen, onClose, onPetAdded }: AddPetModalProps) {
                       value={formData.species}
                       onChange={(e) => handleSelectChange(e.target.value)}
                       className={cn(
-                        "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1",
-                        "dark:bg-dark-bg dark:border-gray-600"
+                        "w-full h-11 px-4 rounded-lg border transition-all outline-none mt-1",
+                        "bg-surface border-border text-text-primary",
+                        "focus:border-secondary-500 focus:ring-2 focus:ring-secondary-300",
+                        "dark:bg-dark-surface dark:border-gray-600 dark:text-white"
                       )}
                     >
                       <option value="" disabled>Selecciona una especie</option>
@@ -277,7 +245,7 @@ export function AddPetModal({ isOpen, onClose, onPetAdded }: AddPetModalProps) {
 
                   {/* Raza */}
                   <div>
-                    <label htmlFor="breed" className="text-sm font-medium leading-none">Raza</label>
+                    <label htmlFor="breed" className="block text-sm font-semibold text-text-primary mb-1">Raza</label>
                     <Input
                       id="breed"
                       name="breed"
@@ -290,23 +258,25 @@ export function AddPetModal({ isOpen, onClose, onPetAdded }: AddPetModalProps) {
 
                   {/* Edad */}
                   <div>
-                    <label htmlFor="age" className="text-sm font-medium leading-none">Edad (años)</label>
+                    <label htmlFor="age" className="block text-sm font-semibold text-text-primary mb-1">Edad (años)</label>
                     <Input
                       id="age"
                       name="age"
                       type="number"
                       min="0"
-                      step="0.5"
+                      max="100"
+                      step="1"
                       value={formData.age}
                       onChange={handleInputChange}
-                      placeholder="Ej. 2.5"
+                      onWheel={(e) => (e.target as HTMLInputElement).blur()}
+                      placeholder="Ej. 3"
                       className="mt-1"
                     />
                   </div>
 
                   {/* Peso */}
                   <div>
-                    <label htmlFor="weight" className="text-sm font-medium leading-none">Peso (kg)</label>
+                    <label htmlFor="weight" className="block text-sm font-semibold text-text-primary mb-1">Peso (kg)</label>
                     <Input
                       id="weight"
                       name="weight"
@@ -322,7 +292,7 @@ export function AddPetModal({ isOpen, onClose, onPetAdded }: AddPetModalProps) {
 
                   {/* Color */}
                   <div>
-                    <label htmlFor="color" className="text-sm font-medium leading-none">Color</label>
+                    <label htmlFor="color" className="block text-sm font-semibold text-text-primary mb-1">Color</label>
                     <Input
                       id="color"
                       name="color"
@@ -336,7 +306,7 @@ export function AddPetModal({ isOpen, onClose, onPetAdded }: AddPetModalProps) {
 
                 {/* Notas médicas */}
                 <div>
-                  <label htmlFor="medicalNotes" className="text-sm font-medium leading-none">Notas médicas</label>
+                  <label htmlFor="medicalNotes" className="block text-sm font-semibold text-text-primary mb-1">Notas médicas</label>
                   <textarea
                     id="medicalNotes"
                     name="medicalNotes"
@@ -345,15 +315,17 @@ export function AddPetModal({ isOpen, onClose, onPetAdded }: AddPetModalProps) {
                     placeholder="Alergias, condiciones especiales, etc."
                     rows={3}
                     className={cn(
-                      "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1 resize-none",
-                      "dark:bg-dark-bg dark:border-gray-600"
+                      "w-full px-4 py-3 rounded-lg border transition-all outline-none resize-none mt-1",
+                      "bg-surface border-border text-text-primary placeholder:text-text-muted",
+                      "focus:border-secondary-500 focus:ring-2 focus:ring-secondary-300",
+                      "dark:bg-dark-surface dark:border-gray-600 dark:text-white"
                     )}
                   />
                 </div>
 
                 {/* Error */}
                 {error && (
-                  <div className="rounded-lg bg-red-500/10 p-3 text-sm text-red-500">
+                  <div className="rounded-lg bg-danger/10 border border-danger/30 p-3 text-sm text-danger">
                     {error}
                   </div>
                 )}
@@ -384,11 +356,7 @@ export function AddPetModal({ isOpen, onClose, onPetAdded }: AddPetModalProps) {
                     )}
                   </Button>
                 </div>
-              </form>
-            </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+      </form>
+    </Modal>
   );
 }

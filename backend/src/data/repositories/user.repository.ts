@@ -15,6 +15,7 @@ export interface UpdateUserInput {
   fullName?: string;
   phone?: string;
   profileImage?: string;
+  notificationChannel?: 'EMAIL' | 'WHATSAPP' | null;
 }
 
 @Injectable()

@@ -66,15 +66,15 @@ export default function ActivityPage() {
           <p className="mt-2 text-soft">Sigue en una sola vista los cambios de perfil, preferencias y reservas.</p>
 
           <div className="mt-5 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-xl border border-line bg-white px-4 py-3">
+            <div className="rounded-xl border border-border bg-surface px-4 py-3">
               <p className="inline-flex items-center gap-2 text-sm font-bold text-navy"><Activity className="h-4 w-4 text-brand" />Eventos totales</p>
               <p className="mt-1 text-sm text-soft">{timeline.length}</p>
             </div>
-            <div className="rounded-xl border border-line bg-white px-4 py-3">
+            <div className="rounded-xl border border-border bg-surface px-4 py-3">
               <p className="inline-flex items-center gap-2 text-sm font-bold text-navy"><Database className="h-4 w-4 text-brand" />Eventos backend</p>
               <p className="mt-1 text-sm text-soft">{backendCount}</p>
             </div>
-            <div className="rounded-xl border border-line bg-white px-4 py-3">
+            <div className="rounded-xl border border-border bg-surface px-4 py-3">
               <p className="inline-flex items-center gap-2 text-sm font-bold text-navy"><PawPrint className="h-4 w-4 text-brand" />Eventos locales</p>
               <p className="mt-1 text-sm text-soft">{localCount}</p>
             </div>
@@ -86,7 +86,7 @@ export default function ActivityPage() {
             <label className="grid gap-1 text-sm text-soft">
               Mascota para eventos de reserva
               <select
-                className="h-10 rounded-md border border-line bg-white px-3 text-sm text-navy"
+                className="h-10 rounded-md border border-border bg-surface px-3 text-sm text-text-primary"
                 value={petId}
                 onChange={(e) => setPetId(e.target.value)}
               >
@@ -107,7 +107,7 @@ export default function ActivityPage() {
             {timeline.length === 0 && <p className="text-sm text-soft">Aun no hay eventos para mostrar.</p>}
 
             {timeline.map((event) => (
-              <article key={event.id} className="rounded-xl border border-line bg-white p-3">
+              <article key={event.id} className="rounded-xl border border-border bg-surface p-3">
                 <div className="flex items-center justify-between gap-2">
                   <h2 className="text-sm font-bold text-navy">{event.title}</h2>
                   <span className={`rounded-md px-2 py-1 text-xs font-semibold ${event.source === "backend" ? "bg-sky text-navy" : "bg-accent/70 text-navy"}`}>

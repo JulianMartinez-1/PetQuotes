@@ -207,7 +207,7 @@ export const PetManagement: React.FC<PetManagementProps> = ({
         <h2
           className={cn(
             "text-2xl font-bold",
-            "bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent"
+            "bg-gradient-to-r from-secondary-500 to-accent-500 bg-clip-text text-transparent"
           )}
         >
           🐾 Mis Mascotas

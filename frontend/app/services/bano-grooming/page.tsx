@@ -103,10 +103,10 @@ export default function BanoGrooming() {
       <ScrollReactivePets />
       
       {/* Header with Back Button */}
-      <div className="bg-gradient-to-r from-green/5 to-green/10 border-b-2 border-green/20">
+      <div className="bg-gradient-to-r from-mint-50 to-mint-100/50 border-b border-mint-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Link href="/">
-            <Button variant="ghost" className="mb-6 text-green hover:text-green-dark">
+            <Button variant="ghost" className="mb-6 text-mint-700 hover:text-mint-700-dark">
               <ArrowLeft size={20} className="mr-2" />
               Volver al Inicio
             </Button>
@@ -119,11 +119,11 @@ export default function BanoGrooming() {
           >
             <div className="flex items-center gap-4 mb-4">
               <div className="text-5xl">✂️</div>
-              <h1 className="text-4xl sm:text-5xl font-black text-green">
+              <h1 className="text-4xl sm:text-5xl font-black text-mint-700">
                 Baño & Grooming
               </h1>
             </div>
-            <p className="text-lg text-textSecondary max-w-2xl">
+            <p className="text-lg text-text-secondary max-w-2xl">
               Servicios profesionales de peluquería y estética para mantener a tu mascota limpia y hermosa
             </p>
           </motion.div>
@@ -141,12 +141,12 @@ export default function BanoGrooming() {
           className="mb-20"
         >
           <motion.div variants={itemVariants} className="mb-12">
-            <h2 className="text-3xl font-black text-green mb-6">¿Qué incluye el Baño & Grooming?</h2>
-            <p className="text-lg text-textSecondary leading-relaxed mb-4">
+            <h2 className="text-3xl font-black text-mint-700 mb-6">¿Qué incluye el Baño & Grooming?</h2>
+            <p className="text-lg text-text-secondary leading-relaxed mb-4">
               El baño y grooming profesional es mucho más que limpiar a tu mascota. Es un servicio integral que incluye
               higiene profunda, corte personalizado, cuidado de uñas y revisión de salud dermatológica.
             </p>
-            <p className="text-lg text-textSecondary leading-relaxed">
+            <p className="text-lg text-text-secondary leading-relaxed">
               Nuestros gromers certificados utilizan productos de calidad premium, técnicas suaves y enfoque
               individualizado para cada mascota, garantizando que tu pet se sienta cómodo y luzca espectacular.
             </p>
@@ -161,7 +161,7 @@ export default function BanoGrooming() {
           viewport={{ once: false, amount: 0.3 }}
           className="mb-20"
         >
-          <motion.h2 variants={itemVariants} className="text-3xl font-black text-green mb-12">
+          <motion.h2 variants={itemVariants} className="text-3xl font-black text-mint-700 mb-12">
             Servicios Incluidos
           </motion.h2>
           
@@ -174,10 +174,10 @@ export default function BanoGrooming() {
           >
             {services.map((service, idx) => (
               <motion.div key={idx} variants={itemVariants}>
-                <div className="bg-white rounded-2xl border-2 border-green/20 p-8 hover:shadow-lg transition-shadow">
-                  <div className="text-4xl mb-4">{service.icon}</div>
-                  <h3 className="text-xl font-bold text-green mb-3">{service.title}</h3>
-                  <p className="text-textSecondary leading-relaxed">{service.description}</p>
+                <div className="bg-surface rounded-2xl border border-mint-100 dark:border-border p-8 hover:shadow-lg hover:border-mint-200 transition-all card-hover">
+                  <div className="text-4xl mb-5">{service.icon}</div>
+                  <h3 className="text-lg font-bold text-text-primary mb-2">{service.title}</h3>
+                  <p className="text-text-secondary leading-relaxed text-sm">{service.description}</p>
                 </div>
               </motion.div>
             ))}
@@ -192,15 +192,15 @@ export default function BanoGrooming() {
           viewport={{ once: false, amount: 0.3 }}
           className="mb-20"
         >
-          <motion.h2 variants={itemVariants} className="text-3xl font-black text-green mb-8">
+          <motion.h2 variants={itemVariants} className="text-3xl font-black text-mint-700 mb-8">
             Beneficios para tu Mascota
           </motion.h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {benefits.map((benefit, idx) => (
               <motion.div key={idx} variants={itemVariants} className="flex items-start gap-3">
-                <CheckCircle2 size={24} className="text-green flex-shrink-0 mt-1" />
-                <span className="text-lg text-textSecondary">{benefit}</span>
+                <CheckCircle2 size={24} className="text-mint-700 flex-shrink-0 mt-1" />
+                <span className="text-lg text-text-secondary">{benefit}</span>
               </motion.div>
             ))}
           </div>
@@ -212,13 +212,13 @@ export default function BanoGrooming() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false, amount: 0.3 }}
           transition={{ duration: 0.6 }}
-          className="bg-green-50 border-l-4 border-green rounded-r-lg p-6 mb-20"
+          className="bg-mint-50 dark:bg-surface border-l-4 border-mint-500 rounded-r-lg p-6 mb-20"
         >
           <div className="flex gap-4">
-            <Info className="text-green flex-shrink-0 mt-1" size={24} />
+            <Info className="text-mint-700 dark:text-mint-400 flex-shrink-0 mt-1" size={24} />
             <div>
-              <h3 className="font-bold text-green mb-2">Recomendación de Frecuencia</h3>
-              <p className="text-textSecondary">
+              <h3 className="font-bold text-text-primary mb-2">Recomendación de Frecuencia</h3>
+              <p className="text-text-secondary">
                 Se recomienda un baño y grooming cada 4-8 semanas dependiendo del tipo de pelaje de tu mascota.
                 Razas con pelaje largo requieren atención más frecuente.
               </p>
@@ -235,7 +235,7 @@ export default function BanoGrooming() {
       />
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-green to-green-dark text-white">
+      <section className="py-20 bg-gradient-to-r from-mint-700 to-mint-600 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -264,7 +264,7 @@ export default function BanoGrooming() {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <Link href="/bookings">
-              <Button size="lg" className="bg-white text-green hover:bg-gray-100 font-bold">
+              <Button size="lg" className="bg-white text-mint-700 hover:bg-gray-100 font-bold">
                 Agendar Ahora
               </Button>
             </Link>

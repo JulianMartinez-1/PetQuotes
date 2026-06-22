@@ -1,143 +1,132 @@
-import { Controller, Get, Query, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
-import { AnalyticsService } from '@business/analytics/analytics.service';
+import {
+  Controller,
+  Get,
+  Query,
+  Headers,
+  HttpCode,
+  HttpStatus,
+  UseGuards,
+  InternalServerErrorException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom, timeout, catchError } from 'rxjs';
+import { AxiosError } from 'axios';
 import { JwtAuthGuard } from '@shared/guards/jwt-auth.guard';
 import { RolesGuard } from '@shared/guards/roles.guard';
-import { CurrentUser } from '@shared/decorators';
 import { Roles } from '@shared/decorators/roles.decorator';
-import { JwtPayload } from '@shared/types';
-import {
-  AnalyticsFiltersDto,
-  DashboardResponseDto,
-  UserMetricsDto,
-  PetMetricsDto,
-  AppointmentMetricsDto,
-  ClinicMetricsDto,
-  ProfessionalMetricsDto,
-  ServiceMetricsDto,
-  MedicalMetricsDto,
-  NotificationMetricsDto,
-} from './analytics.dto';
+import { AnalyticsFiltersDto } from './analytics.dto';
 
-@Controller('api/analytics')
+/**
+ * Proxy controller.
+ * Auth: JwtAuthGuard + RolesGuard(ADMIN) is the first security layer.
+ * The Python analytics service validates the JWT independently as a second layer.
+ */
+@Controller('analytics')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('ADMIN')
 export class AnalyticsController {
-  constructor(private analyticsService: AnalyticsService) {}
+  private readonly analyticsUrl: string;
 
-  /**
-   * GET /api/analytics/dashboard
-   * Obtener todos los KPIs y datos para el dashboard principal
-   */
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
+  ) {
+    this.analyticsUrl =
+      this.configService.get<string>('ANALYTICS_SERVICE_URL') ||
+      'http://analytics-service:3009';
+  }
+
+  private async proxy(path: string, params: Record<string, any>, auth: string) {
+    const cleanParams = Object.fromEntries(
+      Object.entries(params).filter(([, v]) => v !== undefined && v !== null && v !== ''),
+    );
+
+    try {
+      const response = await firstValueFrom(
+        this.httpService
+          .get(`${this.analyticsUrl}/analytics/${path}`, {
+            params: cleanParams,
+            headers: { Authorization: auth },
+          })
+          .pipe(
+            timeout(15000),
+            catchError((err: AxiosError) => {
+              if (err.code === 'ECONNREFUSED' || err.code === 'ECONNRESET') {
+                throw new ServiceUnavailableException(
+                  'El servicio de analítica no está disponible',
+                );
+              }
+              throw err;
+            }),
+          ),
+      );
+      return response.data;
+    } catch (err: any) {
+      if (err?.status) throw err;
+      throw new InternalServerErrorException(
+        `Error al consultar el servicio de analítica: ${err?.message ?? 'unknown'}`,
+      );
+    }
+  }
+
+  @Get('summary')
+  @HttpCode(HttpStatus.OK)
+  async getSummary(
+    @Query() filters: AnalyticsFiltersDto,
+    @Headers('authorization') auth: string,
+  ) {
+    return this.proxy('summary', { start_date: filters.startDate, end_date: filters.endDate }, auth);
+  }
+
+  // /dashboard is the name the frontend hook uses
   @Get('dashboard')
   @HttpCode(HttpStatus.OK)
   async getDashboard(
     @Query() filters: AnalyticsFiltersDto,
-    @CurrentUser() user: JwtPayload,
-  ): Promise<DashboardResponseDto> {
-    return this.analyticsService.getDashboard(filters);
+    @Headers('authorization') auth: string,
+  ) {
+    return this.proxy('summary', { start_date: filters.startDate, end_date: filters.endDate }, auth);
   }
 
-  /**
-   * GET /api/analytics/users
-   * Métricas detalladas de usuarios
-   */
   @Get('users')
   @HttpCode(HttpStatus.OK)
   async getUserMetrics(
     @Query() filters: AnalyticsFiltersDto,
-    @CurrentUser() user: JwtPayload,
-  ): Promise<UserMetricsDto> {
-    return this.analyticsService.getUserMetrics(filters);
+    @Headers('authorization') auth: string,
+  ) {
+    return this.proxy('users', {}, auth);
   }
 
-  /**
-   * GET /api/analytics/pets
-   * Métricas detalladas de mascotas
-   */
-  @Get('pets')
-  @HttpCode(HttpStatus.OK)
-  async getPetMetrics(
-    @Query() filters: AnalyticsFiltersDto,
-    @CurrentUser() user: JwtPayload,
-  ): Promise<PetMetricsDto> {
-    return this.analyticsService.getPetMetrics(filters);
-  }
-
-  /**
-   * GET /api/analytics/appointments
-   * Métricas detalladas de citas
-   */
   @Get('appointments')
   @HttpCode(HttpStatus.OK)
   async getAppointmentMetrics(
     @Query() filters: AnalyticsFiltersDto,
-    @CurrentUser() user: JwtPayload,
-  ): Promise<AppointmentMetricsDto> {
-    return this.analyticsService.getAppointmentMetrics(filters);
+    @Headers('authorization') auth: string,
+  ) {
+    return this.proxy('appointments', {
+      start_date: filters.startDate,
+      end_date: filters.endDate,
+      clinic_id: filters.clinicId,
+    }, auth);
   }
 
-  /**
-   * GET /api/analytics/clinics
-   * Métricas detalladas de clínicas
-   */
+  @Get('pets')
+  @HttpCode(HttpStatus.OK)
+  async getPetMetrics(@Headers('authorization') auth: string) {
+    return this.proxy('pets', {}, auth);
+  }
+
   @Get('clinics')
   @HttpCode(HttpStatus.OK)
-  async getClinicMetrics(
-    @Query() filters: AnalyticsFiltersDto,
-    @CurrentUser() user: JwtPayload,
-  ): Promise<ClinicMetricsDto> {
-    return this.analyticsService.getClinicMetrics(filters);
+  async getClinicMetrics(@Headers('authorization') auth: string) {
+    return this.proxy('clinics', {}, auth);
   }
 
-  /**
-   * GET /api/analytics/professionals
-   * Métricas detalladas de profesionales
-   */
   @Get('professionals')
   @HttpCode(HttpStatus.OK)
-  async getProfessionalMetrics(
-    @Query() filters: AnalyticsFiltersDto,
-    @CurrentUser() user: JwtPayload,
-  ): Promise<ProfessionalMetricsDto> {
-    return this.analyticsService.getProfessionalMetrics(filters);
-  }
-
-  /**
-   * GET /api/analytics/services
-   * Métricas detalladas de servicios
-   */
-  @Get('services')
-  @HttpCode(HttpStatus.OK)
-  async getServiceMetrics(
-    @Query() filters: AnalyticsFiltersDto,
-    @CurrentUser() user: JwtPayload,
-  ): Promise<ServiceMetricsDto> {
-    return this.analyticsService.getServiceMetrics(filters);
-  }
-
-  /**
-   * GET /api/analytics/medical
-   * Métricas de historial médico, vacunas y medicamentos
-   */
-  @Get('medical')
-  @HttpCode(HttpStatus.OK)
-  async getMedicalMetrics(
-    @Query() filters: AnalyticsFiltersDto,
-    @CurrentUser() user: JwtPayload,
-  ): Promise<MedicalMetricsDto> {
-    return this.analyticsService.getMedicalMetrics(filters);
-  }
-
-  /**
-   * GET /api/analytics/notifications
-   * Métricas de notificaciones
-   */
-  @Get('notifications')
-  @HttpCode(HttpStatus.OK)
-  async getNotificationMetrics(
-    @Query() filters: AnalyticsFiltersDto,
-    @CurrentUser() user: JwtPayload,
-  ): Promise<NotificationMetricsDto> {
-    return this.analyticsService.getNotificationMetrics(filters);
+  async getProfessionalMetrics(@Headers('authorization') auth: string) {
+    return this.proxy('professionals', {}, auth);
   }
 }

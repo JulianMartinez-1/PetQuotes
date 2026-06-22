@@ -2,9 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900&family=Poppins:wght@600;700;800;900&display=swap");
 
-* {
+/* ─── Semantic color channels (r g b — for Tailwind opacity modifiers) ── */
+:root {
+  /* background */
+  --tw-c-bg:           241 245 249;   /* #F1F5F9 */
+  /* surfaces */
+  --tw-c-surface:      255 255 255;   /* #FFFFFF */
+  --tw-c-surface-light:248 250 252;   /* #F8FAFC */
+  --tw-c-surface-2:    226 232 240;   /* #E2E8F0 */
+  /* foreground / text */
+  --tw-c-fg:           15  23  42;    /* #0F172A */
+  --tw-c-text-p:       15  23  42;    /* #0F172A */
+  --tw-c-text-s:       71  85  105;   /* #475569 */
+  --tw-c-text-t:       100 116 139;   /* #64748B */
+  --tw-c-text-m:       148 163 184;   /* #94A3B8 */
+  /* borders */
+  --tw-c-bdr:          203 213 225;   /* #CBD5E1 */
+  --tw-c-bdr-lt:       226 232 240;   /* #E2E8F0 */
+  --tw-c-bdr-dk:       148 163 184;   /* #94A3B8 */
+}
+
+.dark {
+  /* background */
+  --tw-c-bg:           15  23  42;    /* #0F172A — slate-900 */
+  /* surfaces */
+  --tw-c-surface:      30  41  59;    /* #1E293B — slate-800 */
+  --tw-c-surface-light:22  34  54;    /* #162236 — between bg and surface */
+  --tw-c-surface-2:    51  65  85;    /* #334155 — slate-700 */
+  /* foreground / text */
+  --tw-c-fg:           241 245 249;   /* #F1F5F9 — slate-100 */
+  --tw-c-text-p:       241 245 249;   /* #F1F5F9 */
+  --tw-c-text-s:       203 213 225;   /* #CBD5E1 — slate-300 */
+  --tw-c-text-t:       148 163 184;   /* #94A3B8 — slate-400 */
+  --tw-c-text-m:       100 116 139;   /* #64748B — slate-500 */
+  /* borders */
+  --tw-c-bdr:          51  65  85;    /* #334155 — slate-700 */
+  --tw-c-bdr-lt:       30  41  59;    /* #1E293B — slate-800 */
+  --tw-c-bdr-dk:       71  85  105;   /* #475569 — slate-600 */
+}
+
+/* ─── Reset ───────────────────────────────────────────── */
+*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -12,64 +52,221 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  background-color: #F1F5F9;
-  color: #0F172A;
-  font-family: "Inter", system-ui;
+  background-color: rgb(var(--tw-c-bg));
+  color: rgb(var(--tw-c-text-p));
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Poppins", system-ui;
-  color: #0F172A;
+  font-family: "Poppins", system-ui, sans-serif;
+  color: rgb(var(--tw-c-text-p));
+  line-height: 1.15;
+  letter-spacing: -0.02em;
 }
 
-/* Colores CSS variables para compatibilidad */
+/* ─── Layout Utilities ────────────────────────────────── */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: rgb(var(--tw-c-bg));
+}
+
+.page-container {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .page-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page-container {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+}
+
+/* ─── Typography Scale ────────────────────────────────── */
+.text-display {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  font-family: "Poppins", system-ui;
+}
+
+.text-headline {
+  font-size: clamp(1.75rem, 4vw, 3rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  font-family: "Poppins", system-ui;
+}
+
+.text-title {
+  font-size: clamp(1.25rem, 2.5vw, 1.875rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-family: "Poppins", system-ui;
+}
+
+/* ─── Section Rhythm ──────────────────────────────────── */
+.section-gap {
+  padding-top: 6rem;
+  padding-bottom: 6rem;
+}
+
+@media (min-width: 768px) {
+  .section-gap {
+    padding-top: 8rem;
+    padding-bottom: 8rem;
+  }
+}
+
+/* ─── Card Polish ─────────────────────────────────────── */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+}
+.dark .card-hover:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* ─── Legacy CSS variable aliases (for any inline var() references) ── */
 :root {
-  /* Primary */
   --color-primary: #1D4ED8;
-  --color-primary-hover: #2563EB;
-  --color-primary-dark: #1E40AF;
-  --color-primary-light: #DBEAFE;
-  
-  /* Secondary */
   --color-secondary: #06B6D4;
-  --color-secondary-hover: #0891B2;
-  --color-secondary-dark: #0E7490;
-  --color-secondary-light: #CFFAFE;
-  
-  /* Mint */
   --color-mint: #10B981;
-  --color-mint-hover: #059669;
-  --color-mint-dark: #047857;
-  --color-mint-light: #D1FAE5;
-  
-  /* Accent */
   --color-accent: #FB7185;
-  --color-accent-hover: #F43F5E;
-  --color-accent-dark: #E11D48;
-  --color-accent-light: #FFE4E6;
-  
-  /* Background & Surface */
-  --color-background: #F1F5F9;
-  --color-surface: #FFFFFF;
-  --color-surface-light: #F8FAFC;
-  --color-surface-2: #E2E8F0;
-  
-  /* Text */
-  --color-text-primary: #0F172A;
-  --color-text-secondary: #475569;
-  --color-text-tertiary: #64748B;
-  --color-text-muted: #94A3B8;
-  
-  /* Semantic */
-  --color-success: #10B981;
+  --color-success: #22C55E;
   --color-warning: #F59E0B;
   --color-danger: #EF4444;
-  
-  /* Borders */
-  --color-border: #CBD5E1;
-  --color-border-light: #E2E8F0;
-  --color-border-dark: #94A3B8;
+
+  --color-background:    rgb(var(--tw-c-bg));
+  --color-surface:       rgb(var(--tw-c-surface));
+  --color-surface-light: rgb(var(--tw-c-surface-light));
+  --color-surface-2:     rgb(var(--tw-c-surface-2));
+  --color-text-primary:  rgb(var(--tw-c-text-p));
+  --color-text-secondary:rgb(var(--tw-c-text-s));
+  --color-text-tertiary: rgb(var(--tw-c-text-t));
+  --color-text-muted:    rgb(var(--tw-c-text-m));
+  --color-border:        rgb(var(--tw-c-bdr));
+  --color-border-light:  rgb(var(--tw-c-bdr-lt));
+  --color-border-dark:   rgb(var(--tw-c-bdr-dk));
+}
+
+/* ─── Google Maps / Leaflet Marker Styles ─────────────── */
+.clinic-marker-wrapper {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+
+.clinic-marker-pin {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  background-color: #118ab2;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(17, 138, 178, 0.4);
+  transition: all 0.2s ease-in-out;
+}
+
+.clinic-marker-wrapper:hover .clinic-marker-pin {
+  width: 20px;
+  height: 20px;
+  box-shadow: 0 4px 12px rgba(17, 138, 178, 0.6);
+}
+
+.clinic-pin-wrap {
+  background: transparent !important;
+  border: none !important;
+}
+
+.clinic-pin {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-color: #118ab2;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(17, 138, 178, 0.4);
+}
+
+/* ─── Map Popup Styles ────────────────────────────────── */
+.gmap-popup-card,
+.clinic-popup-card {
+  padding: 12px;
+  border-radius: 8px;
+  background: rgb(var(--tw-c-surface));
+  font-family: "Inter", system-ui;
+}
+
+.gmap-popup-kicker,
+.clinic-popup-kicker {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgb(var(--tw-c-text-t));
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.gmap-popup-card h4,
+.clinic-popup-card h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgb(var(--tw-c-text-p));
+  margin-bottom: 4px;
+  font-family: "Poppins", system-ui;
+}
+
+.gmap-popup-card p,
+.clinic-popup-card p {
+  font-size: 13px;
+  color: rgb(var(--tw-c-text-s));
+  margin-bottom: 8px;
+}
+
+.gmap-popup-meta,
+.clinic-popup-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: rgb(var(--tw-c-text-t));
+}
+
+.clinic-popup {
+  padding: 4px !important;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }

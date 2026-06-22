@@ -4,6 +4,12 @@ import { AUTH_COOKIE_NAMES } from "@/lib/auth-cookies";
 import { verifyJwtHs256 } from "@/lib/auth-jwt";
 import { ROUTE_ROLE_POLICY } from "@/lib/route-policy";
 
+function redirectToLogin(request: NextRequest, pathname: string): NextResponse {
+  const loginUrl = new URL("/login", request.url);
+  loginUrl.searchParams.set("redirect", pathname);
+  return NextResponse.redirect(loginUrl);
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const rule = ROUTE_ROLE_POLICY.find((entry) => pathname.startsWith(entry.prefix));
@@ -13,37 +19,35 @@ export async function middleware(request: NextRequest) {
   }
 
   const accessToken = request.cookies.get(AUTH_COOKIE_NAMES.access)?.value;
-  
-  console.log(`[Middleware] Ruta protegida: ${pathname}`);
-  console.log(`[Middleware] Cookie presente: ${!!accessToken}`);
-  
-  // Si no hay token, permitir acceso pero dejar que el cliente se encargue
-  // El AuthGuard del lado del cliente redirigirá si es necesario
+
   if (!accessToken) {
-    console.log(`[Middleware] ⚠️ Sin access token en ${pathname}, pero permitiendo acceso al cliente`);
-    return NextResponse.next();
+    // If there is a refresh token, the client still has a valid session —
+    // let the page load so AuthStateProvider can renew the access token on mount.
+    const hasRefreshToken = !!request.cookies.get(AUTH_COOKIE_NAMES.refresh)?.value;
+    if (hasRefreshToken) {
+      return NextResponse.next();
+    }
+    return redirectToLogin(request, pathname);
   }
 
-  // Verificar que el token es válido
   const jwtSecret = process.env.JWT_ACCESS_SECRET;
   if (!jwtSecret) {
-    console.log("[Middleware] JWT_ACCESS_SECRET no configurado");
+    // Secret not configured — fail open only in dev to avoid breaking local setup.
+    // In production this should be a hard error, so log clearly.
+    console.error("[Middleware] JWT_ACCESS_SECRET is not set — server-side auth is disabled");
     return NextResponse.next();
   }
 
   const payload = await verifyJwtHs256(accessToken, jwtSecret);
   if (!payload) {
-    console.log("[Middleware] Token JWT inválido, pero permitiendo acceso al cliente");
-    return NextResponse.next();
+    // Expired or tampered token — send to login so the client can refresh
+    return redirectToLogin(request, pathname);
   }
 
-  // Verificar rol si es necesario
   if (!payload.role || !rule.roles.includes(payload.role)) {
-    console.log(`[Middleware] Rol no autorizado: ${payload.role}, redirigiendo a inicio`);
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  console.log(`[Middleware] ✅ Acceso permitido para ${pathname}, rol: ${payload.role}`);
   return NextResponse.next();
 }
 

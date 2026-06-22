@@ -7,6 +7,7 @@ const REQUEST_TIMEOUT_MS = Number(process.env.NEXT_PUBLIC_API_TIMEOUT_MS ?? 10_0
 type RequestOptions = RequestInit & {
   query?: Record<string, string | number | boolean | undefined>;
   retryOn401?: boolean;
+  timeoutMs?: number;
 };
 
 function isSessionRoute(path: string) {
@@ -55,8 +56,9 @@ function buildUrl(path: string, query?: RequestOptions["query"]) {
 }
 
 export async function requestJson<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const { query, headers, retryOn401 = true, ...rest } = options;
+  const { query, headers, retryOn401 = true, timeoutMs, ...rest } = options;
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  const effectiveTimeout = timeoutMs ?? REQUEST_TIMEOUT_MS;
 
   const requestHeaders = new Headers(headers ?? {});
   requestHeaders.set("Content-Type", "application/json");
@@ -70,7 +72,7 @@ export async function requestJson<T>(path: string, options: RequestOptions = {})
 
   let response: Response;
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  const timeout = setTimeout(() => controller.abort(), effectiveTimeout);
 
   try {
     response = await fetch(buildUrl(normalizedPath, query), {
@@ -100,7 +102,7 @@ export async function requestJson<T>(path: string, options: RequestOptions = {})
 
     if (refreshResponse.ok) {
       const retryController = new AbortController();
-      const retryTimeout = setTimeout(() => retryController.abort(), REQUEST_TIMEOUT_MS);
+      const retryTimeout = setTimeout(() => retryController.abort(), effectiveTimeout);
       try {
         response = await fetch(buildUrl(normalizedPath, query), {
           ...rest,

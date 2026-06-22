@@ -9,6 +9,7 @@ import TimeSeriesChart from '@/components/analytics/charts/TimeSeriesChart';
 import BarChart from '@/components/analytics/charts/BarChart';
 import PieChart from '@/components/analytics/charts/PieChart';
 import LoadingSpinner from '@/components/ui/loading-spinner';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 interface Filters {
   startDate?: string;
@@ -34,20 +35,45 @@ function AnalyticsContent() {
     appointments,
     clinics,
     professionals,
-    services,
     isLoading,
+    error,
   } = useAnalytics(filters);
 
   if (isLoading) {
     return <LoadingSpinner />;
   }
 
+  const hasData = dashboard || appointments || users || pets || clinics || professionals;
+
+  if (error && !hasData) {
+    const message = (error as any)?.message ?? 'Error desconocido';
+    const isUnavailable = message.toLowerCase().includes('servicio') || message.includes('503') || message.includes('504');
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 text-center px-4">
+        <AlertTriangle size={48} className="text-warning" />
+        <h2 className="text-xl font-bold text-text-primary">
+          {isUnavailable ? 'Servicio de analítica no disponible' : 'Error al cargar analíticas'}
+        </h2>
+        <p className="text-text-secondary max-w-md">
+          {isUnavailable
+            ? 'El servicio de analítica no está corriendo. Asegúrate de que el contenedor Docker esté activo.'
+            : message}
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 transition-colors"
+        >
+          <RefreshCw size={15} />
+          Reintentar
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-      {/* Barra de Filtros */}
       <FiltersBar filters={filters} onFiltersChange={setFilters} />
 
-      {/* KPIs Principales */}
       {dashboard && (
         <div className="mt-8">
           <h2 className="text-xl font-bold text-gray-900 mb-4">
@@ -57,9 +83,7 @@ function AnalyticsContent() {
         </div>
       )}
 
-      {/* Gráficas */}
       <DashboardLayout>
-        {/* Tendencia de Citas */}
         {appointments?.appointmentsTrend && (
           <div className="lg:col-span-2">
             <TimeSeriesChart
@@ -69,17 +93,18 @@ function AnalyticsContent() {
           </div>
         )}
 
-        {/* Citas por Estado */}
         {appointments?.appointmentsByStatus && (
           <div>
             <PieChart
               title="Citas por Estado"
-              data={appointments.appointmentsByStatus}
+              data={appointments.appointmentsByStatus.map((s) => ({
+                name: s.status,
+                count: s.count,
+              }))}
             />
           </div>
         )}
 
-        {/* Usuarios por Rol */}
         {users?.usersByRole && (
           <div>
             <BarChart
@@ -91,7 +116,6 @@ function AnalyticsContent() {
           </div>
         )}
 
-        {/* Mascotas por Especie */}
         {pets?.petsBySpecies && (
           <div>
             <BarChart
@@ -103,7 +127,6 @@ function AnalyticsContent() {
           </div>
         )}
 
-        {/* Profesionales por Especialidad */}
         {professionals?.professionalsBySpecialty && (
           <div className="lg:col-span-2">
             <BarChart
@@ -116,26 +139,18 @@ function AnalyticsContent() {
           </div>
         )}
 
-        {/* Clínicas Verificadas */}
         {clinics && (
           <div>
             <PieChart
               title="Estado de Clínicas"
               data={[
-                {
-                  name: 'Verificadas',
-                  count: clinics.verifiedClinics,
-                },
-                {
-                  name: 'No Verificadas',
-                  count: clinics.unverifiedClinics,
-                },
+                { name: 'Verificadas', count: clinics.verifiedClinics },
+                { name: 'No Verificadas', count: clinics.unverifiedClinics },
               ]}
             />
           </div>
         )}
 
-        {/* Top Clientes */}
         {appointments?.topClientsWithAppointments && (
           <div className="lg:col-span-2">
             <BarChart
@@ -148,7 +163,6 @@ function AnalyticsContent() {
           </div>
         )}
 
-        {/* Top Mascotas */}
         {appointments?.topPetsWithAppointments && (
           <div className="lg:col-span-2">
             <BarChart
@@ -161,7 +175,6 @@ function AnalyticsContent() {
           </div>
         )}
 
-        {/* Registros de Usuarios */}
         {users?.userRegistrationTrend && (
           <div className="lg:col-span-2">
             <TimeSeriesChart

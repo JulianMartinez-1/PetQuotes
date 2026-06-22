@@ -77,7 +77,7 @@ export function TestimonialsGrid({
           >
             <h2 className={cn(
               "text-5xl sm:text-6xl font-black mb-4",
-              "bg-gradient-to-r from-primary via-secondary to-mint bg-clip-text text-transparent"
+              "bg-gradient-to-r from-primary-600 via-secondary-400 to-mint-500 bg-clip-text text-transparent"
             )}>
               {title}
             </h2>
@@ -233,7 +233,7 @@ export function TestimonialCarousel({
           >
             <h2 className={cn(
               "text-4xl sm:text-5xl font-bold mb-4",
-              "bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent"
+              "bg-gradient-to-r from-secondary-500 to-accent-500 bg-clip-text text-transparent"
             )}>
               {title}
             </h2>

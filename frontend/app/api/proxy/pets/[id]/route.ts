@@ -8,14 +8,14 @@ const API_GATEWAY_URL = process.env.API_BASE_URL ?? process.env.NEXT_PUBLIC_API_
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const accessToken = request.cookies.get(AUTH_COOKIE_NAMES.access)?.value;
   if (!accessToken) {
     return NextResponse.json({ message: normalizeApiErrorMessage(401, "missing access token") }, { status: 401 });
   }
 
-  const petId = params.id;
+  const { id: petId } = await params;
   const timeoutMs = Number(process.env.API_PROXY_TIMEOUT_MS ?? 8000);
   let upstream: Response;
 
@@ -56,7 +56,7 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   if (!assertDoubleSubmitCsrf(request)) {
     return NextResponse.json({ message: "No se pudo validar la solicitud. Recarga la pagina e intenta de nuevo." }, { status: 403 });
@@ -67,7 +67,7 @@ export async function PATCH(
     return NextResponse.json({ message: normalizeApiErrorMessage(401, "missing access token") }, { status: 401 });
   }
 
-  const petId = params.id;
+  const { id: petId } = await params;
   const contentType = request.headers.get("content-type") ?? "";
   const idempotencyKey = request.headers.get("x-idempotency-key") ?? undefined;
 
@@ -76,7 +76,7 @@ export async function PATCH(
 
   try {
     let body: any;
-    
+
     if (contentType.includes("multipart/form-data")) {
       body = await request.formData();
     } else {
@@ -121,7 +121,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   if (!assertDoubleSubmitCsrf(request)) {
     return NextResponse.json({ message: "No se pudo validar la solicitud. Recarga la pagina e intenta de nuevo." }, { status: 403 });
@@ -132,7 +132,7 @@ export async function DELETE(
     return NextResponse.json({ message: normalizeApiErrorMessage(401, "missing access token") }, { status: 401 });
   }
 
-  const petId = params.id;
+  const { id: petId } = await params;
   const idempotencyKey = request.headers.get("x-idempotency-key") ?? undefined;
 
   const timeoutMs = Number(process.env.API_PROXY_TIMEOUT_MS ?? 8000);

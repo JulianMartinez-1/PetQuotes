@@ -185,21 +185,20 @@ export function useMousePosition() {
  * Hook para dark mode
  */
 export function useDarkMode() {
-  const [isDark, setIsDark] = useState(true); // Dark por defecto
+  const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
-    // Verificar preferencia guardada o preferencia del SO
+    const stored = localStorage.getItem("theme");
     const isDarkMode =
-      localStorage.getItem("theme") === "dark" ||
-      (!localStorage.getItem("theme") &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches);
-
+      stored === "dark" ||
+      (stored === null && window.matchMedia("(prefers-color-scheme: dark)").matches);
     setIsDark(isDarkMode);
     document.documentElement.classList.toggle("dark", isDarkMode);
   }, []);
 
-  const toggleDarkMode = (value?: boolean) => {
-    const newValue = value ?? !isDark;
+  const toggleDarkMode = () => {
+    // Lee del DOM en vez del closure para evitar estado stale
+    const newValue = !document.documentElement.classList.contains("dark");
     setIsDark(newValue);
     localStorage.setItem("theme", newValue ? "dark" : "light");
     document.documentElement.classList.toggle("dark", newValue);

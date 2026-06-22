@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { importLibrary, setOptions } from "@googlemaps/js-api-loader";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { getUserProfileSettings } from "@/lib/user-profile";
+import { useAuthState } from "@/store/auth-state";
 
 let googleMapsLoadPromise: Promise<void> | null = null;
 let googleMapsKey: string | null = null;
@@ -35,10 +37,24 @@ const clinics = [
   }
 ];
 
+const CITY_COORDS: Record<string, [number, number]> = {
+  Bogota: [4.67, -74.06],
+  Medellin: [6.2442, -75.5812],
+  Cali: [3.4372, -76.5197],
+};
+
 export function ClinicMap() {
   const mapElementRef = useRef<HTMLDivElement | null>(null);
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   const [useLeafletFallback, setUseLeafletFallback] = useState(false);
+  const [isMapLoading, setIsMapLoading] = useState(true);
+  const { user } = useAuthState();
+
+  const getMapCenter = (): [number, number] => {
+    if (!user) return CITY_COORDS.Bogota;
+    const profile = getUserProfileSettings(user.id, user.email.split("@")[0]);
+    return CITY_COORDS[profile.city] ?? CITY_COORDS.Bogota;
+  };
 
   const loadGoogleMaps = async (key: string) => {
     if (!googleMapsLoadPromise || googleMapsKey !== key) {
@@ -60,7 +76,9 @@ export function ClinicMap() {
       (container as { _leaflet_id?: number })._leaflet_id = undefined;
     }
 
-    const map = L.map(container, { scrollWheelZoom: false }).setView([4.67, -74.06], 11);
+    const center = getMapCenter();
+    const map = L.map(container, { scrollWheelZoom: false }).setView(center, 11);
+    setIsMapLoading(false);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -74,21 +92,35 @@ export function ClinicMap() {
     });
 
     clinics.forEach((clinic) => {
-      const popupHtml = `
-        <article class="clinic-popup-card">
-          <p class="clinic-popup-kicker">Clinica validada</p>
-          <h4>${clinic.name}</h4>
-          <p>${clinic.service}</p>
-          <div class="clinic-popup-meta">
-            <span>Rating ${clinic.rating}</span>
-            <span>${clinic.eta}</span>
-          </div>
-        </article>
-      `;
+      // Build popup as DOM element to prevent XSS from injected clinic data
+      const article = document.createElement("article");
+      article.className = "clinic-popup-card";
+
+      const kicker = document.createElement("p");
+      kicker.className = "clinic-popup-kicker";
+      kicker.textContent = "Clínica validada";
+
+      const title = document.createElement("h4");
+      title.textContent = clinic.name;
+
+      const service = document.createElement("p");
+      service.textContent = clinic.service;
+
+      const meta = document.createElement("div");
+      meta.className = "clinic-popup-meta";
+
+      const rating = document.createElement("span");
+      rating.textContent = `Rating ${clinic.rating}`;
+
+      const eta = document.createElement("span");
+      eta.textContent = clinic.eta;
+
+      meta.append(rating, eta);
+      article.append(kicker, title, service, meta);
 
       L.marker(clinic.coords, { icon: markerIcon })
         .addTo(map)
-        .bindPopup(popupHtml, { className: "clinic-popup", closeButton: false, offset: [0, -8] });
+        .bindPopup(article, { className: "clinic-popup", closeButton: false, offset: [0, -8] });
     });
 
     return () => {
@@ -103,7 +135,7 @@ export function ClinicMap() {
     }
 
     let isDisposed = false;
-    const markers: google.maps.Marker[] = [];
+    const markers: any[] = [];
     const globalWindow = window as Window & { gm_authFailure?: () => void };
     const previousAuthFailure = globalWindow.gm_authFailure;
 
@@ -122,8 +154,9 @@ export function ClinicMap() {
           return;
         }
 
+        const [clat, clng] = getMapCenter();
         const map = new google.maps.Map(container, {
-          center: { lat: 4.67, lng: -74.06 },
+          center: { lat: clat, lng: clng },
           zoom: 11,
           mapTypeControl: false,
           streetViewControl: false,
@@ -137,36 +170,57 @@ export function ClinicMap() {
           ]
         });
 
+        setIsMapLoading(false);
         const infoWindow = new google.maps.InfoWindow();
 
         clinics.forEach((clinic) => {
-          const marker = new google.maps.Marker({
+          // Create content element for AdvancedMarkerElement
+          const contentElement = document.createElement("div");
+          contentElement.innerHTML = `
+            <div class="clinic-marker-wrapper">
+              <div class="clinic-marker-pin"></div>
+            </div>
+          `;
+          contentElement.style.display = "flex";
+          contentElement.style.alignItems = "center";
+          contentElement.style.justifyContent = "center";
+
+          // Use AdvancedMarkerElement instead of deprecated Marker
+          const marker = new (window as any).google.maps.marker.AdvancedMarkerElement({
             map,
             position: { lat: clinic.coords[0], lng: clinic.coords[1] },
             title: clinic.name,
-            animation: google.maps.Animation.DROP,
-            icon: {
-              path: google.maps.SymbolPath.CIRCLE,
-              fillColor: "#118ab2",
-              fillOpacity: 1,
-              strokeColor: "#ffffff",
-              strokeWeight: 2,
-              scale: 8
-            }
+            content: contentElement,
           });
 
-          marker.addListener("click", () => {
-            infoWindow.setContent(`
-              <article class="gmap-popup-card">
-                <p class="gmap-popup-kicker">Clinica validada</p>
-                <h4>${clinic.name}</h4>
-                <p>${clinic.service}</p>
-                <div class="gmap-popup-meta">
-                  <span>Rating ${clinic.rating}</span>
-                  <span>${clinic.eta}</span>
-                </div>
-              </article>
-            `);
+          marker.addEventListener("click", () => {
+            // Build info window content as DOM element to prevent XSS
+            const card = document.createElement("article");
+            card.className = "gmap-popup-card";
+
+            const kicker = document.createElement("p");
+            kicker.className = "gmap-popup-kicker";
+            kicker.textContent = "Clínica validada";
+
+            const h4 = document.createElement("h4");
+            h4.textContent = clinic.name;
+
+            const svc = document.createElement("p");
+            svc.textContent = clinic.service;
+
+            const metaDiv = document.createElement("div");
+            metaDiv.className = "gmap-popup-meta";
+
+            const ratingSpan = document.createElement("span");
+            ratingSpan.textContent = `Rating ${clinic.rating}`;
+
+            const etaSpan = document.createElement("span");
+            etaSpan.textContent = clinic.eta;
+
+            metaDiv.append(ratingSpan, etaSpan);
+            card.append(kicker, h4, svc, metaDiv);
+
+            infoWindow.setContent(card);
             infoWindow.open({ anchor: marker, map });
           });
 
@@ -182,7 +236,8 @@ export function ClinicMap() {
 
     return () => {
       isDisposed = true;
-      markers.forEach((marker) => marker.setMap(null));
+      // Clear markers - they'll be garbage collected when map is removed
+      markers.length = 0;
       container.innerHTML = "";
       globalWindow.gm_authFailure = previousAuthFailure;
     };
@@ -201,6 +256,12 @@ export function ClinicMap() {
 
   return (
     <div className="relative h-[320px] w-full overflow-hidden rounded-2xl border border-[#dfe7f7]">
+      {isMapLoading && (
+        <div className="absolute inset-0 z-[400] flex flex-col items-center justify-center gap-2 bg-white/80 backdrop-blur-sm">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-secondary border-t-transparent" />
+          <span className="text-xs font-semibold text-text-secondary">Cargando mapa…</span>
+        </div>
+      )}
       {useLeafletFallback && (
         <div className="absolute left-3 top-3 z-[500] rounded-full border border-[#dbe5fb] bg-white/95 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-soft">
           Modo de respaldo activo

@@ -15,10 +15,10 @@ import { MedicationModule } from '@presentation/medications/medication.module';
 import { ClinicsModule } from '@presentation/clinics/clinics.module';
 import { AppointmentsModule } from '@presentation/appointments/appointments.module';
 import { AnalyticsModule } from '@presentation/analytics/analytics.module';
+import { NotificationsModule } from '@presentation/notifications/notifications.module';
 
 // TODO: New modules - pending schema alignment
 // import { ProfessionalModule } from '@presentation/professionals/professionals.module';
-// import { NotificationModule } from '@presentation/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -42,9 +42,9 @@ import { AnalyticsModule } from '@presentation/analytics/analytics.module';
     ClinicsModule,
     AppointmentsModule,
     AnalyticsModule,
+    NotificationsModule,
     // TODO: Add new modules after implementing with correct schema fields
     // ProfessionalModule,
-    // NotificationModule,
   ],
   providers: [PrismaService],
   exports: [PrismaService],

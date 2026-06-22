@@ -85,7 +85,7 @@ export function ServicesGrid({
               {title}
             </motion.h2>
             {subtitle && (
-              <p className="text-xl text-textSecondary max-w-2xl mx-auto">
+              <p className="text-xl text-text-secondary max-w-2xl mx-auto">
                 {subtitle}
               </p>
             )}
@@ -124,18 +124,18 @@ export function ServicesGrid({
                           {service.icon}
                         </motion.div>
 
-                        <h3 className="text-2xl font-black text-textPrimary mb-3">
+                        <h3 className="text-2xl font-black text-text-primary mb-3">
                           {service.title}
                         </h3>
 
-                        <p className="text-textSecondary leading-relaxed mb-6">
+                        <p className="text-text-secondary leading-relaxed mb-6">
                           {service.description}
                         </p>
                       </div>
 
                       {/* Bottom - Learn More Link */}
                       <motion.div
-                        className="flex items-center gap-2 text-sm font-bold text-textSecondary group-hover:text-textPrimary transition-colors"
+                        className="flex items-center gap-2 text-sm font-bold text-text-secondary group-hover:text-text-primary transition-colors"
                         initial={{ opacity: 0.6 }}
                         whileHover={{ opacity: 1 }}
                       >

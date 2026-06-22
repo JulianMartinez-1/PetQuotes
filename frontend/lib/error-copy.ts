@@ -48,7 +48,11 @@ export function normalizeApiErrorMessage(status: number, rawMessage?: string, pa
   const message = (rawMessage ?? "").trim();
   const lower = message.toLowerCase();
 
-  if (status === 401 || lower.includes("missing access token") || lower.includes("token") || lower.includes("unauthorized")) {
+  if (lower.includes("failed to exchange oauth") || lower.includes("oauth code") || lower.includes("exchange oauth")) {
+    return "No se pudo completar el inicio de sesion social. Intenta nuevamente.";
+  }
+
+  if (status === 401 || lower.includes("missing access token") || lower.includes("access token") || lower.includes("token expired") || lower.includes("invalid token") || lower.includes("unauthorized")) {
     // Si es error de login, mostrar mensaje específico de credenciales inválidas
     if (path === "/api/session/login") {
       return "Email o contraseña incorrectos. Intenta nuevamente.";
@@ -68,7 +72,7 @@ export function normalizeApiErrorMessage(status: number, rawMessage?: string, pa
     return "Esta accion no pudo completarse porque la informacion cambio. Actualiza e intenta de nuevo.";
   }
 
-  if (status === 422 || (status === 400 && (lower.includes("validation") || lower.includes("invalid") || lower.includes("required")))) {
+  if (status === 422 || (status === 400 && (lower.includes("validation") || lower.includes("invalid") || lower.includes("inválido") || lower.includes("required") || lower.includes("estado oauth")))) {
     return "Revisa los datos ingresados y vuelve a intentarlo.";
   }
 

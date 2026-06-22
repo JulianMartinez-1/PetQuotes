@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, AlertCircle, Info } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Info, Microscope, HeartPulse, ClipboardList, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SpecializedClinics } from "@/components/sections/specialized-clinics-api";
 import { ScrollReactivePets } from "@/components/animations/scroll-reactive-pets";
@@ -31,22 +31,22 @@ export default function ConsultaVeterinaria() {
 
   const benefits = [
     {
-      icon: "█",
+      Icon: HeartPulse,
       title: "Diagnóstico Preciso",
       description: "Evaluación completa de la salud de tu mascota por veterinarios certificados",
     },
     {
-      icon: "█",
+      Icon: ClipboardList,
       title: "Tratamiento Especializado",
       description: "Planes de tratamiento personalizados según las necesidades de tu pet",
     },
     {
-      icon: "█",
+      Icon: Microscope,
       title: "Laboratorio Avanzado",
       description: "Análisis y pruebas diagnósticas con tecnología de última generación",
     },
     {
-      icon: "█",
+      Icon: BookOpen,
       title: "Historial Médico",
       description: "Registro completo del historial médico de tu mascota en una plataforma segura",
     },
@@ -126,7 +126,7 @@ export default function ConsultaVeterinaria() {
                 Consulta Veterinaria
               </h1>
             </div>
-            <p className="text-lg text-textSecondary max-w-2xl">
+            <p className="text-lg text-text-secondary max-w-2xl">
               Accede a veterinarios calificados para diagnósticos precisos y tratamientos expertos para tu mascota
             </p>
           </motion.div>
@@ -145,12 +145,12 @@ export default function ConsultaVeterinaria() {
         >
           <motion.div variants={itemVariants} className="mb-12">
             <h2 className="text-3xl font-black text-primary mb-6">¿Qué es una Consulta Veterinaria?</h2>
-            <p className="text-lg text-textSecondary leading-relaxed mb-4">
+            <p className="text-lg text-text-secondary leading-relaxed mb-4">
               Una consulta veterinaria es una evaluación completa de la salud de tu mascota realizada por profesionales
               calificados. Estos expertos realizan un examen físico detallado, diagnostican enfermedades, prescriben
               tratamientos y brindan asesoramiento preventivo para mantener a tu pet saludable y feliz.
             </p>
-            <p className="text-lg text-textSecondary leading-relaxed">
+            <p className="text-lg text-text-secondary leading-relaxed">
               En PetQuotes, conectamos a dueños de mascotas con veterinarios de confianza que ofrecen atención
               personalizada, diagnósticos precisos y planes de tratamiento efectivos.
             </p>
@@ -178,10 +178,12 @@ export default function ConsultaVeterinaria() {
           >
             {benefits.map((benefit, idx) => (
               <motion.div key={idx} variants={itemVariants}>
-                <div className="bg-white rounded-2xl border-2 border-primary/20 p-8 hover:shadow-lg transition-shadow">
-                  <div className="text-4xl mb-4">{benefit.icon}</div>
-                  <h3 className="text-xl font-bold text-primary mb-3">{benefit.title}</h3>
-                  <p className="text-textSecondary leading-relaxed">{benefit.description}</p>
+                <div className="bg-surface rounded-2xl border border-primary-100 dark:border-border p-8 hover:shadow-lg hover:border-primary-200 transition-all card-hover">
+                  <div className="w-12 h-12 rounded-xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center mb-5">
+                    <benefit.Icon size={24} className="text-primary-600 dark:text-primary-400" />
+                  </div>
+                  <h3 className="text-lg font-bold text-text-primary mb-2">{benefit.title}</h3>
+                  <p className="text-text-secondary leading-relaxed text-sm">{benefit.description}</p>
                 </div>
               </motion.div>
             ))}
@@ -204,7 +206,7 @@ export default function ConsultaVeterinaria() {
             {conditions.map((condition, idx) => (
               <motion.div key={idx} variants={itemVariants} className="flex items-start gap-3">
                 <CheckCircle2 size={24} className="text-primary flex-shrink-0 mt-1" />
-                <span className="text-lg text-textSecondary">{condition.name}</span>
+                <span className="text-lg text-text-secondary">{condition.name}</span>
               </motion.div>
             ))}
           </div>
@@ -216,13 +218,13 @@ export default function ConsultaVeterinaria() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false, amount: 0.3 }}
           transition={{ duration: 0.6 }}
-          className="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-r-lg mb-20"
+          className="bg-primary-50 dark:bg-surface border-l-4 border-primary-500 p-6 rounded-r-lg mb-20"
         >
           <div className="flex gap-4">
-            <Info className="text-blue-600 flex-shrink-0 mt-1" size={24} />
+            <Info className="text-primary-600 dark:text-primary-400 flex-shrink-0 mt-1" size={24} />
             <div>
-              <h3 className="font-bold text-blue-900 mb-2">Consejo Importante</h3>
-              <p className="text-blue-800">
+              <h3 className="font-bold text-text-primary mb-2">Consejo Importante</h3>
+              <p className="text-text-secondary">
                 Se recomienda una consulta veterinaria al menos una vez al año para mascotas adultas sanas.
                 Cachorros, seniors y mascotas con condiciones crónicas pueden requerir visitas más frecuentes.
               </p>
@@ -239,7 +241,7 @@ export default function ConsultaVeterinaria() {
       />
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-primary to-primary-dark text-white">
+      <section className="py-20 bg-gradient-to-r from-primary-700 to-primary-600 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}

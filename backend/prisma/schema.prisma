@@ -45,6 +45,11 @@ enum NotificationType {
   SYSTEM_ALERT
 }
 
+enum NotificationChannel {
+  EMAIL
+  WHATSAPP
+}
+
 // ============================================================
 // USERS & AUTHENTICATION
 // ============================================================
@@ -55,6 +60,7 @@ model User {
   passwordHash          String
   fullName              String
   phone                 String?
+  notificationChannel   NotificationChannel?
   role                  UserRole @default(CLIENT)
   failedLoginAttempts   Int      @default(0)
   lockedUntil           DateTime?
@@ -277,9 +283,9 @@ model Appointment {
   id                    String            @id @default(cuid())
   clientId              String
   petId                 String
-  professionalId        String
+  professionalId        String?
   serviceId             String
-  branchId              String
+  branchId              String?
   clinicId              String
   status                AppointmentStatus @default(PENDING)
   startTime             DateTime
@@ -293,17 +299,15 @@ model Appointment {
   // Relations
   client                User              @relation("ClientAppointments", fields: [clientId], references: [id], onDelete: Cascade)
   pet                   Pet               @relation(fields: [petId], references: [id], onDelete: Restrict)
-  professional          Professional      @relation(fields: [professionalId], references: [id], onDelete: Restrict)
+  professional          Professional?     @relation(fields: [professionalId], references: [id], onDelete: Restrict)
   service               VeterinaryService @relation(fields: [serviceId], references: [id], onDelete: Restrict)
-  branch                Branch            @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  branch                Branch?           @relation(fields: [branchId], references: [id], onDelete: Restrict)
   clinic                Clinic            @relation(fields: [clinicId], references: [id], onDelete: Cascade)
   medicalHistory        MedicalHistory[]
 
   @@index([clientId, startTime])
-  @@index([professionalId, startTime])
   @@index([petId, startTime])
   @@index([clinicId, startTime])
-  @@unique([professionalId, startTime])
   @@map("appointments")
 }
 

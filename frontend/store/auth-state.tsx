@@ -105,19 +105,19 @@ export function AuthStateProvider({ children }: PropsWithChildren) {
     return () => window.clearInterval(interval);
   }, [isHydrated, refreshSession, user]);
 
-  const login = ({ user: nextUser }: { user: AuthUser }) => {
+  const login = useCallback(({ user: nextUser }: { user: AuthUser }) => {
     console.log("[Auth] login() llamado con:", nextUser.email);
     syncAuth({ user: nextUser });
-  };
+  }, [syncAuth]);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     void logoutRequest();
     clearAuth();
-  };
+  }, [clearAuth]);
 
   const value = useMemo(
     () => ({ user, isHydrated, isAuthenticated: Boolean(user), login, logout }),
-    [user, isHydrated]
+    [user, isHydrated, login, logout]
   );
 
   return <AuthStateContext.Provider value={value}>{children}</AuthStateContext.Provider>;

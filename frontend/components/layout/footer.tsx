@@ -1,267 +1,180 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Instagram, MessageCircle, FileText, Heart, Phone, Mail, MapPin } from "lucide-react";
-import { DURATIONS } from "@/constants/animations";
-import { colors } from "@/constants/colors";
+import { Instagram, MessageCircle, Heart, Phone, Mail, ArrowRight, PawPrint } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email) {
+      setSubscribed(true);
+      setEmail("");
+    }
+  };
 
   const servicesLinks = [
-    { href: "/services#diagnostics", label: "Ayudas Diagnósticas" },
-    { href: "/services#hospitalization", label: "Hospitalización" },
-    { href: "/services#emergencies", label: "Urgencias 24 Horas" },
-    { href: "/services#surgery", label: "Cirugía" },
-    { href: "/services#preventive", label: "Medicina Preventiva" },
-    { href: "/services#consultation", label: "Consulta" },
-    { href: "/services#travel", label: "Trámite de viaje" },
-    { href: "/services#lab", label: "Laboratorio Clínico" },
-    { href: "/services#house-calls", label: "Domicilios Veterinarios en Medellín" },
+    { href: "/services/consulta-veterinaria", label: "Consulta Veterinaria" },
+    { href: "/services/bano-grooming", label: "Baño & Grooming" },
+    { href: "/services/vacunacion", label: "Vacunación" },
+    { href: "/services/estetica", label: "Estética" },
+    { href: "/clinics", label: "Clínicas Verificadas" },
+    { href: "/bookings", label: "Reservar Cita" },
   ];
 
-  const informationLinks = [
+  const companyLinks = [
     { href: "/about", label: "Nosotros" },
-    { href: "/contact", label: "Contactanos" },
-    { href: "/care-tips", label: "Preguntas frecuentes sobre cuidado animal" },
-    { href: "/blog", label: "Blog/Noticias" },
+    { href: "/blog", label: "Blog / Noticias" },
+    { href: "/care-tips", label: "Consejos de Cuidado" },
+    { href: "/contact", label: "Contacto" },
     { href: "/terms", label: "Términos y Condiciones" },
+    { href: "/privacy", label: "Privacidad" },
   ];
 
   const socialLinks = [
-    { icon: Instagram, href: "https://instagram.com", label: "Instagram", color: "hover:text-pink-500" },
-    { icon: MessageCircle, href: "https://tiktok.com", label: "TikTok", color: "hover:text-black" },
-    { icon: MessageCircle, href: "https://wa.me/573233695028", label: "WhatsApp", color: "hover:text-green-500" },
+    { icon: Instagram, href: "https://instagram.com", label: "Instagram" },
+    { icon: MessageCircle, href: "https://wa.me/573233695028", label: "WhatsApp" },
+    { icon: MessageCircle, href: "https://tiktok.com", label: "TikTok" },
   ];
 
-  return (
-    <footer className={cn(
-      "relative bg-gradient-to-b from-slate-900 to-slate-950 border-t border-border/20",
-      "overflow-hidden"
-    )}>
-      {/* Animated Background Gradient */}
-      <div className={cn(
-        "absolute inset-0 opacity-10",
-        "bg-gradient-to-t from-blue-600/20 via-transparent to-transparent"
-      )} />
+  const footerLink = cn(
+    "text-slate-400 text-sm hover:text-white transition-colors duration-200"
+  );
 
-      {/* Content */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.8 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12"
-        >
-          {/* Brand Section */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="md:col-span-1"
-          >
-            <Link href="/">
-              <div className="flex flex-col items-center gap-4 mb-6 group cursor-pointer">
-                <img 
-                  src="/Logo.png" 
-                  alt="PetQuotes Logo" 
-                  className="w-32 h-32 object-contain flex-shrink-0"
-                />
-                <div className="text-center">
-                  <span className={cn(
-                    "font-black text-3xl text-white block"
-                  )}>
-                    PetQuotes
-                  </span>
-                  <span className="text-sm text-blue-300">Clínica Veterinaria</span>
-                </div>
-              </div>
+  return (
+    <footer className="relative bg-slate-950 border-t border-slate-800">
+      {/* Subtle top glow */}
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary-600/40 to-transparent" />
+
+      <div className="page-container py-16">
+        {/* ── Main Grid ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-14">
+
+          {/* Col 1 — Brand */}
+          <div className="sm:col-span-2 lg:col-span-1">
+            <Link href="/" className="inline-flex items-center gap-0.5 mb-4 group">
+              <span className="bg-gradient-to-r from-primary-400 to-secondary-400 bg-clip-text text-transparent text-2xl font-black">Pet</span>
+              <span className="text-white font-black text-2xl">Quotes</span>
             </Link>
-            <p className="text-slate-300 font-medium text-sm leading-relaxed mb-6">
-              Cuidamos la salud de tu mascota con profesionalismo y amor.
+            <p className="text-slate-400 text-sm leading-relaxed mb-6 max-w-xs">
+              La plataforma más confiable para conectar dueños de mascotas con clínicas veterinarias verificadas.
             </p>
-            <div className="flex items-center gap-3">
-              {socialLinks.map((social) => (
+            {/* Social */}
+            <div className="flex items-center gap-2">
+              {socialLinks.map((s) => (
                 <motion.a
-                  key={social.label}
-                  href={social.href}
+                  key={s.label}
+                  href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={cn(
-                    "p-2 rounded-lg bg-slate-800 border border-slate-700",
-                    "transition-all duration-300",
-                    social.color,
-                    "hover:bg-slate-700 hover:border-slate-600"
-                  )}
-                  whileHover={{ scale: 1.15, y: -3 }}
-                  whileTap={{ scale: 0.95 }}
-                  aria-label={social.label}
+                  aria-label={s.label}
+                  className="w-9 h-9 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 hover:border-slate-600 transition-all duration-200"
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.93 }}
                 >
-                  <social.icon size={18} className="text-white" />
+                  <s.icon size={16} />
                 </motion.a>
               ))}
             </div>
-          </motion.div>
+          </div>
 
-          {/* 24 Hour Service Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-            className="md:col-span-1"
-          >
-            <div className="relative">
-              <div className={cn(
-                "absolute -top-4 -left-4 w-20 h-20 rounded-full",
-                "bg-blue-500/20 blur-xl"
-              )} />
-              <h3 className={cn(
-                "font-black text-white mb-6",
-                "text-sm uppercase tracking-wider relative"
-              )}>
-                Atención 24 Horas
-              </h3>
-            </div>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3 group">
-                <Phone size={18} className="text-blue-400 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="text-slate-400 text-xs font-semibold mb-1">Línea de atención</p>
-                  <a href="tel:6043223781" className={cn(
-                    "text-white font-bold text-sm",
-                    "hover:text-blue-300 transition-colors duration-300"
-                  )}>
-                     604 322 3781
-                  </a>
-                </div>
-              </li>
-              <li className="flex items-start gap-3 group">
-                <MessageCircle size={18} className="text-green-400 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="text-slate-400 text-xs font-semibold mb-1">WhatsApp</p>
-                  <a href="https://wa.me/573136537799" className={cn(
-                    "text-white font-bold text-sm",
-                    "hover:text-green-300 transition-colors duration-300"
-                  )} target="_blank" rel="noopener noreferrer">
-                    (+57) 313 653 7799
-                  </a>
-                </div>
-              </li>
-              <li className="flex items-start gap-3 group">
-                <Mail size={18} className="text-red-400 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="text-slate-400 text-xs font-semibold mb-1">Email</p>
-                  <a href="mailto:contacto@petquotes.com" className={cn(
-                    "text-white font-bold text-sm",
-                    "hover:text-red-300 transition-colors duration-300"
-                  )}>
-                    contacto@petquotes.com
-                  </a>
-                </div>
-              </li>
-            </ul>
-          </motion.div>
-
-          {/* Services Section */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="md:col-span-1"
-          >
-            <h3 className={cn(
-              "font-black text-white mb-4",
-              "text-sm uppercase tracking-wider"
-            )}>
-              Servicios
-            </h3>
-            <ul className="grid grid-cols-1 gap-2">
+          {/* Col 2 — Servicios */}
+          <div>
+            <h3 className="text-white font-semibold text-xs uppercase tracking-widest mb-5">Servicios</h3>
+            <ul className="space-y-3">
               {servicesLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href as any}>
-                    <span className={cn(
-                      "text-slate-300 font-medium text-sm",
-                      "hover:text-blue-300 transition-colors duration-300",
-                      "relative group inline-block"
-                    )}>
-                      {link.label}
-                      <span className={cn(
-                        "absolute bottom-0 left-0 w-0 h-0.5 bg-blue-400",
-                        "group-hover:w-full transition-all duration-300"
-                      )} />
-                    </span>
-                  </Link>
+                  <Link href={link.href as any} className={footerLink}>{link.label}</Link>
                 </li>
               ))}
             </ul>
-          </motion.div>
+          </div>
 
-          {/* Information Section */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="md:col-span-1 md:col-start-3"
-          >
-            <h3 className={cn(
-              "font-black text-white mb-4",
-              "text-sm uppercase tracking-wider"
-            )}>
-              Información
-            </h3>
-            <ul className="space-y-2">
-              {informationLinks.map((link) => (
+          {/* Col 3 — Empresa */}
+          <div>
+            <h3 className="text-white font-semibold text-xs uppercase tracking-widest mb-5">Empresa</h3>
+            <ul className="space-y-3">
+              {companyLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href as any}>
-                    <span className={cn(
-                      "text-slate-300 font-medium text-sm",
-                      "hover:text-blue-300 transition-colors duration-300",
-                      "relative group inline-block"
-                    )}>
-                      {link.label}
-                      <span className={cn(
-                        "absolute bottom-0 left-0 w-0 h-0.5 bg-blue-400",
-                        "group-hover:w-full transition-all duration-300"
-                      )} />
-                    </span>
-                  </Link>
+                  <Link href={link.href as any} className={footerLink}>{link.label}</Link>
                 </li>
               ))}
             </ul>
-          </motion.div>
-        </motion.div>
+          </div>
 
-        {/* Divider */}
-        <motion.div
-          className="h-0.5 bg-gradient-to-r from-transparent via-blue-500/30 to-transparent my-8"
-          initial={{ scaleX: 0 }}
-          whileInView={{ scaleX: 1 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-        />
+          {/* Col 4 — Contacto + Newsletter */}
+          <div>
+            <h3 className="text-white font-semibold text-xs uppercase tracking-widest mb-5">Contacto</h3>
+            <ul className="space-y-3 mb-8">
+              <li>
+                <a href="tel:6043223781" className="flex items-center gap-2.5 text-slate-400 text-sm hover:text-white transition-colors">
+                  <Phone size={14} className="text-primary-400 shrink-0" />
+                  604 322 3781
+                </a>
+              </li>
+              <li>
+                <a href="https://wa.me/573136537799" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 text-slate-400 text-sm hover:text-white transition-colors">
+                  <MessageCircle size={14} className="text-green-400 shrink-0" />
+                  (+57) 313 653 7799
+                </a>
+              </li>
+              <li>
+                <a href="mailto:contacto@petquotes.com" className="flex items-center gap-2.5 text-slate-400 text-sm hover:text-white transition-colors">
+                  <Mail size={14} className="text-secondary-400 shrink-0" />
+                  contacto@petquotes.com
+                </a>
+              </li>
+            </ul>
 
-        {/* Bottom Section */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="flex flex-col md:flex-row items-center justify-between gap-6"
-        >
-          <p className="text-slate-400 font-medium text-sm text-center md:text-left flex items-center gap-2">
-            Hecho con <Heart size={14} className="text-red-500 animate-pulse" /> por PetQuotes © {currentYear}
+            {/* Newsletter */}
+            <div>
+              <p className="text-white text-sm font-semibold mb-2">Newsletter</p>
+              <p className="text-slate-500 text-xs mb-3">Recibe consejos y novedades para tu mascota.</p>
+              {subscribed ? (
+                <p className="text-green-400 text-sm font-medium flex items-center gap-2">
+                  <PawPrint size={14} /> ¡Gracias por suscribirte!
+                </p>
+              ) : (
+                <form onSubmit={handleSubscribe} className="flex gap-2">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="tu@correo.com"
+                    required
+                    className="flex-1 min-w-0 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                  />
+                  <button
+                    type="submit"
+                    className="shrink-0 w-9 h-9 rounded-lg bg-primary-600 hover:bg-primary-700 flex items-center justify-center text-white transition-colors"
+                    aria-label="Suscribir"
+                  >
+                    <ArrowRight size={15} />
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Divider ── */}
+        <div className="h-px bg-slate-800 mb-8" />
+
+        {/* ── Bottom Bar ── */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-slate-500 text-sm flex items-center gap-1.5">
+            Hecho con <Heart size={13} className="text-red-500 fill-red-500" /> por PetQuotes © {currentYear}
           </p>
-          <p className="text-slate-400 font-medium text-sm">
-            PetQuotes • Veterinaria de Confianza
+          <p className="text-slate-600 text-xs">
+            Todos los derechos reservados · Medellín, Colombia
           </p>
-        </motion.div>
+        </div>
       </div>
     </footer>
   );

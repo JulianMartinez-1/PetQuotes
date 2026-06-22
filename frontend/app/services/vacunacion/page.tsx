@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, AlertCircle } from "lucide-react";
+import { ArrowLeft, CheckCircle2, ShieldCheck, Syringe, AlertTriangle, BellRing } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SpecializedClinics } from "@/components/sections/specialized-clinics-api";
 import { ScrollReactivePets } from "@/components/animations/scroll-reactive-pets";
@@ -30,22 +30,22 @@ export default function Vacunacion() {
 
   const vaccines = [
     {
-      icon: "█",
+      Icon: ShieldCheck,
       title: "Vacuna Polivalente",
       description: "Protección contra moquillo, parvovirosis y otras enfermedades virales",
     },
     {
-      icon: "█",
+      Icon: Syringe,
       title: "Vacuna Antirrábica",
       description: "Protección fundamental contra la rabia, enfermedad mortal",
     },
     {
-      icon: "█",
+      Icon: AlertTriangle,
       title: "Vacuna Leptospirosis",
       description: "Protección contra la leptospirosis, enfermedad bacteriana grave",
     },
     {
-      icon: "█",
+      Icon: BellRing,
       title: "Refuerzos Periódicos",
       description: "Recordatorios automáticos para mantener la inmunización al día",
     },
@@ -129,7 +129,7 @@ export default function Vacunacion() {
       <div className="bg-gradient-to-r from-teal/5 to-teal/10 border-b-2 border-teal/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Link href="/">
-            <Button variant="ghost" className="mb-6 text-teal hover:text-teal-dark">
+            <Button variant="ghost" className="mb-6 text-secondary-700 hover:text-secondary-700-dark">
               <ArrowLeft size={20} className="mr-2" />
               Volver al Inicio
             </Button>
@@ -142,11 +142,11 @@ export default function Vacunacion() {
           >
             <div className="flex items-center gap-4 mb-4">
               <div className="text-5xl">💉</div>
-              <h1 className="text-4xl sm:text-5xl font-black text-teal">
+              <h1 className="text-4xl sm:text-5xl font-black text-secondary-700">
                 Vacunación
               </h1>
             </div>
-            <p className="text-lg text-textSecondary max-w-2xl">
+            <p className="text-lg text-text-secondary max-w-2xl">
               Protege a tu mascota con un programa completo de inmunización
             </p>
           </motion.div>
@@ -164,13 +164,13 @@ export default function Vacunacion() {
           className="mb-20"
         >
           <motion.div variants={itemVariants} className="mb-12">
-            <h2 className="text-3xl font-black text-teal mb-6">¿Por qué es importante la vacunación?</h2>
-            <p className="text-lg text-textSecondary leading-relaxed mb-4">
+            <h2 className="text-3xl font-black text-secondary-700 mb-6">¿Por qué es importante la vacunación?</h2>
+            <p className="text-lg text-text-secondary leading-relaxed mb-4">
               La vacunación es la herramienta más efectiva para prevenir enfermedades infecciosas graves en
               mascotas. Protege a tu perro o gato de virus y bacterias potencialmente mortales, garantizando
               una vida larga y saludable.
             </p>
-            <p className="text-lg text-textSecondary leading-relaxed">
+            <p className="text-lg text-text-secondary leading-relaxed">
               En PetQuotes, te ayudamos a mantener un calendario de vacunación actualizado con recordatorios
               automáticos y acceso a veterinarios especializados en inmunología animal.
             </p>
@@ -185,7 +185,7 @@ export default function Vacunacion() {
           viewport={{ once: false, amount: 0.3 }}
           className="mb-20"
         >
-          <motion.h2 variants={itemVariants} className="text-3xl font-black text-teal mb-12">
+          <motion.h2 variants={itemVariants} className="text-3xl font-black text-secondary-700 mb-12">
             Vacunas Disponibles
           </motion.h2>
           
@@ -198,10 +198,12 @@ export default function Vacunacion() {
           >
             {vaccines.map((vaccine, idx) => (
               <motion.div key={idx} variants={itemVariants}>
-                <div className="bg-white rounded-2xl border-2 border-teal/20 p-8 hover:shadow-lg transition-shadow">
-                  <div className="text-4xl mb-4">{vaccine.icon}</div>
-                  <h3 className="text-xl font-bold text-teal mb-3">{vaccine.title}</h3>
-                  <p className="text-textSecondary leading-relaxed">{vaccine.description}</p>
+                <div className="bg-surface rounded-2xl border border-secondary-100 dark:border-border p-8 hover:shadow-lg hover:border-secondary-200 transition-all card-hover">
+                  <div className="w-12 h-12 rounded-xl bg-secondary-50 dark:bg-secondary-900/30 flex items-center justify-center mb-5">
+                    <vaccine.Icon size={24} className="text-secondary-600 dark:text-secondary-400" />
+                  </div>
+                  <h3 className="text-lg font-bold text-text-primary mb-2">{vaccine.title}</h3>
+                  <p className="text-text-secondary leading-relaxed text-sm">{vaccine.description}</p>
                 </div>
               </motion.div>
             ))}
@@ -216,7 +218,7 @@ export default function Vacunacion() {
           viewport={{ once: false, amount: 0.3 }}
           className="mb-20"
         >
-          <motion.h2 variants={itemVariants} className="text-3xl font-black text-teal mb-8">
+          <motion.h2 variants={itemVariants} className="text-3xl font-black text-secondary-700 mb-8">
             Calendario de Vacunación Recomendado
           </motion.h2>
           
@@ -225,12 +227,12 @@ export default function Vacunacion() {
               <motion.div
                 key={idx}
                 variants={itemVariants}
-                className="flex items-start gap-4 bg-white rounded-xl border-2 border-teal/20 p-6 hover:shadow-lg transition-shadow"
+                className="flex items-start gap-4 bg-surface rounded-xl border-2 border-teal/20 dark:border-border p-6 hover:shadow-lg transition-shadow"
               >
-                <CheckCircle2 size={28} className="text-teal flex-shrink-0 mt-1" />
+                <CheckCircle2 size={28} className="text-secondary-700 flex-shrink-0 mt-1" />
                 <div className="flex-1">
-                  <h4 className="font-bold text-teal text-lg mb-1">{item.age}</h4>
-                  <p className="text-textSecondary">{item.vaccines}</p>
+                  <h4 className="font-bold text-secondary-700 text-lg mb-1">{item.age}</h4>
+                  <p className="text-text-secondary">{item.vaccines}</p>
                 </div>
               </motion.div>
             ))}
@@ -245,15 +247,15 @@ export default function Vacunacion() {
           viewport={{ once: false, amount: 0.3 }}
           className="mb-20"
         >
-          <motion.h2 variants={itemVariants} className="text-3xl font-black text-teal mb-8">
+          <motion.h2 variants={itemVariants} className="text-3xl font-black text-secondary-700 mb-8">
             Beneficios de Vacunar a tu Mascota
           </motion.h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {benefits.map((benefit, idx) => (
               <motion.div key={idx} variants={itemVariants} className="flex items-start gap-3">
-                <CheckCircle2 size={24} className="text-teal flex-shrink-0 mt-1" />
-                <span className="text-lg text-textSecondary">{benefit}</span>
+                <CheckCircle2 size={24} className="text-secondary-700 flex-shrink-0 mt-1" />
+                <span className="text-lg text-text-secondary">{benefit}</span>
               </motion.div>
             ))}
           </div>
@@ -265,13 +267,13 @@ export default function Vacunacion() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false, amount: 0.3 }}
           transition={{ duration: 0.6 }}
-          className="bg-amber-50 border-l-4 border-amber-500 rounded-r-lg p-6 mb-20"
+          className="bg-amber-50 dark:bg-surface border-l-4 border-amber-500 rounded-r-lg p-6 mb-20"
         >
           <div className="flex gap-4">
-            <AlertCircle className="text-amber-600 flex-shrink-0 mt-1" size={24} />
+            <AlertTriangle className="text-amber-600 dark:text-amber-400 flex-shrink-0 mt-1" size={24} />
             <div>
-              <h3 className="font-bold text-amber-900 mb-2">Importante</h3>
-              <p className="text-amber-800">
+              <h3 className="font-bold text-text-primary mb-2">Importante</h3>
+              <p className="text-text-secondary">
                 Consulta con tu veterinario sobre el programa de vacunación más adecuado para tu mascota.
                 Las necesidades varían según raza, edad, estilo de vida y ubicación geográfica.
               </p>
@@ -288,7 +290,7 @@ export default function Vacunacion() {
       />
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-teal to-teal-dark text-white">
+      <section className="py-20 bg-gradient-to-r from-teal-600 to-teal-700 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -317,7 +319,7 @@ export default function Vacunacion() {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <Link href="/bookings">
-              <Button size="lg" className="bg-white text-teal hover:bg-gray-100 font-bold">
+              <Button size="lg" className="bg-white text-secondary-700 hover:bg-gray-100 font-bold">
                 Agendar Vacunación
               </Button>
             </Link>

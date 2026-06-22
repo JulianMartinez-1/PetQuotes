@@ -29,7 +29,7 @@ export function EnhancedSectionHeader({
         <motion.h2
           className={cn(
             "text-4xl sm:text-5xl lg:text-6xl font-bold mb-4",
-            "bg-gradient-to-r from-secondary via-text-primary to-accent",
+            "bg-gradient-to-r from-secondary-500 via-primary-400 to-accent-500",
             "bg-clip-text text-transparent"
           )}
         >

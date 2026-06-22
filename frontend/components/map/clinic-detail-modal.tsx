@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { GoogleMap, Marker, InfoWindow } from "@react-google-maps/api";
-import { motion } from "framer-motion";
-import { X, Phone, MapPin, Star, Clock } from "lucide-react";
+import { GoogleMap, Marker } from "@react-google-maps/api";
+import { Phone, MapPin, Star, Clock, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Modal } from "@/components/ui/modal";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
@@ -41,34 +41,22 @@ export function ClinicDetailModal({ clinic, onClose, onReservar }: ClinicDetailM
   useEffect(() => {
     if (!window.google) {
       setError("Google Maps no está disponible. Recarga la página.");
-      console.error("❌ window.google no está disponible");
-      return;
     }
-    console.log("✅ Google Maps está disponible");
   }, []);
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      onClick={onClose}
-      className="fixed inset-0 z-50 bg-dark/70 backdrop-blur-sm flex items-center justify-center p-4"
+    <Modal
+      open={true}
+      title={clinic.name}
+      onClose={onClose}
+      showHeader={false}
+      maxWidth="max-w-4xl"
+      className="h-[90vh] overflow-hidden flex flex-col p-0"
     >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        onClick={(e) => e.stopPropagation()}
-        className={cn(
-          "w-full max-w-4xl h-[90vh] rounded-2xl border border-border/30",
-          "bg-surface overflow-hidden flex flex-col"
-        )}
-      >
         {/* Header */}
         <div className={cn(
           "relative z-10 bg-gradient-to-r from-surface via-surface to-surface/80",
-          "p-6 flex items-center justify-between border-b border-border/30"
+          "p-6 flex items-center justify-between border-b border-border/30 shrink-0"
         )}>
           <div className="flex-1">
             <h2 className="text-2xl font-bold text-text-primary mb-1">
@@ -80,6 +68,7 @@ export function ClinicDetailModal({ clinic, onClose, onReservar }: ClinicDetailM
           </div>
           <button
             onClick={onClose}
+            aria-label="Cerrar"
             className="p-2 hover:bg-surface-hover rounded-lg transition-colors flex-shrink-0"
           >
             <X size={24} className="text-text-primary" />
@@ -96,6 +85,7 @@ export function ClinicDetailModal({ clinic, onClose, onReservar }: ClinicDetailM
                 src={clinic.image}
                 alt={clinic.name}
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover"
               />
             </div>
@@ -270,7 +260,6 @@ export function ClinicDetailModal({ clinic, onClose, onReservar }: ClinicDetailM
             )}
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+    </Modal>
   );
 }

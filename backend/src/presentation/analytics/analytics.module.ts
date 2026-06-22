@@ -1,12 +1,19 @@
 import { Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { HttpModule } from '@nestjs/axios';
 import { AnalyticsController } from './analytics.controller';
-import { AnalyticsService } from '@business/analytics/analytics.service';
-import { PrismaService } from '@shared/prisma/prisma.service';
 
 @Module({
+  imports: [
+    HttpModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: (config: ConfigService) => ({
+        timeout: Number(config.get('SERVICE_HTTP_TIMEOUT_MS') ?? 15000),
+        maxRedirects: 0,
+      }),
+      inject: [ConfigService],
+    }),
+  ],
   controllers: [AnalyticsController],
-  providers: [AnalyticsService, PrismaService, ConfigService],
-  exports: [AnalyticsService],
 })
 export class AnalyticsModule {}

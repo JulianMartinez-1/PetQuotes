@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsEmail } from 'class-validator';
+import { IsOptional, IsString, IsIn } from 'class-validator';
 
 export class UpdateUserDto {
   @IsOptional()
@@ -12,6 +12,10 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString()
   profileImage?: string;
+
+  @IsOptional()
+  @IsIn(['EMAIL', 'WHATSAPP'])
+  notificationChannel?: 'EMAIL' | 'WHATSAPP';
 }
 
 export class UserResponseDto {
@@ -22,6 +26,7 @@ export class UserResponseDto {
   role: string;
   emailVerified: boolean;
   profileImage: string | null;
+  notificationChannel: string | null;
   createdAt: Date;
   updatedAt: Date;
 }

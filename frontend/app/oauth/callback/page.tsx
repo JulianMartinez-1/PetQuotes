@@ -34,25 +34,24 @@ export default function OAuthCallbackPage() {
   }, [searchParams]);
 
   useEffect(() => {
-    if (hasExchangedRef.current) {
-      return;
-    }
-
-    let active = true;
+    // Guard against React Strict Mode double-invocation and dep-change re-runs.
+    // We must NOT reset this ref in a cleanup: resetting it causes a second
+    // exchange request that consumes the OAuth code and clears the state cookie,
+    // making the first request fail with a cookie-mismatch 400 error.
+    if (hasExchangedRef.current) return;
     hasExchangedRef.current = true;
 
+    // No isMounted / active guard needed: React 18 removed the warning about
+    // setState on unmounted components, and navigation / login must never be
+    // suppressed — suppressing them was the original cause of the infinite loading.
     const run = async () => {
       if (params.oauthError) {
-        if (active) {
-          setError("El proveedor social devolvio un error al autenticar.");
-        }
+        setError("El proveedor social devolvio un error al autenticar.");
         return;
       }
 
       if (!SUPPORTED_PROVIDERS.has(params.provider) || !params.code || !params.state) {
-        if (active) {
-          setError("No recibimos datos validos del proveedor social.");
-        }
+        setError("No recibimos datos validos del proveedor social.");
         return;
       }
 
@@ -62,10 +61,8 @@ export default function OAuthCallbackPage() {
           provider: params.provider,
           code: params.code,
           state: params.state,
-          redirectUri
+          redirectUri,
         });
-
-        if (!active) return;
 
         if ("requiresProfileCompletion" in response && response.requiresProfileCompletion) {
           sessionStorage.setItem("oauthProfileCompletion", JSON.stringify(response));
@@ -75,23 +72,18 @@ export default function OAuthCallbackPage() {
 
         if ("user" in response) {
           login({ user: response.user });
-          router.push("/bookings");
+          router.push("/");
           return;
         }
 
         setError("No se pudo resolver la respuesta de autenticacion social.");
       } catch (err) {
-        if (!active) return;
         setError((err as Error).message || "No se pudo completar la autenticacion social");
       }
     };
 
     void run();
-
-    return () => {
-      active = false;
-    };
-  }, [login, params, router]);
+  }, [params, router, login]);
 
   return (
     <main className="page-container max-w-md py-6">

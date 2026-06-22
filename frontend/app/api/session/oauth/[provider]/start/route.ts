@@ -8,7 +8,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ pro
   const query = new URLSearchParams({ redirectUri: callbackUri }).toString();
 
   try {
-    const backendResponse = await callAuthBackendRequest(`/auth/oauth/${provider}/start?${query}`, { method: "GET" });
+    const backendResponse = await callAuthBackendRequest(`/api/auth/oauth/${provider}/start?${query}`, { method: "GET" });
     if (!backendResponse.ok) {
       return NextResponse.redirect(new URL("/login?oauthError=provider", request.url));
     }

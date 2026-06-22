@@ -20,6 +20,10 @@ export class CreateAppointmentDto {
 
   @IsOptional()
   @IsString()
+  clinicName?: string;
+
+  @IsOptional()
+  @IsString()
   notes?: string;
 }
 

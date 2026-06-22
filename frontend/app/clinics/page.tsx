@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Route } from "next";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useAuthState } from "@/store/auth-state";
 import { useMemo, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -91,6 +92,7 @@ function setCachedClinics(clinics: typeof CLINIC_CATALOG, latitude: number, long
 export default function ClinicsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { user } = useAuthState();
   const [query, setQuery] = useState("");
   const [selectedCity, setSelectedCity] = useState("all");
   const [openNowOnly, setOpenNowOnly] = useState(false);
@@ -285,17 +287,6 @@ export default function ClinicsPage() {
         </motion.div>
       )}
 
-      {/* Error State */}
-      {locationError && !loading && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="fixed top-0 left-0 right-0 bg-red-500/90 text-white p-4 z-50 text-center"
-        >
-          <p className="font-medium">📍 {locationError}</p>
-          <p className="text-sm mt-1">Activa los permisos de ubicación para ver veterinarias cercanas</p>
-        </motion.div>
-      )}
 
       {/* Clinic Booking Modal */}
       <AnimatePresence>
@@ -352,7 +343,7 @@ export default function ClinicsPage() {
 
             <h1 className={cn(
               "text-5xl sm:text-6xl font-bold mb-6",
-              "bg-gradient-to-r from-secondary via-foreground to-accent",
+              "bg-gradient-to-r from-secondary-500 via-primary-400 to-accent-500",
               "bg-clip-text text-transparent"
             )}>
               Encuentra Tu Veterinaria Ideal
@@ -362,14 +353,16 @@ export default function ClinicsPage() {
               Compara clínicas verificadas, compara precios y disponibilidad con total confianza
             </p>
 
-            {/* Admin Link */}
-            <div className="mt-6">
-              <Link href="/admin/clinics">
-                <Badge className="px-4 py-2 bg-secondary/10 border-secondary/50 hover:bg-secondary/20 cursor-pointer transition-all inline-block">
-                  🔧 Panel de Administración
-                </Badge>
-              </Link>
-            </div>
+            {/* Admin Link — only for admins */}
+            {user?.role === 'ADMIN' && (
+              <div className="mt-6">
+                <Link href="/admin/clinics">
+                  <Badge className="px-4 py-2 bg-secondary/10 border-secondary/50 hover:bg-secondary/20 cursor-pointer transition-all inline-block">
+                    🔧 Panel de Administración
+                  </Badge>
+                </Link>
+              </div>
+            )}
           </motion.div>
 
           {/* Stats Row */}
@@ -400,6 +393,20 @@ export default function ClinicsPage() {
           </motion.div>
         </div>
       </section>
+
+      {/* Location warning banner — inline, below hero */}
+      {locationError && !loading && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-0"
+        >
+          <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-warning/10 border border-warning/30 text-sm">
+            <span className="text-warning shrink-0">📍</span>
+            <p className="text-text-secondary flex-1">{locationError}</p>
+          </div>
+        </motion.div>
+      )}
 
       {/* Filters Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

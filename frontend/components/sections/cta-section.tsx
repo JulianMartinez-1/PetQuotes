@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { DURATIONS } from "@/constants/animations";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,7 @@ export function CTA({
   size = "md",
   className,
 }: CTAProps) {
+  const prefersReducedMotion = useReducedMotion();
   const sizeMap = {
     sm: {
       containerPadding: "py-12 px-6",
@@ -78,7 +79,7 @@ export function CTA({
         <motion.div
           className="absolute inset-0 -z-10 opacity-20"
           initial={{ rotate: 0 }}
-          animate={{ rotate: 360 }}
+          animate={prefersReducedMotion ? {} : { rotate: 360 }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-secondary via-transparent to-accent blur-3xl" />
@@ -132,12 +133,12 @@ export function CTA({
               <Button
                 variant="primary"
                 size="lg"
-                className="gap-2 group !text-black"
+                className="gap-2 group"
               >
                 {primaryText}
                 <motion.span
                   className="inline-block"
-                  animate={{ x: [0, 4, 0] }}
+                  animate={prefersReducedMotion ? {} : { x: [0, 4, 0] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
                 >
                   <ArrowRight size={18} />

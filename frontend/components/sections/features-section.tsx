@@ -75,7 +75,7 @@ export function FeaturesGrid({
             <motion.h2
               className={cn(
                 "text-5xl sm:text-6xl font-black mb-6",
-                "bg-gradient-to-r from-primary via-secondary to-mint bg-clip-text text-transparent"
+                "bg-gradient-to-r from-primary-600 via-secondary-400 to-mint-500 bg-clip-text text-transparent"
               )}
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -149,7 +149,7 @@ export function HeroFeatures({
         >
           <h2 className={cn(
             "text-3xl sm:text-4xl font-bold mb-4",
-            "bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent"
+            "bg-gradient-to-r from-secondary-500 to-accent-500 bg-clip-text text-transparent"
           )}>
             {title}
           </h2>

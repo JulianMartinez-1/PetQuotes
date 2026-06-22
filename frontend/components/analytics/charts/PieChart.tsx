@@ -59,7 +59,7 @@ export default function PieChart({ title, data, variant = 'pie' }: PieChartProps
             outerRadius={outerRadius}
             paddingAngle={2}
             dataKey="count"
-            label={({ name, count }) => `${name}: ${count}`}
+            label={({ name, value }) => `${name}: ${value}`}
           >
             {memoizedData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

@@ -91,16 +91,16 @@ export function PetsStateProvider({ children }: PropsWithChildren) {
     }
   }, []);
 
-  // Hidratación inicial
+  // Marcar hidratación solo al montar, una vez
   useEffect(() => {
-    console.log("[Pets] Iniciando hidratación...");
     setIsHydrated(true);
+  }, []);
 
-    // Si el usuario está autenticado, cargar mascotas
+  // Reaccionar a cambios de autenticación para cargar o limpiar mascotas
+  useEffect(() => {
     if (isAuthenticated) {
       void fetchPets();
     } else {
-      // Limpiar mascotas si no está autenticado
       setPets([]);
       localStorage.removeItem(PETS_STORAGE_KEY);
       setIsLoading(false);

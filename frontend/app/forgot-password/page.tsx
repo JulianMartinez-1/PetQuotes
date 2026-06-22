@@ -101,7 +101,7 @@ export default function ForgotPasswordPage() {
                   </div>
                   <h1 className={cn(
                     "text-4xl font-bold mb-3",
-                    "bg-gradient-to-r from-accent to-secondary bg-clip-text text-transparent"
+                    "bg-gradient-to-r from-accent-500 to-secondary-500 bg-clip-text text-transparent"
                   )}>
                     Recuperar Acceso
                   </h1>
@@ -197,8 +197,8 @@ export default function ForgotPasswordPage() {
                   variants={itemVariants}
                   className="mt-6 p-4 rounded-lg bg-secondary/5 border border-secondary/30"
                 >
-                  <p className="text-xs text-textSecondary">
-                    <span className="font-semibold text-textPrimary">Consejo:</span> Si el correo existe en nuestro sistema, recibirás un enlace de recuperación en minutos. Por tu seguridad, no revelamos si la cuenta existe.
+                  <p className="text-xs text-text-secondary">
+                    <span className="font-semibold text-text-primary">Consejo:</span> Si el correo existe en nuestro sistema, recibirás un enlace de recuperación en minutos. Por tu seguridad, no revelamos si la cuenta existe.
                   </p>
                 </motion.div>
               </>
@@ -223,7 +223,7 @@ export default function ForgotPasswordPage() {
                   {/* Title */}
                   <h2 className={cn(
                     "text-3xl font-bold",
-                    "bg-gradient-to-r from-success to-secondary bg-clip-text text-transparent"
+                    "bg-gradient-to-r from-success to-secondary-400 bg-clip-text text-transparent"
                   )}>
                     ¡Enlace Enviado!
                   </h2>

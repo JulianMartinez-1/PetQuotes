@@ -62,7 +62,7 @@ export function StatsGrid({
           >
             <h2 className={cn(
               "text-5xl sm:text-6xl font-black mb-4",
-              "bg-gradient-to-r from-primary via-secondary to-mint bg-clip-text text-transparent"
+              "bg-gradient-to-r from-primary-600 via-secondary-400 to-mint-500 bg-clip-text text-transparent"
             )}>
               {title}
             </h2>

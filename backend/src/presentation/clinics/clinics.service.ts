@@ -23,11 +23,17 @@ export class ClinicsService {
   ) {
     this.googleMapsApiKey = this.configService.get<string | undefined>('GOOGLE_MAPS_API_KEY');
     
-    this.logger.log(`Google Maps API Key: ${this.googleMapsApiKey ? '✅ Configurada' : '❌ No configurada'}`);
+    if (this.googleMapsApiKey) {
+      this.logger.log(`✅ Google Maps API Key configurada (primeros 10 caracteres): ${this.googleMapsApiKey.substring(0, 10)}...`);
+      // Log para debugging - mostrar la longitud de la API key
+      this.logger.debug(`📊 Longitud de API Key: ${this.googleMapsApiKey.length} caracteres`);
+    } else {
+      this.logger.warn('❌ GOOGLE_MAPS_API_KEY no está configurada en las variables de entorno');
+    }
     
     this.googleMapsClient = axios.create({
       baseURL: 'https://maps.googleapis.com/maps/api',
-      timeout: 10000,
+      timeout: 15000, // Aumentar timeout
     });
   }
 
@@ -44,7 +50,7 @@ export class ClinicsService {
 
     try {
       // Intentar con Google Places primero
-      const clinics = await this.searchPlaces(coords, 'veterinary_care', city);
+      const clinics = await this.searchPlaces(coords, city);
       
       if (clinics.length > 0) {
         this.logger.log(`✅ Encontradas ${clinics.length} clínicas en ${city} desde Google Places`);
@@ -87,7 +93,7 @@ async searchClinicsByCoordinates(
         params: {
           location: `${latitude},${longitude}`,
           radius: radiusMeters,
-          keyword: 'veterinaria',
+          keyword: 'veterinaria veterinary clinic pet',
           key: this.googleMapsApiKey,
           language: 'es',
         },
@@ -116,6 +122,13 @@ async searchClinicsByCoordinates(
           `❌ Error Google: ${response.data.error_message}`,
         );
       }
+      
+      // Log detallado para debugging
+      this.logger.log(`📊 Parámetros enviados a Google Places:`);
+      this.logger.log(`  - Ubicación: ${latitude}, ${longitude}`);
+      this.logger.log(`  - Radio: ${radiusMeters}m (${radiusKm}km)`);
+      this.logger.log(`  - API Key presente: ${this.googleMapsApiKey ? 'Sí' : 'No'}`);
+      this.logger.log(`  - Idioma: es`);
     }
 
     if (
@@ -224,11 +237,10 @@ async searchClinicsByCoordinates(
   }
 
   /**
-   * Búsqueda genérica usando Google Places API
+   * Búsqueda genérica usando Google Places API con múltiples estrategias
    */
   private async searchPlaces(
     coords: { lat: number; lng: number },
-    keyword: string,
     city: string,
   ): Promise<ClinicCatalogItem[]> {
     try {
@@ -237,28 +249,53 @@ async searchClinicsByCoordinates(
         return this.fallbackService.getClinicsWithFallback(city);
       }
 
-      this.logger.log(`📍 Buscando con Google Places en ${city}...`);
+      this.logger.log(`📍 Buscando con Google Places en ${city} (${coords.lat}, ${coords.lng})...`);
       
-      const response = await this.googleMapsClient.get('/place/nearbysearch/json', {
+      // Estrategia 1: Búsqueda con keyword 'veterinaria' en español con radio mayor
+      let response = await this.googleMapsClient.get('/place/nearbysearch/json', {
         params: {
           location: `${coords.lat},${coords.lng}`,
-          radius: 15000, // 15 km de radio
-          keyword: keyword,
-          type: 'veterinary_care',
+          radius: 25000, // 25 km de radio para cobertura mayor
+          keyword: 'veterinaria veterinary clinic',
           key: this.googleMapsApiKey,
           language: 'es',
         },
       });
 
+      this.logger.log(`📡 Estrategia 1 - Status: ${response.data.status} | Resultados: ${response.data.results?.length || 0}`);
+
+      // Estrategia 2: Si la primera falla, intentar con búsqueda más amplia
       if (!response.data.results || response.data.results.length === 0) {
-        this.logger.warn(`⚠️ Google Places: Sin resultados para ${city}, usando fallback`);
+        this.logger.warn(`⚠️ Estrategia 1 sin resultados. Intentando Estrategia 2...`);
+        response = await this.googleMapsClient.get('/place/nearbysearch/json', {
+          params: {
+            location: `${coords.lat},${coords.lng}`,
+            radius: 35000, // Radio más amplio
+            keyword: 'veterinary pet doctor animal clinic',
+            key: this.googleMapsApiKey,
+            language: 'es',
+          },
+        });
+        this.logger.log(`📡 Estrategia 2 - Status: ${response.data.status} | Resultados: ${response.data.results?.length || 0}`);
+      }
+
+      if (response.data.status !== 'OK') {
+        this.logger.warn(`⚠️ Google Places devolvió status: ${response.data.status}`);
+        if (response.data.error_message) {
+          this.logger.error(`❌ Error Google: ${response.data.error_message}`);
+        }
+        return this.fallbackService.getClinicsWithFallback(city);
+      }
+
+      if (!response.data.results || response.data.results.length === 0) {
+        this.logger.warn(`⚠️ Google Places: Sin resultados para ${city} después de intentos múltiples`);
         return this.fallbackService.getClinicsWithFallback(city);
       }
 
       // Procesar resultados
       const clinics = await Promise.all(
         response.data.results
-          .slice(0, 10) // Limitar a 10 resultados por ciudad
+          .slice(0, 15) // Aumentar límite de resultados
           .map((place: any) => this.transformPlaceToClinic(place, city)),
       );
 
@@ -273,7 +310,6 @@ async searchClinicsByCoordinates(
       return validClinics;
     } catch (error) {
       this.logger.error(`❌ Error en searchPlaces para ${city}:`, error);
-      // Usar fallback en caso de error
       return this.fallbackService.getClinicsWithFallback(city);
     }
   }
@@ -417,5 +453,75 @@ async searchClinicsByCoordinates(
     return parts.length > 0
       ? parts.join(' • ')
       : 'Servicio veterinario profesional';
+  }
+
+  /**
+   * Endpoint de debugging para probar Google Maps API Key
+   */
+  async debugTestGoogleMapsApi() {
+    const testResult = {
+      timestamp: new Date().toISOString(),
+      apiKeyConfigured: !!this.googleMapsApiKey,
+      apiKeyLength: this.googleMapsApiKey?.length || 0,
+      apiKeyPrefix: this.googleMapsApiKey ? `${this.googleMapsApiKey.substring(0, 10)}...` : 'N/A',
+      tests: {} as any,
+    };
+
+    // Test 1: Verificar que la API Key esté configurada
+    testResult.tests.step1_apiKeyPresent = !!this.googleMapsApiKey;
+
+    if (!this.googleMapsApiKey) {
+      this.logger.error('❌ GOOGLE_MAPS_API_KEY no está configurada');
+      return testResult;
+    }
+
+    // Test 2: Intentar una búsqueda de prueba en Bogotá
+    try {
+      this.logger.log('🧪 Probando Google Places API...');
+      
+      const response = await this.googleMapsClient.get('/place/nearbysearch/json', {
+        params: {
+          location: '4.7110,-74.0055', // Bogotá
+          radius: 25000,
+          keyword: 'veterinaria',
+          key: this.googleMapsApiKey,
+          language: 'es',
+        },
+      });
+
+      testResult.tests.step2_googleApiCall = {
+        status: response.data.status,
+        resultsCount: response.data.results?.length || 0,
+        hasError: response.data.status !== 'OK',
+        errorMessage: response.data.error_message || 'No error',
+      };
+
+      if (response.data.status === 'OK' && response.data.results.length > 0) {
+        testResult.tests.step3_resultsProcessing = {
+          success: true,
+          firstResult: {
+            name: response.data.results[0].name,
+            rating: response.data.results[0].rating,
+            types: response.data.results[0].types?.slice(0, 3),
+          },
+        };
+      } else {
+        testResult.tests.step3_resultsProcessing = {
+          success: false,
+          reason: 'No results or API error',
+        };
+      }
+
+      this.logger.log('✅ Debug test completado:', JSON.stringify(testResult, null, 2));
+    } catch (error: any) {
+      this.logger.error('❌ Error durante debug test:', error);
+      testResult.tests.step2_googleApiCall = {
+        error: error.message,
+        statusCode: error.response?.status,
+        data: error.response?.data,
+      };
+    }
+
+    return testResult;
   }
 }

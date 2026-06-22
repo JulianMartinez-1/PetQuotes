@@ -5,10 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ArrowLeft, User, Mail, Lock, CheckCircle2, AlertCircle } from "lucide-react";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { AnimatedAuthPanel } from "@/components/auth/animated-auth-panel";
 import { SocialAuthButtons } from "@/components/auth/social-auth-buttons";
 import { registerRequest } from "@/lib/auth-api";
 import { useAuthState } from "@/store/auth-state";
@@ -100,310 +99,150 @@ export default function RegisterPage() {
     validations.name && validations.email && validations.password;
 
   return (
-    <main className="min-h-screen relative flex items-center justify-center pt-16 pb-12 px-4">
-      {/* Background Gradients */}
-      <motion.div
-        className="absolute inset-0 -z-10 overflow-hidden"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-      >
-        <div className="absolute top-0 right-0 w-96 h-96 bg-accent/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-secondary/20 rounded-full blur-3xl" />
-      </motion.div>
+    <div className="h-[calc(100vh-4rem)] overflow-hidden grid lg:grid-cols-2">
+      <AnimatedAuthPanel variant="register" />
 
-      {/* Content */}
-      <div className="w-full max-w-md relative z-10">
-        {/* Back Button */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: DURATIONS.fast / 1000 }}
-          className="mb-8"
-        >
-          <Link href="/">
-            <Button variant="ghost" size="sm" className="gap-2 text-text-secondary">
-              <ArrowLeft size={16} />
-              Volver
-            </Button>
-          </Link>
-        </motion.div>
+      {/* ── Panel derecho — Form ── */}
+      <div className="flex items-center justify-center p-6 sm:p-10 bg-surface overflow-y-auto">
+        <div className="w-full max-w-sm">
+          <motion.div variants={containerVariants} initial="hidden" animate="visible">
+            {/* Back (mobile only) */}
+            <motion.div variants={itemVariants} className="mb-6 lg:hidden">
+              <Link href="/">
+                <Button variant="ghost" size="sm" className="gap-2 -ml-2">
+                  <ArrowLeft size={15} />
+                  Volver
+                </Button>
+              </Link>
+            </motion.div>
 
-        {/* Card */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <Card className="backdrop-blur-xl">
             {/* Header */}
             <motion.div variants={itemVariants} className="mb-8">
-              <div className="mb-4">
-                <Badge className="px-3 py-1 bg-accent/20 border-accent/50 inline-block">
-                  Nuevo Registro
-                </Badge>
-              </div>
-              <h1 className={cn(
-                "text-4xl font-bold mb-3",
-                "bg-gradient-to-r from-accent to-secondary bg-clip-text text-transparent"
-              )}>
-                Crea Tu Cuenta
-              </h1>
-              <p className="text-text-secondary text-lg">
-                Únete a miles de dueños que cuidan a sus mascotas con PetQuotes
-              </p>
+              <h1 className="text-2xl font-bold text-text-primary mb-1.5">Crea tu cuenta</h1>
+              <p className="text-text-secondary text-sm">Únete a miles de dueños que cuidan a sus mascotas con PetQuotes</p>
             </motion.div>
 
             {/* Form */}
-            <motion.form
-              variants={itemVariants}
-              className="space-y-5 mb-8"
-              onSubmit={onSubmit}
-            >
-              {/* Full Name Input */}
-              <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary/40 size-5" />
-                <Input
-                  type="text"
-                  placeholder="Tu nombre completo"
-                  value={form.fullName}
-                  onChange={(e) => {
-                    setForm((prev) => ({ ...prev, fullName: e.target.value }));
-                    checkValidations(e.target.value, form.email, form.password);
-                  }}
-                  className="pl-12"
-                  variant="default"
-                  required
-                />
-                {form.fullName.length > 0 && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="absolute right-4 top-1/2 -translate-y-1/2"
-                  >
-                    {validations.name ? (
-                      <CheckCircle2 size={20} className="text-success" />
-                    ) : (
-                      <AlertCircle size={20} className="text-warning" />
-                    )}
-                  </motion.div>
-                )}
-              </div>
-
-              {/* Email Input */}
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary/40 size-5" />
-                <Input
-                  type="email"
-                  placeholder="tu-correo@dominio.com"
-                  value={form.email}
-                  onChange={(e) => {
-                    setForm((prev) => ({ ...prev, email: e.target.value }));
-                    checkValidations(form.fullName, e.target.value, form.password);
-                  }}
-                  className="pl-12"
-                  variant="default"
-                  required
-                />
-                {form.email.length > 0 && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="absolute right-4 top-1/2 -translate-y-1/2"
-                  >
-                    {validations.email ? (
-                      <CheckCircle2 size={20} className="text-success" />
-                    ) : (
-                      <AlertCircle size={20} className="text-warning" />
-                    )}
-                  </motion.div>
-                )}
-              </div>
-
-              {/* Password Input */}
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary/40 size-5" />
-                <Input
-                  type="password"
-                  placeholder="Mínimo 8 caracteres"
-                  value={form.password}
-                  onChange={(e) => {
-                    setForm((prev) => ({ ...prev, password: e.target.value }));
-                    checkValidations(form.fullName, form.email, e.target.value);
-                  }}
-                  className="pl-12"
-                  variant="default"
-                  required
-                />
-                {form.password.length > 0 && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="absolute right-4 top-1/2 -translate-y-1/2"
-                  >
-                    {validations.password ? (
-                      <CheckCircle2 size={20} className="text-success" />
-                    ) : (
-                      <AlertCircle size={20} className="text-warning" />
-                    )}
-                  </motion.div>
-                )}
-              </div>
-
-              {/* Password Requirements */}
-              {form.password.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="p-3 rounded-lg bg-surface border border-border/30 text-xs text-text-secondary space-y-1"
-                >
-                  <p className="flex items-center gap-2">
-                    {form.password.length >= 8 ? (
-                      <CheckCircle2 size={14} className="text-success flex-shrink-0" />
-                    ) : (
-                      <AlertCircle size={14} className="text-warning flex-shrink-0" />
-                    )}
-                    <span>Mínimo 8 caracteres</span>
-                  </p>
-                </motion.div>
-              )}
-
-              {/* Error Message */}
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className={cn(
-                    "p-4 rounded-lg",
-                    "bg-danger/10 border border-danger/30 text-danger text-sm"
+            <motion.form variants={itemVariants} className="space-y-4 mb-6" onSubmit={onSubmit}>
+              <div>
+                <label className="block text-sm font-medium text-text-secondary mb-1.5">Nombre completo</label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted size-4" />
+                  <Input
+                    type="text"
+                    placeholder="Tu nombre completo"
+                    value={form.fullName}
+                    onChange={(e) => { setForm((p) => ({ ...p, fullName: e.target.value })); checkValidations(e.target.value, form.email, form.password); }}
+                    className="pl-10 pr-10"
+                    variant="default"
+                    required
+                  />
+                  {form.fullName.length > 0 && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      {validations.name ? <CheckCircle2 size={16} className="text-success" /> : <AlertCircle size={16} className="text-warning" />}
+                    </div>
                   )}
-                >
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-text-secondary mb-1.5">Correo electrónico</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted size-4" />
+                  <Input
+                    type="email"
+                    placeholder="tu-correo@dominio.com"
+                    value={form.email}
+                    onChange={(e) => { setForm((p) => ({ ...p, email: e.target.value })); checkValidations(form.fullName, e.target.value, form.password); }}
+                    className="pl-10 pr-10"
+                    variant="default"
+                    required
+                  />
+                  {form.email.length > 0 && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      {validations.email ? <CheckCircle2 size={16} className="text-success" /> : <AlertCircle size={16} className="text-warning" />}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-text-secondary mb-1.5">Contraseña</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted size-4" />
+                  <Input
+                    type="password"
+                    placeholder="Mínimo 8 caracteres"
+                    value={form.password}
+                    onChange={(e) => { setForm((p) => ({ ...p, password: e.target.value })); checkValidations(form.fullName, form.email, e.target.value); }}
+                    className="pl-10 pr-10"
+                    variant="default"
+                    required
+                  />
+                  {form.password.length > 0 && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      {validations.password ? <CheckCircle2 size={16} className="text-success" /> : <AlertCircle size={16} className="text-warning" />}
+                    </div>
+                  )}
+                </div>
+                {form.password.length > 0 && !validations.password && (
+                  <p className="mt-1.5 text-xs text-text-muted">Mínimo 8 caracteres</p>
+                )}
+              </div>
+
+              {error && (
+                <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
+                  className="p-3 rounded-lg bg-danger/8 border border-danger/20 text-danger text-sm">
                   {error}
                 </motion.div>
               )}
 
-              {/* Success Message */}
               {success && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className={cn(
-                    "p-4 rounded-lg",
-                    "bg-success/10 border border-success/30 text-success text-sm font-semibold flex items-center gap-3"
-                  )}
-                >
-                  <CheckCircle2 size={20} className="flex-shrink-0" />
-                  <div>
-                    <p>¡Cuenta creada correctamente!</p>
-                    <p className="text-xs opacity-80 mt-1">Redirigiendo al inicio...</p>
-                  </div>
+                <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
+                  className="p-3 rounded-lg bg-success/8 border border-success/20 text-success text-sm flex items-center gap-2.5">
+                  <CheckCircle2 size={16} className="shrink-0" />
+                  <span>¡Cuenta creada! Redirigiendo...</span>
                 </motion.div>
               )}
 
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                variant={success ? "secondary" : "primary"}
-                size="lg"
-                disabled={loading || !isFormValid || success}
-                className="w-full"
-              >
-                {success ? (
-                  <motion.span
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="flex items-center justify-center gap-2"
-                  >
-                    <CheckCircle2 size={18} />
-                    ¡Listo!
-                  </motion.span>
-                ) : loading ? (
-                  <motion.span
-                    animate={{ opacity: [1, 0.5, 1] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                  >
-                    Creando tu cuenta...
-                  </motion.span>
-                ) : (
-                  <>
-                    <CheckCircle2 size={18} className="mr-2" />
-                    Crear Mi Cuenta
-                  </>
-                )}
+              <Button type="submit" variant="primary" size="lg" disabled={loading || !isFormValid || success} className="w-full">
+                {success ? "¡Listo!" : loading ? "Creando cuenta..." : "Crear mi cuenta"}
               </Button>
+
+              <p className="text-center text-xs text-text-muted">
+                Al registrarte aceptas nuestros{" "}
+                <Link href="#" className="text-primary-600 hover:underline">Términos</Link>
+                {" "}y{" "}
+                <Link href="#" className="text-primary-600 hover:underline">Privacidad</Link>
+              </p>
             </motion.form>
 
             {/* Divider */}
-            <motion.div
-              variants={itemVariants}
-              className="relative mb-8"
-            >
+            <motion.div variants={itemVariants} className="relative mb-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border/30" />
+                <div className="w-full border-t border-border" />
               </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-surface text-text-tertiary">O continúa con</span>
+              <div className="relative flex justify-center">
+                <span className="px-3 bg-surface text-xs text-text-muted font-medium">O continúa con</span>
               </div>
             </motion.div>
 
-            {/* Social Auth */}
-            <motion.div variants={itemVariants} className="mb-8">
+            <motion.div variants={itemVariants} className="mb-6">
               <SocialAuthButtons contextLabel="register" />
             </motion.div>
 
-            {/* Sign In Link */}
-            <motion.div
-              variants={itemVariants}
-              className="text-center"
-            >
-              <p className="text-text-secondary">
+            <motion.div variants={itemVariants} className="text-center">
+              <p className="text-text-secondary text-sm">
                 ¿Ya tienes cuenta?{" "}
-                <Link href="/login" className="text-accent hover:text-accent/80 font-semibold transition-colors">
+                <Link href="/login" className="text-primary-600 hover:text-primary-700 font-semibold transition-colors">
                   Inicia sesión
                 </Link>
               </p>
             </motion.div>
-
-            {/* Terms */}
-            <motion.p
-              variants={itemVariants}
-              className="mt-6 text-xs text-text-tertiary text-center"
-            >
-              Al crear una cuenta, aceptas nuestros{" "}
-              <Link href="#" className="text-secondary hover:text-secondary/80">
-                Términos de Servicio
-              </Link>
-              {" "}y{" "}
-              <Link href="#" className="text-secondary hover:text-secondary/80">
-                Política de Privacidad
-              </Link>
-            </motion.p>
-          </Card>
-
-          {/* Features Cards */}
-          <motion.div
-            variants={itemVariants}
-            className="mt-8 grid gap-4 md:hidden"
-          >
-            {[
-              { icon: "█", title: "Mascotas", desc: "Perfil completo" },
-              { icon: "█", title: "Clínicas", desc: "Verificadas" },
-              { icon: "█", title: "Citas", desc: "Confirmadas" },
-            ].map((item) => (
-              <div
-                key={item.title}
-                className="p-4 rounded-lg bg-surface/50 border border-border/30 text-center"
-              >
-                <div className="text-2xl mb-2">{item.icon}</div>
-                <p className="text-sm font-semibold text-textPrimary">{item.title}</p>
-                <p className="text-xs text-textTertiary">{item.desc}</p>
-              </div>
-            ))}
           </motion.div>
-        </motion.div>
+        </div>
       </div>
-    </main>
+    </div>
   );
 }
 

@@ -10,7 +10,7 @@ export default function BookingsError({ error, reset }: { error: Error; reset: (
         <p className="mt-2 text-sm text-red-700">
           Ocurrio un error inesperado al cargar esta seccion. Puedes reintentar sin perder tu sesion.
         </p>
-        <p className="mt-3 rounded-lg bg-white px-3 py-2 text-xs text-red-700">Detalle: {error.message}</p>
+        <p className="mt-3 rounded-lg bg-surface px-3 py-2 text-xs text-red-700">Detalle: {error.message}</p>
         <div className="mt-4">
           <Button onClick={reset}>Reintentar</Button>
         </div>

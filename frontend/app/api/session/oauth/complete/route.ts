@@ -20,9 +20,10 @@ export async function POST(request: NextRequest) {
     backendResponse = await callAuthBackendRequest(`/api/auth/oauth/${body.provider}/complete`, {
       method: "POST",
       body: {
+        provider: body.provider,
         completionToken: body.completionToken,
-        fullName: body.fullName
-      }
+        fullName: body.fullName,
+      },
     });
   } catch {
     return NextResponse.json({ message: normalizeApiErrorMessage(504, "upstream timeout") }, { status: 504 });

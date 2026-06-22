@@ -24,6 +24,18 @@ export class ClinicsController {
   }
 
   /**
+   * Endpoint de debugging para probar Google Maps API
+   * GET /clinics/debug/test-api
+   */
+  @Get('debug/test-api')
+  @HttpCode(HttpStatus.OK)
+  async debugTestGoogleMapsApi() {
+    this.logger.log('🔧 Endpoint de debug - Probando Google Maps API...');
+    
+    return await this.clinicsService.debugTestGoogleMapsApi();
+  }
+
+  /**
    * Busca veterinarias en una ciudad específica
    * GET /clinics/search?city=Bogota
    */

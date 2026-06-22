@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, LogOut, Settings, User } from "lucide-react";
+import { Menu, X, LogOut, Settings, User, Moon, Sun } from "lucide-react";
 import { useAuthState } from "@/store/auth-state";
 import { useDarkMode } from "@/hooks/useAnimations";
 import { DURATIONS } from "@/constants/animations";
@@ -39,12 +39,12 @@ export function NavBar() {
   };
 
   const navLinks = [
-    { href: "/" as const, label: "Home", gradient: false },
-    { href: "/clinics" as const, label: "Clinics", gradient: false },
+    { href: "/" as const, label: "Inicio", gradient: false },
+    { href: "/clinics" as const, label: "Clínicas", gradient: false },
     ...(isAuthenticated ? [
-      { href: "/bookings" as const, label: "My Bookings", gradient: false },
-      { href: "/pets" as const, label: "My Pets", gradient: false },
-      { href: "/profile" as const, label: "Profile", gradient: false },
+      { href: "/bookings" as const, label: "Mis Reservas", gradient: false },
+      { href: "/pets" as const, label: "Mis Mascotas", gradient: false },
+      { href: "/profile" as const, label: "Mi Perfil", gradient: false },
     ] : []),
   ];
 
@@ -116,19 +116,33 @@ export function NavBar() {
 
             {/* Right Side Actions */}
             <div className="flex items-center gap-4">
-              {/* Dark Mode Toggle */}
+              {/* Dark Mode Toggle — pill deslizante */}
               <motion.button
                 onClick={() => toggleDarkMode()}
-                className={cn(
-                  "hidden sm:flex items-center justify-center w-10 h-10 rounded-lg",
-                  "bg-surface border border-border/30 hover:border-primary/50",
-                  "transition-all duration-300 hover:bg-surface-light"
-                )}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                aria-label="Toggle dark mode"
+                whileTap={{ scale: 0.93 }}
+                aria-label={isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+                className="relative flex items-center p-1 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 transition-colors duration-200"
               >
-                {isDark ? "◐" : "◑"}
+                {/* Indicador deslizante */}
+                <motion.span
+                  className="absolute top-1 left-1 w-6 h-6 rounded-full bg-white/25 pointer-events-none"
+                  animate={{ x: isDark ? 24 : 0 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                />
+                {/* Sol */}
+                <span className={cn(
+                  "relative z-10 w-6 h-6 flex items-center justify-center transition-colors duration-200",
+                  !isDark ? "text-warning" : "text-white/50"
+                )}>
+                  <Sun size={13} />
+                </span>
+                {/* Luna */}
+                <span className={cn(
+                  "relative z-10 w-6 h-6 flex items-center justify-center transition-colors duration-200",
+                  isDark ? "text-blue-200" : "text-white/50"
+                )}>
+                  <Moon size={13} />
+                </span>
               </motion.button>
 
               {/* Auth Actions */}
@@ -176,7 +190,6 @@ export function NavBar() {
                         <div className="p-3 border-b border-border/30">
                           <p className="text-sm font-bold text-text-primary">{user.fullName}</p>
                           <p className="text-xs text-text-secondary">{user.email}</p>
-                          <p className="text-xs text-text-secondary mt-1">Role: {user.role || 'undefined'}</p>
                         </div>
                         <div className="p-2 space-y-2">
                           <motion.div
@@ -324,18 +337,18 @@ export function NavBar() {
                   className="w-full justify-center gap-2 text-base font-bold"
                 >
                   <LogOut size={16} />
-                  Logout
+                  Cerrar sesión
                 </Button>
               ) : (
                 <div className="space-y-2">
                   <Link href="/login">
                     <Button variant="outline" size="sm" className="w-full text-base font-bold">
-                      Login
+                      Entrar
                     </Button>
                   </Link>
                   <Link href="/register">
                     <Button variant="primary" size="sm" className="w-full text-base font-bold">
-                      Sign Up
+                      Crear cuenta
                     </Button>
                   </Link>
                 </div>

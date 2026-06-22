@@ -43,18 +43,6 @@ export function ContactClinicModal({
   const [success, setSuccess] = useState(false);
 
   // Cargar mascotas del usuario
-  if (!isAuthenticated) {
-  return (
-    <div className="p-6 text-center">
-      <p className="text-text-secondary">
-        Debes iniciar sesión para contactar a la veterinaria.
-      </p>
-      <Button className="mt-4" onClick={() => router.push("/login")}>
-        Iniciar sesión
-      </Button>
-    </div>
-  );
-}
   useEffect(() => {
     if (!isOpen || !isAuthenticated) return;
 
@@ -77,6 +65,19 @@ export function ContactClinicModal({
 
     fetchPets();
   }, [isOpen, isAuthenticated]);
+
+  if (!isAuthenticated) {
+    return (
+      <div className="p-6 text-center">
+        <p className="text-text-secondary">
+          Debes iniciar sesión para contactar a la veterinaria.
+        </p>
+        <Button className="mt-4" onClick={() => router.push("/login")}>
+          Iniciar sesión
+        </Button>
+      </div>
+    );
+  }
 
   const handleSubmit = async () => {
     if (!selectedPetId) {

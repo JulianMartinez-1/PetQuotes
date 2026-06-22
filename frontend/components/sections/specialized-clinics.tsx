@@ -98,7 +98,7 @@ export function SpecializedClinics({
           <h2 className={cn("text-4xl sm:text-5xl font-black mb-4", colors.header)}>
             {title}
           </h2>
-          <p className="text-textSecondary text-lg max-w-2xl mx-auto">
+          <p className="text-text-secondary text-lg max-w-2xl mx-auto">
             Seleccionadas y verificadas para ofrecerte el mejor servicio
           </p>
         </motion.div>
@@ -119,14 +119,14 @@ export function SpecializedClinics({
             >
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/20 to-teal/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               
-              <div className="relative h-full bg-white rounded-2xl border-2 border-border p-6 hover:shadow-2xl transition-all duration-300">
+              <div className="relative h-full bg-surface rounded-2xl border-2 border-border p-6 hover:shadow-2xl transition-all duration-300">
                 {/* Header */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-textPrimary mb-1">
+                    <h3 className="text-xl font-bold text-text-primary mb-1">
                       {clinic.name}
                     </h3>
-                    <p className="text-sm text-textSecondary mb-3">
+                    <p className="text-sm text-text-secondary mb-3">
                       {clinic.specialty}
                     </p>
                   </div>
@@ -161,10 +161,10 @@ export function SpecializedClinics({
                       />
                     ))}
                   </div>
-                  <span className="text-sm font-semibold text-textPrimary">
+                  <span className="text-sm font-semibold text-text-primary">
                     {clinic.rating}
                   </span>
-                  <span className="text-xs text-textTertiary">
+                  <span className="text-xs text-text-tertiary">
                     ({clinic.reviews} reseñas)
                   </span>
                 </div>
@@ -172,20 +172,20 @@ export function SpecializedClinics({
                 {/* Info Items */}
                 <div className="space-y-3 mb-6">
                   <div className="flex items-start gap-3">
-                    <MapPin size={18} className="text-textSecondary flex-shrink-0 mt-0.5" />
+                    <MapPin size={18} className="text-text-secondary flex-shrink-0 mt-0.5" />
                     <div className="flex-1">
-                      <p className="text-sm text-textSecondary leading-snug">
+                      <p className="text-sm text-text-secondary leading-snug">
                         {clinic.address}
                       </p>
-                      <p className="text-xs text-textTertiary mt-1">
+                      <p className="text-xs text-text-tertiary mt-1">
                         {clinic.distance}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <Clock size={18} className="text-textSecondary flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-textSecondary">
+                    <Clock size={18} className="text-text-secondary flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-text-secondary">
                       {clinic.hours}
                     </p>
                   </div>
