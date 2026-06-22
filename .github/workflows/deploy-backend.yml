@@ -8,6 +8,7 @@ on:
       - 'analytics-service/**'
       - 'docker-compose.yml'
       - '.github/workflows/deploy-backend.yml'
+  workflow_dispatch:
 
 jobs:
   build-push:
