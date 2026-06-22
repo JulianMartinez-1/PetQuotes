@@ -9,10 +9,8 @@ services:
       - .env
     environment:
       POSTGRES_USER: ${DATABASE_USER:-pet_quotes}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-pet_quotes_password}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-changeme}
       POSTGRES_DB: ${DATABASE_NAME:-pet_quotes_db}
-    ports:
-      - "5432:5432"
     volumes:
       - pet_quotes_data:/var/lib/postgresql/data
       - ./backend/prisma/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -23,9 +21,12 @@ services:
       retries: 10
     networks:
       - pet_quotes_network
+    restart: unless-stopped
 
   # ============================================================
   # Backend (NestJS)
+  # Nginx forwards api.petquotes.online → 127.0.0.1:3001
+  # Bind to localhost only so the port is not publicly reachable.
   # ============================================================
   backend:
     build:
@@ -35,74 +36,93 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgresql://${DATABASE_USER:-pet_quotes}:${DATABASE_PASSWORD:-pet_quotes_password}@postgres-db:5432/${DATABASE_NAME:-pet_quotes_db}
-      NODE_ENV: development
+      DATABASE_URL: postgresql://${DATABASE_USER:-pet_quotes}:${DATABASE_PASSWORD:-changeme}@postgres-db:5432/${DATABASE_NAME:-pet_quotes_db}
+      NODE_ENV: production
       APP_PORT: 3001
-      FRONTEND_URL: http://frontend:3000
+      FRONTEND_URL: https://petquotes.online
     ports:
-      - "3001:3001"
+      - "127.0.0.1:3001:3001"
     depends_on:
       postgres-db:
         condition: service_healthy
-    volumes:
-      - ./backend/src:/app/src
-      - ./backend/prisma:/app/prisma
-      - /app/node_modules
+      redis:
+        condition: service_healthy
     networks:
       - pet_quotes_network
-    command: npm run start:prod
+    restart: unless-stopped
 
   # ============================================================
   # Frontend (Next.js)
+  # Nginx forwards petquotes.online → 127.0.0.1:3000
+  # NEXT_PUBLIC_* vars are baked at build time via build args.
   # ============================================================
   frontend:
     build:
       context: .
       dockerfile: frontend/Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: https://api.petquotes.online
+        NEXT_PUBLIC_API_URL: https://api.petquotes.online
+        NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+        NEXT_PUBLIC_API_TIMEOUT_MS: ${NEXT_PUBLIC_API_TIMEOUT_MS:-10000}
     container_name: pet_quotes_frontend
     env_file:
       - .env
     environment:
+      NODE_ENV: production
       API_BASE_URL: http://backend:3001
-      NEXT_PUBLIC_API_URL: http://localhost:3001
+      NEXT_PUBLIC_API_BASE_URL: https://api.petquotes.online
+      NEXT_PUBLIC_API_URL: https://api.petquotes.online
+      JWT_ACCESS_SECRET: ${JWT_SECRET}
+      API_PROXY_TIMEOUT_MS: ${API_PROXY_TIMEOUT_MS:-8000}
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     depends_on:
       - backend
     volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      - /app/.next
+      - pet_uploads:/app/public/uploads/pets
     networks:
       - pet_quotes_network
+    restart: unless-stopped
 
   # ============================================================
-  # PgAdmin (Database Admin UI)
+  # Analytics Service (Python / FastAPI)
+  # No public port — internal Docker network only.
+  # All external traffic goes through backend at /api/analytics/*.
   # ============================================================
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: pet_quotes_pgadmin
+  analytics-service:
+    build:
+      context: ./analytics-service
+      dockerfile: Dockerfile
+    container_name: pet_quotes_analytics
+    env_file:
+      - .env
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@example.com}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
-    ports:
-      - "5050:80"
+      ANALYTICS_DB_URL: postgresql://${DATABASE_USER:-pet_quotes}:${DATABASE_PASSWORD:-changeme}@postgres-db:5432/${DATABASE_NAME:-pet_quotes_db}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ALGORITHM: HS256
+      ANALYTICS_PORT: 3009
+      LOG_LEVEL: info
     depends_on:
       postgres-db:
         condition: service_healthy
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
     networks:
       - pet_quotes_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:3009/health')\""]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
   # ============================================================
   # Redis (Cache)
+  # No public port — internal Docker network only.
   # ============================================================
   redis:
     image: redis:7-alpine
     container_name: pet_quotes_redis
-    ports:
-      - "6379:6379"
+    command: redis-server --appendonly yes
     volumes:
       - redis_data:/data
     healthcheck:
@@ -112,6 +132,7 @@ services:
       retries: 5
     networks:
       - pet_quotes_network
+    restart: unless-stopped
 
 # ============================================================
 # Volumes
@@ -119,9 +140,9 @@ services:
 volumes:
   pet_quotes_data:
     driver: local
-  pgadmin_data:
-    driver: local
   redis_data:
+    driver: local
+  pet_uploads:
     driver: local
 
 # ============================================================
