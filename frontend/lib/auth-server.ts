@@ -66,13 +66,7 @@ export async function callAuthBackendRequest(path: string, options?: {
 export function normalizeSessionResponse(raw: BackendAuthResponse): SessionAuthResponse {
   const payload = decodeJwtPayload(raw.accessToken);
 
-  // Usar role del JWT como preferencia, fallback a raw.role
   const role = (payload.role as AuthRole) ?? raw.role;
-  
-  console.log("[normalizeSessionResponse] 📋 Normalizando respuesta:");
-  console.log("[normalizeSessionResponse] raw.role:", raw.role);
-  console.log("[normalizeSessionResponse] payload.role:", payload.role);
-  console.log("[normalizeSessionResponse] role final:", role);
 
   return {
     user: {

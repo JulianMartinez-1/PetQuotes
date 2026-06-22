@@ -71,10 +71,6 @@ export class PetsController {
     @UploadedFile() file: MulterFile | undefined,
     @CurrentUser() user: JwtPayload,
   ): Promise<PetResponseDto> {
-    console.log("[createPet] Received DTO:", JSON.stringify(dto, null, 2));
-    console.log("[createPet] File present:", !!file, "Size:", file?.size);
-    console.log("[createPet] Current user:", user.sub);
-    
     // Validate required fields
     if (!dto.species || dto.species.trim() === '') {
       throw new BadRequestException('species is required');
@@ -89,8 +85,6 @@ export class PetsController {
     if (file) {
       profileImage = file.buffer.toString('base64');
     }
-
-    console.log("[createPet] Passed validation, creating pet...");
 
     // Add data URI prefix to base64 image for proper display
     let profileImageWithPrefix: string | undefined;
