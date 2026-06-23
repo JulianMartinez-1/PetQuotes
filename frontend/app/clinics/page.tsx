@@ -558,9 +558,13 @@ export default function ClinicsPage() {
                               unoptimized
                             />
                           ) : imgFailed ? (
-                            /* Both failed — icon fallback */
-                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-secondary/10 to-accent/10">
-                              <Building2 size={48} className="text-text-tertiary/50" />
+                            /* Both failed — location fallback */
+                            <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-secondary/10 to-accent/10">
+                              <Building2 size={40} className="text-text-tertiary/50" />
+                              <div className="text-center px-4">
+                                <p className="text-xs font-semibold text-text-secondary">{clinic.neighborhood}</p>
+                                <p className="text-xs text-text-tertiary">{clinic.city}</p>
+                              </div>
                             </div>
                           ) : (
                             /* No API key or map failed — show clinic photo */
@@ -572,6 +576,7 @@ export default function ClinicsPage() {
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                               onError={() => handleImageError(clinic.id)}
                               loading="lazy"
+                              unoptimized
                             />
                           )}
 
@@ -586,6 +591,7 @@ export default function ClinicsPage() {
                                 className="w-full h-full object-cover"
                                 onError={() => handleImageError(clinic.id)}
                                 loading="lazy"
+                                unoptimized
                               />
                             </div>
                           )}
