@@ -159,7 +159,7 @@ export default function HomePageClient() {
               transition={{ delay: 0.1, duration: DURATIONS.fast / 1000 }}
               className="flex justify-center"
             >
-              <Badge className="px-6 py-2 bg-primary/20 border-primary/50 text-lg">
+              <Badge className="px-3 sm:px-6 py-2 bg-primary/20 border-primary/50 text-sm sm:text-lg text-center">
                 🐾 Cuidado veterinario, simplificado
               </Badge>
             </motion.div>
@@ -167,7 +167,7 @@ export default function HomePageClient() {
             {/* Main Title */}
             <motion.h1
               className={cn(
-                "text-6xl sm:text-7xl lg:text-8xl font-black",
+                "text-4xl sm:text-6xl lg:text-8xl font-black",
                 "text-foreground leading-tight tracking-tight"
               )}
               initial={{ opacity: 0, y: 30, scale: 0.8 }}
@@ -186,7 +186,7 @@ export default function HomePageClient() {
 
             {/* Subtitle */}
             <motion.p
-              className="text-xl sm:text-2xl text-text-secondary max-w-3xl mx-auto leading-relaxed"
+              className="text-base sm:text-xl md:text-2xl text-text-secondary max-w-3xl mx-auto leading-relaxed"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: DURATIONS.base / 1000 }}

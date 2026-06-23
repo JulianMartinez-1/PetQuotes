@@ -342,7 +342,7 @@ export default function ClinicsPage() {
             </Badge>
 
             <h1 className={cn(
-              "text-5xl sm:text-6xl font-bold mb-6",
+              "text-3xl sm:text-5xl lg:text-6xl font-bold mb-6",
               "bg-gradient-to-r from-secondary-500 via-primary-400 to-accent-500",
               "bg-clip-text text-transparent"
             )}>

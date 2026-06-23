@@ -48,34 +48,35 @@ export default function AdminLayout({ children }: PropsWithChildren) {
         animate={{ opacity: 1, y: 0 }}
         className="sticky top-0 z-40 border-b border-border/30 bg-surface/80 backdrop-blur-sm"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between gap-2 sm:gap-4">
           <Link href="/">
-            <Button variant="ghost" className="gap-2 hover:bg-surface/50 shrink-0">
+            <Button variant="ghost" className="gap-1.5 hover:bg-surface/50 shrink-0 px-2 sm:px-3">
               <ChevronLeft size={18} />
-              Inicio
+              <span className="hidden sm:inline">Inicio</span>
             </Button>
           </Link>
 
-          {/* Admin nav */}
-          <nav className="flex items-center gap-1">
+          {/* Admin nav — icon-only on mobile, icon+label on sm+ */}
+          <nav className="flex items-center gap-0.5 sm:gap-1">
             {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
               <Link key={href} href={href}>
                 <Button
                   variant="ghost"
+                  title={label}
                   className={cn(
-                    "gap-2 text-sm",
+                    "gap-1.5 text-sm px-2 sm:px-3",
                     pathname.startsWith(href) &&
                       "bg-primary-50 text-primary-700 hover:bg-primary-100"
                   )}
                 >
                   <Icon size={16} />
-                  {label}
+                  <span className="hidden sm:inline">{label}</span>
                 </Button>
               </Link>
             ))}
           </nav>
 
-          <div className="text-xs font-semibold text-text-muted shrink-0">ADMIN</div>
+          <div className="hidden sm:block text-xs font-semibold text-text-muted shrink-0">ADMIN</div>
         </div>
       </motion.header>
 

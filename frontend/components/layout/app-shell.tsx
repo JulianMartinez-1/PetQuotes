@@ -21,6 +21,8 @@ const NAV_ITEMS = [
   { href: "/bookings", label: "Reservas" },
 ] as const satisfies ReadonlyArray<{ href: Route; label: string }>;
 
+const ADMIN_NAV_ITEM = { href: "/admin" as Route, label: "Admin" };
+
 export function AppShell({ children }: PropsWithChildren) {
   const pathname = usePathname();
   const { mobileMenuOpen, setMobileMenuOpen, selectedCity } = useAppState();
@@ -62,6 +64,19 @@ export function AppShell({ children }: PropsWithChildren) {
                 </Link>
               );
             })}
+            {user?.role === "ADMIN" && (
+              <Link
+                href={ADMIN_NAV_ITEM.href}
+                className={cn(
+                  "rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150",
+                  pathname.startsWith("/admin")
+                    ? "bg-primary-50 text-primary-700 font-semibold dark:bg-primary-900/30 dark:text-primary-300"
+                    : "text-text-secondary hover:text-text-primary hover:bg-surface-light"
+                )}
+              >
+                {ADMIN_NAV_ITEM.label}
+              </Link>
+            )}
           </nav>
 
           {/* Right side actions */}
@@ -197,6 +212,20 @@ export function AppShell({ children }: PropsWithChildren) {
                       >
                         Perfil: {user?.fullName}
                       </Link>
+                      {user?.role === "ADMIN" && (
+                        <Link
+                          href="/admin"
+                          className={cn(
+                            "rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors",
+                            pathname.startsWith("/admin")
+                              ? "bg-primary-50 text-primary-700"
+                              : "text-primary-600 hover:bg-surface-light hover:text-primary-700"
+                          )}
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Panel Admin
+                        </Link>
+                      )}
                       <button
                         type="button"
                         className="rounded-lg px-3 py-2.5 text-left text-sm font-medium text-text-muted hover:bg-surface-light hover:text-text-primary transition-colors"

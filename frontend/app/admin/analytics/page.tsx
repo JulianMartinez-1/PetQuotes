@@ -74,7 +74,7 @@ function AnalyticsContent() {
 
       {/* Cuadros de demo — siempre visibles desde el primer render */}
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+        <div className="lg:col-span-2 bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Citas por Mes</h3>
           <ResponsiveContainer width="100%" height={280}>
             <RechartsBar data={DEMO_APPOINTMENTS_BY_MONTH} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
