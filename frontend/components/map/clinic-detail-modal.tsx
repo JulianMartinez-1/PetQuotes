@@ -34,14 +34,32 @@ const mapContainerStyle = {
   height: "100%",
 };
 
+function getStaticMapUrl(lat: number, lng: number): string | null {
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  if (!apiKey) return null;
+  const params = new URLSearchParams({
+    center: `${lat},${lng}`,
+    zoom: "15",
+    size: "800x500",
+    maptype: "roadmap",
+    markers: `color:0x1D4ED8|${lat},${lng}`,
+    key: apiKey,
+  });
+  return `https://maps.googleapis.com/maps/api/staticmap?${params.toString()}`;
+}
+
 export function ClinicDetailModal({ clinic, onClose, onReservar }: ClinicDetailModalProps) {
-  const [error, setError] = useState<string | null>(null);
+  const [useStaticFallback, setUseStaticFallback] = useState(false);
   const mapRef = useRef<GoogleMap | null>(null);
+  const staticMapUrl = getStaticMapUrl(clinic.latitude, clinic.longitude);
 
   useEffect(() => {
-    if (!window.google) {
-      setError("Google Maps no está disponible. Recarga la página.");
-    }
+    // If the Maps JS SDK hasn't loaded after 3s, fall back to static map
+    if (typeof window === "undefined") return;
+    const timer = setTimeout(() => {
+      if (!(window as any).google?.maps) setUseStaticFallback(true);
+    }, 3000);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -76,9 +94,9 @@ export function ClinicDetailModal({ clinic, onClose, onReservar }: ClinicDetailM
         </div>
 
         {/* Content Grid */}
-        <div className="flex-1 overflow-hidden flex gap-6 p-6">
+        <div className="flex-1 overflow-hidden flex flex-col md:flex-row gap-4 p-4 sm:p-6">
           {/* Left Side - Info */}
-          <div className="w-80 overflow-y-auto flex flex-col gap-6">
+          <div className="md:w-72 lg:w-80 overflow-y-auto flex flex-col gap-4 shrink-0">
             {/* Image */}
             <div className="relative rounded-xl overflow-hidden h-48 flex-shrink-0">
               <Image
@@ -183,13 +201,30 @@ export function ClinicDetailModal({ clinic, onClose, onReservar }: ClinicDetailM
           </div>
 
           {/* Right Side - Map */}
-          <div className="flex-1 rounded-xl overflow-hidden border border-border/30">
-            {error ? (
-              <div className="w-full h-full flex items-center justify-center bg-surface">
-                <div className="text-center">
-                  <p className="text-text-secondary">{error}</p>
+          <div className="flex-1 min-h-[200px] md:min-h-0 rounded-xl overflow-hidden border border-border/30">
+            {useStaticFallback ? (
+              staticMapUrl ? (
+                /* Static map fallback when JS SDK fails */
+                <div className="relative w-full h-full min-h-[200px]">
+                  <Image
+                    src={staticMapUrl}
+                    alt={`Mapa de ${clinic.name}`}
+                    fill
+                    className="object-cover"
+                    unoptimized
+                  />
+                  <div className="absolute bottom-2 right-2 bg-surface/80 backdrop-blur-sm rounded-md px-2 py-1 text-xs text-text-secondary">
+                    📍 {clinic.neighborhood}, {clinic.city}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-surface">
+                  <div className="text-center px-4">
+                    <MapPin size={32} className="mx-auto mb-2 text-text-muted opacity-40" />
+                    <p className="text-sm text-text-secondary">{clinic.neighborhood}, {clinic.city}</p>
+                  </div>
+                </div>
+              )
             ) : (
               <GoogleMap
                 ref={mapRef}

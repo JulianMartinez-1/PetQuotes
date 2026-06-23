@@ -34,6 +34,20 @@ const CATALOG_PAGE_SIZE = 4;
 const CLINICS_CACHE_KEY = "clinics_nearby_cache";
 const CLINICS_CACHE_TTL = 30 * 60 * 1000; // 30 minutos
 
+function getStaticMapUrl(lat: number, lng: number): string | null {
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  if (!apiKey) return null;
+  const params = new URLSearchParams({
+    center: `${lat},${lng}`,
+    zoom: "15",
+    size: "600x300",
+    maptype: "roadmap",
+    markers: `color:0x1D4ED8|${lat},${lng}`,
+    key: apiKey,
+  });
+  return `https://maps.googleapis.com/maps/api/staticmap?${params.toString()}`;
+}
+
 type SortMode = "rating" | "distance";
 
 interface ClinicsCache {
@@ -104,6 +118,7 @@ export default function ClinicsPage() {
   const [loadingMessage, setLoadingMessage] = useState("");
   const [locationError, setLocationError] = useState<string | null>(null);
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+  const [failedMaps, setFailedMaps] = useState<Set<string>>(new Set());
   
   // Estados para el modal de clínica individual
   const [selectedClinic, setSelectedClinic] = useState<typeof CLINIC_CATALOG[0] | null>(null);
@@ -519,42 +534,82 @@ export default function ClinicsPage() {
                       setShowClinicDetail(true);
                     }}
                   >
-                    {/* Image Container */}
-                    <div className="relative overflow-hidden h-48 bg-gradient-to-br from-secondary/20 to-accent/20">
-                      {failedImages.has(clinic.id) ? (
-                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-secondary/10 to-accent/10">
-                          <Building2 size={48} className="text-text-tertiary/50" />
-                        </div>
-                      ) : (
-                        <Image
-                          src={clinic.image}
-                          alt={clinic.name}
-                          width={1200}
-                          height={600}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                          onError={() => handleImageError(clinic.id)}
-                          loading="lazy"
-                        />
-                      )}
+                    {/* Map / Image Container */}
+                    {(() => {
+                      const staticMapUrl = getStaticMapUrl(clinic.latitude, clinic.longitude);
+                      const mapFailed = failedMaps.has(clinic.id);
+                      const imgFailed = failedImages.has(clinic.id);
+                      const showMap = staticMapUrl && !mapFailed;
 
-                      {/* Status Badge */}
-                      <div className="absolute top-4 right-4">
-                        <Badge
-                          className={cn(
-                            "px-3 py-1",
-                            clinic.openNow
-                              ? "bg-success/20 border-success/50 text-success"
-                              : "bg-warning/20 border-warning/50 text-warning"
+                      return (
+                        <div className="relative overflow-hidden h-48 bg-gradient-to-br from-secondary/20 to-accent/20">
+                          {showMap ? (
+                            /* Static map as main visual */
+                            <Image
+                              src={staticMapUrl}
+                              alt={`Ubicación de ${clinic.name}`}
+                              width={600}
+                              height={300}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                              onError={() =>
+                                setFailedMaps((prev) => new Set([...prev, clinic.id]))
+                              }
+                              unoptimized
+                            />
+                          ) : imgFailed ? (
+                            /* Both failed — icon fallback */
+                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-secondary/10 to-accent/10">
+                              <Building2 size={48} className="text-text-tertiary/50" />
+                            </div>
+                          ) : (
+                            /* No API key or map failed — show clinic photo */
+                            <Image
+                              src={clinic.image}
+                              alt={clinic.name}
+                              width={1200}
+                              height={600}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                              onError={() => handleImageError(clinic.id)}
+                              loading="lazy"
+                            />
                           )}
-                        >
-                          <Clock size={12} className="inline mr-1" />
-                          {clinic.openNow ? "Abierta" : "Cerrada"}
-                        </Badge>
-                      </div>
 
-                      {/* Overlay Gradient */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-dark via-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
+                          {/* Clinic photo thumbnail overlay (when map is showing) */}
+                          {showMap && !imgFailed && (
+                            <div className="absolute bottom-2 left-2 w-14 h-14 rounded-lg overflow-hidden border-2 border-white/80 shadow-md">
+                              <Image
+                                src={clinic.image}
+                                alt={clinic.name}
+                                width={56}
+                                height={56}
+                                className="w-full h-full object-cover"
+                                onError={() => handleImageError(clinic.id)}
+                                loading="lazy"
+                              />
+                            </div>
+                          )}
+
+                          {/* Status Badge */}
+                          <div className="absolute top-2 right-2">
+                            <Badge
+                              className={cn(
+                                "px-3 py-1",
+                                clinic.openNow
+                                  ? "bg-success/20 border-success/50 text-success"
+                                  : "bg-warning/20 border-warning/50 text-warning"
+                              )}
+                            >
+                              <Clock size={12} className="inline mr-1" />
+                              {clinic.openNow ? "Abierta" : "Cerrada"}
+                            </Badge>
+                          </div>
+
+                          {/* Hover overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-dark via-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                      );
+                    })()}
 
                     {/* Content */}
                     <div className="p-6 flex-1 flex flex-col">
