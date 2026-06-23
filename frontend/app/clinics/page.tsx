@@ -331,48 +331,41 @@ export default function ClinicsPage() {
         )}
       </AnimatePresence>
       {/* Hero Section */}
-      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden pt-16 pb-12">
+      <section className="relative flex items-center justify-center overflow-hidden pt-24 pb-10">
         {/* Background Gradients */}
-        <motion.div
-          className="absolute inset-0 -z-10"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1 }}
-        >
-          <div className="absolute top-20 left-10 w-96 h-96 bg-secondary/15 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/15 rounded-full blur-3xl" />
-          <div className="absolute inset-0 bg-gradient-to-b from-dark/40 via-transparent to-transparent" />
-        </motion.div>
+        <div className="absolute inset-0 -z-10 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-secondary/20 rounded-full blur-3xl" />
+          <div className="absolute top-0 right-1/4 w-[400px] h-[400px] bg-accent/15 rounded-full blur-3xl" />
+        </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: DURATIONS.base / 1000 }}
-            className="text-center mb-12"
+            className="text-center mb-8"
           >
-            <Badge className="mb-4 px-4 py-2 bg-secondary/20 border-secondary/50 inline-block">
-              <Building2 size={16} className="inline mr-2" />
+            <Badge className="mb-4 px-4 py-1.5 bg-secondary/20 border-secondary/50 inline-flex items-center gap-1.5">
+              <Building2 size={14} />
               Directorio Premium
             </Badge>
 
             <h1 className={cn(
-              "text-3xl sm:text-5xl lg:text-6xl font-bold mb-6",
+              "text-4xl sm:text-5xl lg:text-6xl font-bold mb-4",
               "bg-gradient-to-r from-secondary-500 via-primary-400 to-accent-500",
               "bg-clip-text text-transparent"
             )}>
               Encuentra Tu Veterinaria Ideal
             </h1>
 
-            <p className="text-xl text-text-secondary max-w-2xl mx-auto">
-              Compara clínicas verificadas, compara precios y disponibilidad con total confianza
+            <p className="text-lg text-text-secondary max-w-xl mx-auto">
+              Clínicas verificadas cerca de ti, con precios, horarios y reseñas reales
             </p>
 
-            {/* Admin Link — only for admins */}
             {user?.role === 'ADMIN' && (
-              <div className="mt-6">
+              <div className="mt-4">
                 <Link href="/admin/clinics">
-                  <Badge className="px-4 py-2 bg-secondary/10 border-secondary/50 hover:bg-secondary/20 cursor-pointer transition-all inline-block">
+                  <Badge className="px-4 py-1.5 bg-secondary/10 border-secondary/50 hover:bg-secondary/20 cursor-pointer transition-all inline-block">
                     🔧 Panel de Administración
                   </Badge>
                 </Link>
@@ -382,28 +375,21 @@ export default function ClinicsPage() {
 
           {/* Stats Row */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: DURATIONS.base / 1000 }}
-            className="grid grid-cols-3 gap-4 max-w-xl mx-auto"
+            className="flex items-center justify-center gap-6 flex-wrap"
           >
             {[
               { value: filtered.length, label: "Clínicas" },
-              { value: openNowCount, label: "Abiertas Ahora" },
-              { value: totalPages, label: "Páginas" },
+              { value: openNowCount, label: "Abiertas ahora" },
+              { value: `${totalPages * CATALOG_PAGE_SIZE}+`, label: "Reseñas" },
             ].map((stat, idx) => (
-              <motion.div
-                key={idx}
-                whileHover={{ y: -4 }}
-                className={cn(
-                  "p-4 rounded-xl text-center",
-                  "bg-surface border border-border/30",
-                  "hover:border-secondary/50 transition-all"
-                )}
-              >
-                <div className="text-2xl font-bold text-text-primary">{stat.value}</div>
-                <div className="text-xs text-text-tertiary mt-1">{stat.label}</div>
-              </motion.div>
+              <div key={idx} className="flex items-center gap-2">
+                <span className="text-2xl font-bold text-text-primary">{stat.value}</span>
+                <span className="text-sm text-text-tertiary">{stat.label}</span>
+                {idx < 2 && <span className="w-1 h-1 rounded-full bg-border ml-2" />}
+              </div>
             ))}
           </motion.div>
         </div>
@@ -424,97 +410,91 @@ export default function ClinicsPage() {
       )}
 
       {/* Filters Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: DURATIONS.base / 1000 }}
           viewport={{ once: true }}
           className={cn(
-            "p-6 rounded-2xl border border-border/30",
-            "bg-surface/50 backdrop-blur-sm"
+            "px-4 py-3 rounded-2xl border border-border/30",
+            "bg-surface/70 backdrop-blur-sm",
+            "flex flex-wrap items-center gap-3"
           )}
         >
-          <div className="flex items-center gap-2 mb-6">
-            <SlidersHorizontal size={20} className="text-secondary" />
-            <h2 className="text-lg font-bold text-text-primary">Filtros</h2>
+          {/* Search Input */}
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary size-4" />
+            <Input
+              placeholder="Busca clínica, zona o servicio..."
+              value={query}
+              onChange={(e) => { setPage(1); setQuery(e.target.value); }}
+              className="pl-9 h-9 text-sm"
+              variant="default"
+            />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-            {/* Search Input */}
-            <div className="relative lg:col-span-2">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary/40 size-5" />
-              <Input
-                placeholder="Busca clínica, zona o servicio..."
-                value={query}
-                onChange={(e) => {
-                  setPage(1);
-                  setQuery(e.target.value);
-                }}
-                className="pl-12"
-                variant="default"
-              />
-            </div>
+          {/* City Select */}
+          <select
+            value={selectedCity}
+            onChange={(e) => { setPage(1); setSelectedCity(e.target.value); }}
+            className={cn(
+              "px-3 py-2 rounded-lg border transition-all h-9",
+              "bg-surface border-border/30 text-text-primary",
+              "hover:border-secondary/50 text-sm font-medium"
+            )}
+          >
+            {cityOptions.map((city) => (
+              <option key={city} value={city}>
+                {city === "all" ? "Todas las ciudades" : city}
+              </option>
+            ))}
+          </select>
 
-            {/* City Select */}
-            <select
-              value={selectedCity}
-              onChange={(e) => {
-                setPage(1);
-                setSelectedCity(e.target.value);
-              }}
-              className={cn(
-                "px-4 py-3 rounded-lg border transition-all",
-                "bg-surface border-border/30 text-text-primary",
-                "hover:border-secondary/50 focus:border-secondary focus:ring-secondary/20",
-                "text-sm font-medium"
-              )}
-            >
-              {cityOptions.map((city) => (
-                <option key={city} value={city}>
-                  {city === "all" ? "Todas las ciudades" : city}
-                </option>
-              ))}
-            </select>
+          {/* Sort Select */}
+          <select
+            value={sortMode}
+            onChange={(e) => setSortMode(e.target.value as SortMode)}
+            className={cn(
+              "px-3 py-2 rounded-lg border transition-all h-9",
+              "bg-surface border-border/30 text-text-primary",
+              "hover:border-secondary/50 text-sm font-medium"
+            )}
+          >
+            <option value="rating">Mejor rating</option>
+            <option value="distance">Más cercanas</option>
+          </select>
 
-            {/* Sort Select */}
-            <select
-              value={sortMode}
-              onChange={(e) => setSortMode(e.target.value as SortMode)}
-              className={cn(
-                "px-4 py-3 rounded-lg border transition-all",
-                "bg-surface border-border/30 text-text-primary",
-                "hover:border-secondary/50 focus:border-secondary focus:ring-secondary/20",
-                "text-sm font-medium"
-              )}
-            >
-              <option value="rating">Por Rating</option>
-              <option value="distance">Por Cercania</option>
-            </select>
+          {/* Open Now Toggle */}
+          <label className={cn(
+            "px-3 py-2 h-9 rounded-lg border cursor-pointer transition-all flex items-center gap-2",
+            openNowOnly
+              ? "bg-success/10 border-success/40 text-success"
+              : "bg-surface border-border/30 text-text-secondary hover:border-secondary/50",
+            "text-sm font-medium whitespace-nowrap"
+          )}>
+            <input
+              type="checkbox"
+              checked={openNowOnly}
+              onChange={(e) => { setPage(1); setOpenNowOnly(e.target.checked); }}
+              className="sr-only"
+            />
+            <span className={cn(
+              "w-2 h-2 rounded-full",
+              openNowOnly ? "bg-success" : "bg-text-tertiary/40"
+            )} />
+            Abiertas ahora
+          </label>
 
-            {/* Open Now Checkbox */}
-            <label className={cn(
-              "px-4 py-3 rounded-lg border cursor-pointer transition-all flex items-center gap-3",
-              "bg-surface border-border/30 hover:border-secondary/50",
-              "text-sm font-medium"
-            )}>
-              <input
-                type="checkbox"
-                checked={openNowOnly}
-                onChange={(e) => {
-                  setPage(1);
-                  setOpenNowOnly(e.target.checked);
-                }}
-                className="w-4 h-4 rounded cursor-pointer"
-              />
-              <span>Abiertas Ahora</span>
-            </label>
-          </div>
+          {/* Results count */}
+          <span className="ml-auto text-xs text-text-tertiary whitespace-nowrap hidden sm:block">
+            {filtered.length} {filtered.length === 1 ? "resultado" : "resultados"}
+          </span>
         </motion.div>
       </section>
 
       {/* Clinics Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {paginated.length > 0 ? (
           <>
             <motion.div
@@ -618,55 +598,61 @@ export default function ClinicsPage() {
                     })()}
 
                     {/* Content */}
-                    <div className="p-6 flex-1 flex flex-col">
+                    <div className="p-5 flex-1 flex flex-col">
                       {/* Header */}
-                      <div className="mb-4">
-                        <h3 className="text-xl font-bold text-text-primary mb-1">
-                          {clinic.name}
-                        </h3>
-                        <p className="text-sm text-text-tertiary">
-                          {clinic.city} • {clinic.neighborhood}
-                        </p>
+                      <div className="mb-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <h3 className="text-lg font-bold text-text-primary leading-tight">
+                            {clinic.name}
+                          </h3>
+                          <div className="flex items-center gap-1 shrink-0 mt-0.5">
+                            <Star size={14} className="text-warning fill-warning" />
+                            <span className="text-sm font-bold text-text-primary">
+                              {clinic.rating.toFixed(1)}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <MapPin size={12} className="text-secondary shrink-0" />
+                          <p className="text-xs text-text-tertiary">
+                            {clinic.neighborhood}, {clinic.city} · {clinic.distanceKm.toFixed(1)} km
+                          </p>
+                        </div>
                       </div>
 
                       {/* Description */}
-                      <p className="text-sm text-text-secondary mb-4 line-clamp-2">
+                      <p className="text-sm text-text-tertiary mb-4 line-clamp-2 leading-relaxed">
                         {clinic.description}
                       </p>
 
-                      {/* Rating & Distance */}
-                      <div className="flex items-center gap-4 mb-4 pb-4 border-b border-border/30">
-                        <div className="flex items-center gap-1">
-                          <Star size={16} className="text-warning fill-warning" />
-                          <span className="font-semibold text-text-primary">
-                            {clinic.rating.toFixed(1)}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1 text-text-secondary">
-                          <MapPin size={16} className="text-secondary" />
-                          <span className="text-sm">{clinic.distanceKm.toFixed(1)} km</span>
+                      {/* Services */}
+                      <div className="flex-1 mb-4">
+                        <div className="flex flex-wrap gap-1.5">
+                          {clinic.services.slice(0, 3).map((service) => (
+                            <span
+                              key={service}
+                              className="px-2.5 py-1 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20"
+                            >
+                              {service}
+                            </span>
+                          ))}
+                          {clinic.services.length > 3 && (
+                            <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-surface border border-border/30 text-text-tertiary">
+                              +{clinic.services.length - 3}
+                            </span>
+                          )}
                         </div>
                       </div>
 
-                      {/* Services */}
-                      <div className="mb-6 flex-1">
-                        <p className="text-xs font-semibold text-text-tertiary mb-2 uppercase tracking-wide">
-                          Servicios
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {clinic.services.slice(0, 3).map((service) => (
-                            <Badge
-                              key={service}
-                              className="bg-secondary/10 border-secondary/30 text-secondary text-xs"
-                            >
-                              {service}
-                            </Badge>
-                          ))}
-                          {clinic.services.length > 3 && (
-                            <Badge className="bg-surface border-border/30 text-text-tertiary text-xs">
-                              +{clinic.services.length - 3}
-                            </Badge>
-                          )}
+                      {/* CTA */}
+                      <div className="pt-3 border-t border-border/20">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-text-tertiary">
+                            {clinic.openNow ? "Abierta ahora" : "Cerrada"}
+                          </span>
+                          <span className="text-xs font-semibold text-secondary group-hover:underline">
+                            Ver detalles →
+                          </span>
                         </div>
                       </div>
                     </div>
