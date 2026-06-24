@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { Route } from "next";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -10,12 +10,17 @@ import { useAuthState } from "@/store/auth-state";
 
 const SUPPORTED_PROVIDERS = new Set<OAuthProviderId>(["google", "facebook", "github", "microsoft"]);
 
+// Module-level guard: survives React Strict Mode's unmount→remount cycle.
+// useRef resets to false on every remount, causing double exchanges that
+// consume the single-use OAuth code and clear the state cookie on the first
+// call, making the second call fail with a state-mismatch 400 error.
+let lastExchangedState: string | null = null;
+
 export default function OAuthCallbackPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login } = useAuthState();
   const [error, setError] = useState<string | null>(null);
-  const hasExchangedRef = useRef(false);
 
   const params = useMemo(() => {
     let provider = (searchParams.get("provider") ?? "") as OAuthProviderId;
@@ -34,16 +39,12 @@ export default function OAuthCallbackPage() {
   }, [searchParams]);
 
   useEffect(() => {
-    // Guard against React Strict Mode double-invocation and dep-change re-runs.
-    // We must NOT reset this ref in a cleanup: resetting it causes a second
-    // exchange request that consumes the OAuth code and clears the state cookie,
-    // making the first request fail with a cookie-mismatch 400 error.
-    if (hasExchangedRef.current) return;
-    hasExchangedRef.current = true;
+    // A non-empty state uniquely identifies one OAuth round-trip.
+    // Comparing against the module-level var (not a ref) prevents the second
+    // Strict Mode mount from re-running the exchange for the same state.
+    if (!params.state || params.state === lastExchangedState) return;
+    lastExchangedState = params.state;
 
-    // No isMounted / active guard needed: React 18 removed the warning about
-    // setState on unmounted components, and navigation / login must never be
-    // suppressed — suppressing them was the original cause of the infinite loading.
     const run = async () => {
       if (params.oauthError) {
         setError("El proveedor social devolvio un error al autenticar.");
