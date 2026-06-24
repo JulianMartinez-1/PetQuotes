@@ -44,10 +44,9 @@ export class NotificationService {
     });
 
     const isDev = this.config.get<string>('NODE_ENV') !== 'production';
-    const recipient = isDev
-      ? (this.config.get<string>('RESEND_FROM_EMAIL') ?? data.to)
-      : data.to;
-    const subject = isDev
+    const devRedirect = this.config.get<string>('RESEND_DEV_REDIRECT_EMAIL');
+    const recipient = isDev && devRedirect ? devRedirect : data.to;
+    const subject = isDev && devRedirect
       ? `[DEV → ${data.to}] ✅ Cita confirmada — ${data.clinicName}`
       : `✅ Cita confirmada — ${data.clinicName}`;
 
