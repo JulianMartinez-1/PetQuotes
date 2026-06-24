@@ -3,6 +3,7 @@ import * as bcrypt from 'bcryptjs';
 import { UserRepository } from '@data/repositories/user.repository';
 import { JwtManager } from '@config/auth/jwt.manager';
 import { PrismaService } from '@shared/prisma/prisma.service';
+import { NotificationService } from '@business/notifications/notification.service';
 import {
   InvalidCredentialsException,
   DuplicateEntityException,
@@ -40,6 +41,7 @@ export class AuthService {
     private userRepository: UserRepository,
     private jwtManager: JwtManager,
     private prisma: PrismaService,
+    private notificationService: NotificationService,
   ) {}
 
   async register(
@@ -60,6 +62,11 @@ export class AuthService {
 
     if (role === 'VETERINARY' && options.veterinaryType) {
       await this._createVeterinaryProfile(user.id, options);
+      // Fire-and-forget: do not fail registration if notification fails
+      this._notifyAdminOfNewVeterinaryRequest(
+        { fullName: user.fullName, email: user.email },
+        options,
+      ).catch(() => {});
     }
 
     const tokens = this.jwtManager.generateTokens(user.id, user.email, user.role, user.fullName);
@@ -119,6 +126,40 @@ export class AuthService {
           },
         });
       }
+    });
+  }
+
+  private async _notifyAdminOfNewVeterinaryRequest(
+    user: { fullName: string; email: string },
+    options: RegisterOptions,
+  ): Promise<void> {
+    const admin = await this.prisma.user.findFirst({ where: { role: 'ADMIN' } });
+    if (!admin) return;
+
+    await this.prisma.notification.create({
+      data: {
+        userId: admin.id,
+        type: 'VETERINARY_APPROVAL_REQUEST',
+        title: 'Nueva solicitud veterinaria pendiente',
+        message: `${user.fullName} (${user.email}) solicitó registrar su ${options.veterinaryType === 'CLINIC' ? 'clínica' : 'perfil de veterinario independiente'}.`,
+        data: JSON.stringify({
+          applicantName: user.fullName,
+          applicantEmail: user.email,
+          veterinaryType: options.veterinaryType,
+          clinicName: options.clinicData?.clinicName,
+          serviceArea: options.independentData?.serviceArea,
+        }),
+      },
+    });
+
+    await this.notificationService.sendVeterinaryApprovalRequest({
+      to: admin.email,
+      adminName: admin.fullName,
+      applicantName: user.fullName,
+      applicantEmail: user.email,
+      veterinaryType: options.veterinaryType!,
+      clinicName: options.clinicData?.clinicName,
+      serviceArea: options.independentData?.serviceArea,
     });
   }
 

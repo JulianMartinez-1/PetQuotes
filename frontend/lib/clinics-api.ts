@@ -263,6 +263,29 @@ export async function searchAllCities(): Promise<ClinicCatalogItem[]> {
   }
 }
 
+export interface PlatformClinicsResponse {
+  clinics: ClinicCatalogItem[];
+  independents: {
+    id: string;
+    ownerName: string;
+    serviceArea: string;
+    homeVisits: boolean;
+    coverageRadius?: number;
+  }[];
+}
+
+export async function fetchPlatformClinics(): Promise<PlatformClinicsResponse> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/clinics/platform-registered`, {
+      cache: "no-store",
+    });
+    if (!response.ok) return { clinics: [], independents: [] };
+    return response.json();
+  } catch {
+    return { clinics: [], independents: [] };
+  }
+}
+
 /**
  * Search nearby clinics using user's GPS coordinates
  * @param latitude - User's latitude

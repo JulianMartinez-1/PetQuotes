@@ -25,8 +25,18 @@ interface VeterinaryClinicFormProps {
 
 export function VeterinaryClinicForm({ value, onChange }: VeterinaryClinicFormProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const markerRef = useRef<google.maps.Marker | null>(null);
+  const geocoderRef = useRef<google.maps.Geocoder | null>(null);
+  const lastReverseGeocodedAddressRef = useRef('');
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Stored inside map init; callable from the forward-geocode effect
+  const placeMarkerFnRef = useRef<((latLng: google.maps.LatLng, skipGeocode?: boolean) => void) | null>(null);
+
   const [mapLoading, setMapLoading] = useState(true);
   const [mapError, setMapError] = useState(false);
+  const [isGeocoding, setIsGeocoding] = useState(false);
+
   const valueRef = useRef(value);
   const onChangeRef = useRef(onChange);
   useEffect(() => { valueRef.current = value; onChangeRef.current = onChange; });
@@ -42,6 +52,7 @@ export function VeterinaryClinicForm({ value, onChange }: VeterinaryClinicFormPr
     set({ services: next });
   };
 
+  // ── Map init (runs once) ──────────────────────────────────────────────────
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
@@ -57,9 +68,11 @@ export function VeterinaryClinicForm({ value, onChange }: VeterinaryClinicFormPr
     const initMap = async () => {
       try {
         setOptions({ key: apiKey });
-        await importLibrary("maps");
+        await Promise.all([importLibrary("maps"), importLibrary("geocoding")]);
 
         if (isDisposed || !mapContainerRef.current) return;
+
+        geocoderRef.current = new google.maps.Geocoder();
 
         const center =
           valueRef.current.latitude && valueRef.current.longitude
@@ -79,10 +92,9 @@ export function VeterinaryClinicForm({ value, onChange }: VeterinaryClinicFormPr
             { featureType: "poi.business", stylers: [{ visibility: "off" }] },
           ],
         });
+        mapRef.current = map;
 
         setMapLoading(false);
-
-        let marker: google.maps.Marker | null = null;
 
         const setCoords = (lat: number, lng: number) => {
           onChangeRef.current({
@@ -92,36 +104,60 @@ export function VeterinaryClinicForm({ value, onChange }: VeterinaryClinicFormPr
           });
         };
 
-        const placeMarker = (latLng: google.maps.LatLng) => {
+        const reverseGeocode = async (latLng: google.maps.LatLng) => {
+          if (!geocoderRef.current) return;
+          try {
+            const result = await geocoderRef.current.geocode({ location: latLng });
+            if (result.results.length > 0) {
+              const addr = result.results[0].formatted_address;
+              // Extract city from address components
+              const cityComponent = result.results[0].address_components.find(
+                (c) => c.types.includes("locality") || c.types.includes("administrative_area_level_2"),
+              );
+              const city = cityComponent?.long_name ?? valueRef.current.city ?? '';
+              lastReverseGeocodedAddressRef.current = addr;
+              onChangeRef.current({ ...valueRef.current, address: addr, city });
+            }
+          } catch {
+            // geocoding errors are non-fatal
+          }
+        };
+
+        const placeMarker = (latLng: google.maps.LatLng, skipGeocode = false) => {
           const lat = latLng.lat();
           const lng = latLng.lng();
           setCoords(lat, lng);
 
-          if (marker) {
-            marker.setPosition(latLng);
+          if (markerRef.current) {
+            markerRef.current.setPosition(latLng);
           } else {
-            marker = new google.maps.Marker({
+            const m = new google.maps.Marker({
               map,
               position: latLng,
               draggable: true,
               animation: google.maps.Animation.DROP,
               title: "Ubicación de la veterinaria",
             });
+            markerRef.current = m;
 
-            marker.addListener("dragend", () => {
-              const pos = marker!.getPosition();
-              if (pos) setCoords(pos.lat(), pos.lng());
+            m.addListener("dragend", () => {
+              const pos = m.getPosition();
+              if (pos) {
+                setCoords(pos.lat(), pos.lng());
+                reverseGeocode(pos);
+              }
             });
           }
+
+          if (!skipGeocode) reverseGeocode(latLng);
         };
 
-        // Place marker if we already have coordinates
+        placeMarkerFnRef.current = placeMarker;
+
         if (valueRef.current.latitude && valueRef.current.longitude) {
           placeMarker(
-            new google.maps.LatLng(
-              valueRef.current.latitude,
-              valueRef.current.longitude,
-            ),
+            new google.maps.LatLng(valueRef.current.latitude, valueRef.current.longitude),
+            true, // don't reverse-geocode on init
           );
         }
 
@@ -143,6 +179,44 @@ export function VeterinaryClinicForm({ value, onChange }: VeterinaryClinicFormPr
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // ── Forward geocode on address change (debounced 600 ms) ─────────────────
+  useEffect(() => {
+    const addr = value.address;
+    if (!addr || addr.length < 5) return;
+    // Skip if the address was just set BY a reverse-geocode (anti-loop guard)
+    if (addr === lastReverseGeocodedAddressRef.current) return;
+
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(async () => {
+      if (!geocoderRef.current) return;
+      setIsGeocoding(true);
+      try {
+        const result = await geocoderRef.current.geocode({ address: addr });
+        if (result.results.length > 0) {
+          const loc = result.results[0].geometry.location;
+          const lat = Math.round(loc.lat() * 1e6) / 1e6;
+          const lng = Math.round(loc.lng() * 1e6) / 1e6;
+          const latLng = new google.maps.LatLng(lat, lng);
+
+          onChangeRef.current({ ...valueRef.current, latitude: lat, longitude: lng });
+
+          if (placeMarkerFnRef.current) {
+            placeMarkerFnRef.current(latLng, true); // skipGeocode = true
+          }
+          mapRef.current?.panTo(latLng);
+        }
+      } catch {
+        // forward geocoding errors are non-fatal
+      } finally {
+        setIsGeocoding(false);
+      }
+    }, 600);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [value.address]);
 
   return (
     <div className="space-y-4">
@@ -192,10 +266,16 @@ export function VeterinaryClinicForm({ value, onChange }: VeterinaryClinicFormPr
             placeholder="Calle 45 # 12-34"
             value={value.address ?? ""}
             onChange={(e) => set({ address: e.target.value })}
-            className="pl-10"
+            className="pl-10 pr-10"
             variant="default"
             required
           />
+          {isGeocoding && (
+            <Loader2
+              size={14}
+              className="absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-text-muted"
+            />
+          )}
         </div>
       </div>
 
@@ -203,7 +283,9 @@ export function VeterinaryClinicForm({ value, onChange }: VeterinaryClinicFormPr
       <div>
         <label className="block text-sm font-medium text-text-secondary mb-1.5">
           Ubicación en mapa{" "}
-          <span className="text-xs text-text-muted font-normal">(haz clic para marcar)</span>
+          <span className="text-xs text-text-muted font-normal">
+            (haz clic para marcar · arrastra el pin o escribe la dirección)
+          </span>
         </label>
         <div
           className="relative rounded-xl overflow-hidden border border-border"

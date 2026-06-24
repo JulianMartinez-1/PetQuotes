@@ -25,7 +25,7 @@ import { Badge } from "@/components/ui/badge";
 import { ClinicBookingModal } from "@/components/clinics/clinic-booking-modal";
 import { ClinicDetailModal } from "@/components/map/clinic-detail-modal";
 import { getClinicsFromStorage } from "@/lib/clinic-storage";
-import { searchNearByClinics } from "@/lib/clinics-api";
+import { searchNearByClinics, fetchPlatformClinics } from "@/lib/clinics-api";
 import { CLINIC_CATALOG } from "@/lib/clinic-catalog";
 import { DURATIONS } from "@/constants/animations";
 import { cn } from "@/lib/utils";
@@ -210,6 +210,18 @@ export default function ClinicsPage() {
     };
 
     loadNearByClinics();
+  }, []);
+
+  // Merge platform-registered (APPROVED) clinics with the catalog
+  useEffect(() => {
+    fetchPlatformClinics().then(({ clinics }) => {
+      if (clinics.length === 0) return;
+      setClinicsData((prev) => {
+        const existingIds = new Set(prev.map((c) => c.id));
+        const newOnes = clinics.filter((c) => !existingIds.has(c.id));
+        return newOnes.length > 0 ? [...prev, ...newOnes] : prev;
+      });
+    });
   }, []);
 
   // Preseleccionar ciudad desde URL si viene en los params
@@ -577,7 +589,7 @@ export default function ClinicsPage() {
                           )}
 
                           {/* Status Badge */}
-                          <div className="absolute top-2 right-2">
+                          <div className="absolute top-2 right-2 flex flex-col gap-1 items-end">
                             <Badge
                               className={cn(
                                 "px-3 py-1",
@@ -589,6 +601,11 @@ export default function ClinicsPage() {
                               <Clock size={12} className="inline mr-1" />
                               {clinic.openNow ? "Abierta" : "Cerrada"}
                             </Badge>
+                            {clinic.source === "platform" && (
+                              <Badge className="px-2 py-0.5 bg-primary-600/90 text-white border-primary-500 text-xs">
+                                🐾 PetQuotes
+                              </Badge>
+                            )}
                           </div>
 
                           {/* Hover overlay */}

@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { AxiosInstance } from 'axios';
-import { ClinicCatalogItem } from './types';
+import { ClinicCatalogItem, IndependentVetItem } from './types';
 import { ClinicsWithFallbackService } from './clinics-fallback.service';
+import { PrismaService } from '@shared/prisma/prisma.service';
 
 @Injectable()
 export class ClinicsService {
@@ -20,6 +21,7 @@ export class ClinicsService {
   constructor(
     private readonly configService: ConfigService,
     private readonly fallbackService: ClinicsWithFallbackService,
+    private readonly prisma: PrismaService,
   ) {
     // GOOGLE_PLACES_API_KEY is a server-side key with no HTTP-referrer restriction.
     // Falls back to GOOGLE_MAPS_API_KEY if the dedicated key is not set.
@@ -527,5 +529,70 @@ async searchClinicsByCoordinates(
     }
 
     return testResult;
+  }
+
+  async getPlatformRegisteredClinics(): Promise<{
+    clinics: ClinicCatalogItem[];
+    independents: IndependentVetItem[];
+  }> {
+    const profiles = await this.prisma.veterinaryProfile.findMany({
+      where: { status: 'APPROVED' },
+      include: {
+        user: { select: { fullName: true } },
+        clinic: {
+          include: {
+            branches: {
+              select: { city: true, address: true, latitude: true, longitude: true, phone: true },
+              take: 1,
+            },
+            services: { select: { name: true, category: true } },
+          },
+        },
+      },
+    });
+
+    const SERVICE_LABELS: Record<string, string> = {
+      consultation: 'Consulta general',
+      vaccination: 'Vacunación',
+      surgery: 'Cirugía',
+      dental: 'Odontología',
+      grooming: 'Estética / Grooming',
+      emergency: 'Urgencias',
+    };
+
+    const clinics: ClinicCatalogItem[] = profiles
+      .filter((p) => p.veterinaryType === 'CLINIC' && p.clinic?.branches?.[0])
+      .map((p) => {
+        const clinic = p.clinic!;
+        const branch = clinic.branches[0];
+        return {
+          id: clinic.id,
+          name: clinic.name,
+          city: branch.city,
+          neighborhood: branch.address,
+          latitude: branch.latitude,
+          longitude: branch.longitude,
+          services: clinic.services.map((s) => SERVICE_LABELS[s.category] ?? s.name),
+          rating: 0,
+          distanceKm: 0,
+          openNow: false,
+          image: '',
+          description: clinic.description ?? '',
+          phone: clinic.phone ?? branch.phone ?? '',
+          source: 'platform' as const,
+        };
+      });
+
+    const independents: IndependentVetItem[] = profiles
+      .filter((p) => p.veterinaryType === 'INDEPENDENT')
+      .map((p) => ({
+        id: p.id,
+        ownerName: p.user.fullName,
+        serviceArea: p.serviceArea ?? '',
+        homeVisits: p.homeVisits,
+        coverageRadius: p.coverageRadius ?? undefined,
+      }));
+
+    return { clinics, independents };
   }
 }

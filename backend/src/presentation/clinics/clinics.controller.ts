@@ -150,4 +150,14 @@ export class ClinicsController {
       throw error;
     }
   }
+
+  /**
+   * Clínicas registradas en la plataforma con estado APPROVED
+   * GET /clinics/platform-registered
+   */
+  @Get('platform-registered')
+  @HttpCode(HttpStatus.OK)
+  async getPlatformRegistered() {
+    return this.clinicsService.getPlatformRegisteredClinics();
+  }
 }

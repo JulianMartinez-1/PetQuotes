@@ -12,6 +12,15 @@ export type ClinicCatalogItem = {
   image: string;
   description: string;
   phone: string;
+  source?: 'platform' | 'google_places';
+};
+
+export type IndependentVetItem = {
+  id: string;
+  ownerName: string;
+  serviceArea: string;
+  homeVisits: boolean;
+  coverageRadius?: number;
 };
 
 export interface SearchClinicsResponse {

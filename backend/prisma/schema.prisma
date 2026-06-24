@@ -43,6 +43,7 @@ enum NotificationType {
   APPOINTMENT_REMINDER
   MEDICAL_UPDATE
   SYSTEM_ALERT
+  VETERINARY_APPROVAL_REQUEST
 }
 
 enum NotificationChannel {
@@ -53,6 +54,12 @@ enum NotificationChannel {
 enum VeterinaryType {
   CLINIC
   INDEPENDENT
+}
+
+enum VeterinaryStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 // ============================================================
@@ -216,17 +223,19 @@ model Branch {
 // ============================================================
 
 model VeterinaryProfile {
-  id             String          @id @default(cuid())
-  userId         String          @unique
-  veterinaryType VeterinaryType
+  id              String            @id @default(cuid())
+  userId          String            @unique
+  veterinaryType  VeterinaryType
+  status          VeterinaryStatus  @default(PENDING)
+  rejectionReason String?
   // INDEPENDENT fields
-  serviceArea    String?
-  homeVisits     Boolean         @default(false)
-  coverageRadius Float?
+  serviceArea     String?
+  homeVisits      Boolean           @default(false)
+  coverageRadius  Float?
   // CLINIC fields
-  clinicId       String?         @unique
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  clinicId        String?           @unique
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
 
   user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   clinic Clinic? @relation(fields: [clinicId], references: [id], onDelete: SetNull)

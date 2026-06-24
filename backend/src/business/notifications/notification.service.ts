@@ -11,6 +11,24 @@ export interface AppointmentConfirmationData {
   startTime: Date;
 }
 
+export interface VeterinaryApprovalRequestData {
+  to: string;
+  adminName: string;
+  applicantName: string;
+  applicantEmail: string;
+  veterinaryType: 'CLINIC' | 'INDEPENDENT';
+  clinicName?: string;
+  serviceArea?: string;
+}
+
+export interface VeterinaryRejectionData {
+  to: string;
+  applicantName: string;
+  veterinaryType: 'CLINIC' | 'INDEPENDENT';
+  clinicName?: string;
+  reason: string;
+}
+
 @Injectable()
 export class NotificationService {
   private readonly logger = new Logger(NotificationService.name);
@@ -25,50 +43,168 @@ export class NotificationService {
     }
   }
 
-  async sendAppointmentConfirmation(data: AppointmentConfirmationData): Promise<void> {
+  private get from(): string {
+    return this.config.get<string>('RESEND_FROM_EMAIL') ?? 'onboarding@resend.dev';
+  }
+
+  private get isDev(): boolean {
+    return this.config.get<string>('NODE_ENV') !== 'production';
+  }
+
+  private devRecipient(realTo: string): { to: string; subjectPrefix: string } {
+    const redirect = this.config.get<string>('RESEND_DEV_REDIRECT_EMAIL');
+    return this.isDev && redirect
+      ? { to: redirect, subjectPrefix: `[DEV → ${realTo}] ` }
+      : { to: realTo, subjectPrefix: '' };
+  }
+
+  private async send(to: string, subject: string, html: string): Promise<void> {
     if (!this.resend) {
-      this.logger.warn(`Skipping email to ${data.to}: RESEND_API_KEY not set`);
+      this.logger.warn(`Skipping email to ${to}: RESEND_API_KEY not set`);
       return;
     }
+    const { to: recipient, subjectPrefix } = this.devRecipient(to);
+    try {
+      const { error } = await this.resend.emails.send({
+        from: `PetQuotes <${this.from}>`,
+        to: recipient,
+        subject: `${subjectPrefix}${subject}`,
+        html,
+      });
+      if (error) {
+        this.logger.error(`Resend error for ${recipient}: ${error.message}`);
+      } else {
+        this.logger.log(`Email sent to ${recipient}`);
+      }
+    } catch (err) {
+      this.logger.error(`Failed to send email to ${to}`, err);
+    }
+  }
 
-    const from = this.config.get<string>('RESEND_FROM_EMAIL') ?? 'onboarding@resend.dev';
-
+  async sendAppointmentConfirmation(data: AppointmentConfirmationData): Promise<void> {
     const dateStr = data.startTime.toLocaleDateString('es-CO', {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
       timeZone: 'America/Bogota',
     });
     const timeStr = data.startTime.toLocaleTimeString('es-CO', {
-      hour: '2-digit', minute: '2-digit',
-      hour12: true,
+      hour: '2-digit', minute: '2-digit', hour12: true,
       timeZone: 'America/Bogota',
     });
-
-    const isDev = this.config.get<string>('NODE_ENV') !== 'production';
-    const devRedirect = this.config.get<string>('RESEND_DEV_REDIRECT_EMAIL');
-    const recipient = isDev && devRedirect ? devRedirect : data.to;
-    const subject = isDev && devRedirect
-      ? `[DEV → ${data.to}] ✅ Cita confirmada — ${data.clinicName}`
-      : `✅ Cita confirmada — ${data.clinicName}`;
-
-    try {
-      const { error } = await this.resend.emails.send({
-        from: `PetQuotes <${from}>`,
-        to: recipient,
-        subject,
-        html: this.buildHtml({ ...data, dateStr, timeStr }),
-      });
-
-      if (error) {
-        this.logger.error(`Resend error for ${recipient}: ${error.message}`);
-      } else {
-        this.logger.log(`Confirmation email sent to ${recipient}${isDev ? ` (dev redirect from ${data.to})` : ''}`);
-      }
-    } catch (err) {
-      this.logger.error(`Failed to send confirmation email to ${data.to}`, err);
-    }
+    await this.send(
+      data.to,
+      `✅ Cita confirmada — ${data.clinicName}`,
+      this.buildAppointmentHtml({ ...data, dateStr, timeStr }),
+    );
   }
 
-  private buildHtml(data: {
+  async sendVeterinaryApprovalRequest(data: VeterinaryApprovalRequestData): Promise<void> {
+    const typeLabel = data.veterinaryType === 'CLINIC' ? 'Veterinaria (clínica)' : 'Veterinario independiente';
+    const entityLabel = data.veterinaryType === 'CLINIC'
+      ? (data.clinicName ?? 'Sin nombre')
+      : (data.serviceArea ?? 'Zona no especificada');
+
+    await this.send(
+      data.to,
+      `🐾 Nueva solicitud: ${typeLabel} — ${data.applicantName}`,
+      `<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:40px 16px;">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);max-width:100%;">
+        <tr>
+          <td style="background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);padding:36px 40px;text-align:center;">
+            <div style="font-size:36px;margin-bottom:12px;">🐾</div>
+            <h1 style="margin:0 0 6px;color:#fff;font-size:22px;font-weight:700;">Nueva solicitud pendiente</h1>
+            <p style="margin:0;color:rgba(255,255,255,0.8);font-size:14px;">PetQuotes · Panel de Administración</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:32px 40px 24px;">
+            <p style="margin:0 0 16px;color:#334155;font-size:15px;">Hola <strong>${data.adminName}</strong>,</p>
+            <p style="margin:0 0 24px;color:#64748b;font-size:14px;line-height:1.6;">Se ha registrado una nueva solicitud de <strong>${typeLabel}</strong> que requiere tu aprobación:</p>
+            <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;">
+              <tr><td style="padding:14px 20px;border-bottom:1px solid #e2e8f0;">
+                <p style="margin:0 0 3px;color:#64748b;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Solicitante</p>
+                <p style="margin:0;color:#1e293b;font-size:15px;font-weight:600;">${data.applicantName}</p>
+                <p style="margin:0;color:#64748b;font-size:13px;">${data.applicantEmail}</p>
+              </td></tr>
+              <tr><td style="padding:14px 20px;border-bottom:1px solid #e2e8f0;">
+                <p style="margin:0 0 3px;color:#64748b;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Tipo</p>
+                <p style="margin:0;color:#1e293b;font-size:15px;font-weight:600;">${typeLabel}</p>
+              </td></tr>
+              <tr><td style="padding:14px 20px;">
+                <p style="margin:0 0 3px;color:#64748b;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">${data.veterinaryType === 'CLINIC' ? 'Nombre de la clínica' : 'Zona de atención'}</p>
+                <p style="margin:0;color:#1e293b;font-size:15px;font-weight:600;">${entityLabel}</p>
+              </td></tr>
+            </table>
+            <p style="margin:24px 0 0;color:#64748b;font-size:14px;">Ingresa al panel de administración para revisar y aprobar o rechazar esta solicitud.</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:20px 40px;background:#f8fafc;border-top:1px solid #e2e8f0;text-align:center;">
+            <p style="margin:0;color:#94a3b8;font-size:12px;">PetQuotes · Plataforma de reservas veterinarias</p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+    );
+  }
+
+  async sendVeterinaryRejection(data: VeterinaryRejectionData): Promise<void> {
+    const typeLabel = data.veterinaryType === 'CLINIC' ? 'clínica veterinaria' : 'perfil de veterinario independiente';
+    const entityLabel = data.clinicName ? `"${data.clinicName}"` : 'tu solicitud';
+
+    await this.send(
+      data.to,
+      `Actualización sobre tu solicitud en PetQuotes`,
+      `<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:40px 16px;">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);max-width:100%;">
+        <tr>
+          <td style="background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);padding:36px 40px;text-align:center;">
+            <div style="font-size:36px;margin-bottom:12px;">🐾</div>
+            <h1 style="margin:0 0 6px;color:#fff;font-size:22px;font-weight:700;">Actualización de tu solicitud</h1>
+            <p style="margin:0;color:rgba(255,255,255,0.8);font-size:14px;">PetQuotes · Registro Veterinario</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:32px 40px 24px;">
+            <p style="margin:0 0 16px;color:#334155;font-size:15px;">Hola <strong>${data.applicantName}</strong>,</p>
+            <p style="margin:0 0 24px;color:#64748b;font-size:14px;line-height:1.6;">
+              Hemos revisado tu solicitud para registrar ${entityLabel} como ${typeLabel} en PetQuotes. Lamentablemente, en esta ocasión no podemos aprobarla.
+            </p>
+            <table width="100%" cellpadding="0" cellspacing="0" style="background:#fff3f3;border-radius:12px;overflow:hidden;border:1px solid #fecaca;">
+              <tr><td style="padding:20px 24px;">
+                <p style="margin:0 0 8px;color:#b91c1c;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;">Motivo del rechazo</p>
+                <p style="margin:0;color:#334155;font-size:14px;line-height:1.6;">${data.reason}</p>
+              </td></tr>
+            </table>
+            <p style="margin:24px 0 0;color:#64748b;font-size:14px;line-height:1.6;">Si tienes dudas o crees que hubo un error, puedes contactarnos respondiendo este correo.</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:20px 40px;background:#f8fafc;border-top:1px solid #e2e8f0;text-align:center;">
+            <p style="margin:0;color:#94a3b8;font-size:12px;">PetQuotes · Plataforma de reservas veterinarias</p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+    );
+  }
+
+  private buildAppointmentHtml(data: {
     clientName: string;
     clinicName: string;
     petName: string;

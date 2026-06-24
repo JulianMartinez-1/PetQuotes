@@ -12,6 +12,7 @@ export type ClinicCatalogItem = {
   image: string;
   description: string;
   phone: string;
+  source?: 'platform' | 'google_places';
 };
 
 export const CLINIC_CATALOG: ClinicCatalogItem[] = [
