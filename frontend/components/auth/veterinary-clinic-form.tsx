@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Building2, MapPin, Phone, FileText, Hash, Loader2 } from "lucide-react";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
+import { Building2, MapPin, Phone, FileText, Hash, Loader2, AlertCircle } from "lucide-react";
+import { importLibrary, setOptions } from "@googlemaps/js-api-loader";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import type { VeterinaryClinicData } from "@/lib/auth-api";
@@ -17,6 +16,8 @@ const SERVICE_OPTIONS = [
   { value: "emergency", label: "Urgencias" },
 ];
 
+const DEFAULT_CENTER = { lat: 4.711, lng: -74.0721 }; // Bogotá
+
 interface VeterinaryClinicFormProps {
   value: Partial<VeterinaryClinicData>;
   onChange: (data: Partial<VeterinaryClinicData>) => void;
@@ -24,9 +25,8 @@ interface VeterinaryClinicFormProps {
 
 export function VeterinaryClinicForm({ value, onChange }: VeterinaryClinicFormProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<unknown>(null);
-  const markerRef = useRef<unknown>(null);
   const [mapLoading, setMapLoading] = useState(true);
+  const [mapError, setMapError] = useState(false);
   const valueRef = useRef(value);
   const onChangeRef = useRef(onChange);
   useEffect(() => { valueRef.current = value; onChangeRef.current = onChange; });
@@ -44,69 +44,103 @@ export function VeterinaryClinicForm({ value, onChange }: VeterinaryClinicFormPr
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
-    let cleanup: (() => void) | undefined;
 
-    (() => {
-      // Fix default icons broken by webpack
-      delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl;
-      L.Icon.Default.mergeOptions({
-        iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-        iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-        shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
-      });
-
-      const defaultLat = value.latitude ?? 4.711;
-      const defaultLng = value.longitude ?? -74.0721;
-
-      const map = L.map(mapContainerRef.current!, {
-        scrollWheelZoom: false,
-        zoomControl: true,
-      }).setView([defaultLat, defaultLng], 12);
-
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "© OpenStreetMap",
-        maxZoom: 19,
-      }).addTo(map);
-
-      const marker = L.marker([defaultLat, defaultLng], { draggable: true });
-
-      if (value.latitude && value.longitude) {
-        marker.addTo(map);
-        markerRef.current = marker;
-      }
-
-      const setCoords = (lat: number, lng: number) => {
-        onChangeRef.current({
-          ...valueRef.current,
-          latitude: Math.round(lat * 1e6) / 1e6,
-          longitude: Math.round(lng * 1e6) / 1e6,
-        });
-      };
-
-      const placeMarker = (lat: number, lng: number) => {
-        setCoords(lat, lng);
-        marker.setLatLng([lat, lng]);
-        if (!map.hasLayer(marker)) marker.addTo(map);
-        marker.bindPopup("Ubicación seleccionada").openPopup();
-      };
-
-      map.on("click", (e: { latlng: { lat: number; lng: number } }) => {
-        placeMarker(e.latlng.lat, e.latlng.lng);
-      });
-
-      marker.on("dragend", () => {
-        const pos = marker.getLatLng();
-        setCoords(pos.lat, pos.lng);
-      });
-
-      mapRef.current = map;
-      markerRef.current = marker;
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    if (!apiKey) {
+      setMapError(true);
       setMapLoading(false);
+      return;
+    }
 
-      cleanup = () => map.remove();
-    })();
+    let isDisposed = false;
 
-    return () => cleanup?.();
+    const initMap = async () => {
+      try {
+        setOptions({ key: apiKey });
+        await importLibrary("maps");
+
+        if (isDisposed || !mapContainerRef.current) return;
+
+        const center =
+          valueRef.current.latitude && valueRef.current.longitude
+            ? { lat: valueRef.current.latitude, lng: valueRef.current.longitude }
+            : DEFAULT_CENTER;
+
+        const map = new google.maps.Map(mapContainerRef.current, {
+          center,
+          zoom: 14,
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
+          clickableIcons: false,
+          gestureHandling: "cooperative",
+          zoomControl: true,
+          styles: [
+            { featureType: "poi.business", stylers: [{ visibility: "off" }] },
+          ],
+        });
+
+        setMapLoading(false);
+
+        let marker: google.maps.Marker | null = null;
+
+        const setCoords = (lat: number, lng: number) => {
+          onChangeRef.current({
+            ...valueRef.current,
+            latitude: Math.round(lat * 1e6) / 1e6,
+            longitude: Math.round(lng * 1e6) / 1e6,
+          });
+        };
+
+        const placeMarker = (latLng: google.maps.LatLng) => {
+          const lat = latLng.lat();
+          const lng = latLng.lng();
+          setCoords(lat, lng);
+
+          if (marker) {
+            marker.setPosition(latLng);
+          } else {
+            marker = new google.maps.Marker({
+              map,
+              position: latLng,
+              draggable: true,
+              animation: google.maps.Animation.DROP,
+              title: "Ubicación de la veterinaria",
+            });
+
+            marker.addListener("dragend", () => {
+              const pos = marker!.getPosition();
+              if (pos) setCoords(pos.lat(), pos.lng());
+            });
+          }
+        };
+
+        // Place marker if we already have coordinates
+        if (valueRef.current.latitude && valueRef.current.longitude) {
+          placeMarker(
+            new google.maps.LatLng(
+              valueRef.current.latitude,
+              valueRef.current.longitude,
+            ),
+          );
+        }
+
+        map.addListener("click", (e: google.maps.MapMouseEvent) => {
+          if (e.latLng) placeMarker(e.latLng);
+        });
+      } catch {
+        if (!isDisposed) {
+          setMapError(true);
+          setMapLoading(false);
+        }
+      }
+    };
+
+    initMap();
+
+    return () => {
+      isDisposed = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -171,17 +205,26 @@ export function VeterinaryClinicForm({ value, onChange }: VeterinaryClinicFormPr
           Ubicación en mapa{" "}
           <span className="text-xs text-text-muted font-normal">(haz clic para marcar)</span>
         </label>
-        <div className="relative rounded-xl overflow-hidden border border-border" style={{ height: 200 }}>
-          {mapLoading && (
+        <div
+          className="relative rounded-xl overflow-hidden border border-border"
+          style={{ height: 220 }}
+        >
+          {mapLoading && !mapError && (
             <div className="absolute inset-0 flex items-center justify-center bg-surface-light z-10">
               <Loader2 size={20} className="animate-spin text-text-muted" />
+            </div>
+          )}
+          {mapError && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-surface-light gap-2 z-10">
+              <AlertCircle size={20} className="text-warning" />
+              <p className="text-xs text-text-muted">No se pudo cargar el mapa</p>
             </div>
           )}
           <div ref={mapContainerRef} className="w-full h-full" />
         </div>
         {value.latitude && value.longitude && (
           <p className="mt-1 text-xs text-text-muted">
-            Lat {value.latitude}, Lng {value.longitude}
+            {value.latitude}, {value.longitude}
           </p>
         )}
       </div>
