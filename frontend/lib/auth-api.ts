@@ -6,11 +6,33 @@ export type LoginPayload = {
   captchaToken: string;
 };
 
+export type VeterinaryClinicData = {
+  clinicName: string;
+  city: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  phone?: string;
+  description?: string;
+  licenseNumber?: string;
+  services?: string[];
+};
+
+export type VeterinaryIndependentData = {
+  serviceArea: string;
+  homeVisits: boolean;
+  coverageRadius?: number;
+};
+
 export type RegisterPayload = {
   fullName: string;
   email: string;
   password: string;
   captchaToken: string;
+  role?: "CLIENT" | "VETERINARY";
+  veterinaryType?: "CLINIC" | "INDEPENDENT";
+  clinicData?: VeterinaryClinicData;
+  independentData?: VeterinaryIndependentData;
 };
 
 export type ForgotPasswordPayload = {

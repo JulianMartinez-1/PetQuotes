@@ -16,7 +16,12 @@ export class AuthController {
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   async register(@Body() dto: RegisterDto): Promise<TokenResponseDto> {
-    return this.authService.register(dto.email, dto.password, dto.fullName);
+    return this.authService.register(dto.email, dto.password, dto.fullName, {
+      role: dto.role,
+      veterinaryType: dto.veterinaryType,
+      clinicData: dto.clinicData,
+      independentData: dto.independentData,
+    });
   }
 
   /**

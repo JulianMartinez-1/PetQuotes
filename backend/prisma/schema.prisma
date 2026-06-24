@@ -50,6 +50,11 @@ enum NotificationChannel {
   WHATSAPP
 }
 
+enum VeterinaryType {
+  CLINIC
+  INDEPENDENT
+}
+
 // ============================================================
 // USERS & AUTHENTICATION
 // ============================================================
@@ -77,6 +82,7 @@ model User {
   professionalProfile   Professional?
   ownedClinics          Clinic[]
   notifications         Notification[]
+  veterinaryProfile     VeterinaryProfile?
 
   @@map("users")
 }
@@ -175,6 +181,7 @@ model Clinic {
   branches              Branch[]
   services              VeterinaryService[]
   appointments          Appointment[]
+  veterinaryProfile     VeterinaryProfile?
 
   @@index([ownerUserId])
   @@map("clinics")
@@ -202,6 +209,29 @@ model Branch {
 
   @@index([clinicId])
   @@map("branches")
+}
+
+// ============================================================
+// VETERINARY PROFILES
+// ============================================================
+
+model VeterinaryProfile {
+  id             String          @id @default(cuid())
+  userId         String          @unique
+  veterinaryType VeterinaryType
+  // INDEPENDENT fields
+  serviceArea    String?
+  homeVisits     Boolean         @default(false)
+  coverageRadius Float?
+  // CLINIC fields
+  clinicId       String?         @unique
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clinic Clinic? @relation(fields: [clinicId], references: [id], onDelete: SetNull)
+
+  @@map("veterinary_profiles")
 }
 
 // ============================================================
