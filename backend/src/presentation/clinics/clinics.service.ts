@@ -576,7 +576,7 @@ async searchClinicsByCoordinates(
           rating: 0,
           distanceKm: 0,
           openNow: false,
-          image: '',
+          image: clinic.logo ?? '',
           description: clinic.description ?? '',
           phone: clinic.phone ?? branch.phone ?? '',
           source: 'platform' as const,

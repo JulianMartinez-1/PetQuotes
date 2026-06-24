@@ -98,14 +98,22 @@ export function ClinicDetailModal({ clinic, onClose, onReservar }: ClinicDetailM
           {/* Left Side - Info */}
           <div className="md:w-72 lg:w-80 overflow-y-auto flex flex-col gap-4 shrink-0">
             {/* Image */}
-            <div className="relative rounded-xl overflow-hidden h-48 flex-shrink-0">
-              <Image
-                src={clinic.image}
-                alt={clinic.name}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="object-cover"
-              />
+            <div className="relative rounded-xl overflow-hidden h-48 flex-shrink-0 bg-gradient-to-br from-secondary/20 to-accent/20">
+              {clinic.image ? (
+                <Image
+                  src={clinic.image}
+                  alt={clinic.name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="object-cover"
+                  unoptimized
+                />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center gap-2">
+                  <Building2 size={40} className="text-text-tertiary/40" />
+                  <p className="text-xs text-text-tertiary">{clinic.city}</p>
+                </div>
+              )}
             </div>
 
             {/* Status & Rating */}
