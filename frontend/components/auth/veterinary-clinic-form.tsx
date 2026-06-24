@@ -354,9 +354,15 @@ export function VeterinaryClinicForm({ value, onChange }: VeterinaryClinicFormPr
           )}
           <div ref={mapContainerRef} className="w-full h-full" />
         </div>
-        {value.latitude && value.longitude && (
-          <p className="mt-1 text-xs text-text-muted">
-            {value.latitude}, {value.longitude}
+        {value.latitude && value.longitude ? (
+          <p className="mt-1 text-xs text-success flex items-center gap-1">
+            <span className="inline-block size-1.5 rounded-full bg-success" />
+            Ubicación marcada ({value.latitude}, {value.longitude})
+          </p>
+        ) : (
+          <p className="mt-1 text-xs text-warning flex items-center gap-1">
+            <span className="inline-block size-1.5 rounded-full bg-warning" />
+            Escribe la dirección para marcar automáticamente, o haz clic en el mapa
           </p>
         )}
       </div>

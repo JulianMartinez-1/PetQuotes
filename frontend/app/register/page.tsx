@@ -95,6 +95,10 @@ export default function RegisterPage() {
       if (!clinicData.clinicName?.trim()) { setError("El nombre de la veterinaria es requerido."); return; }
       if (!clinicData.city?.trim()) { setError("La ciudad es requerida."); return; }
       if (!clinicData.address?.trim()) { setError("La dirección es requerida."); return; }
+      if (!clinicData.latitude || !clinicData.longitude) {
+        setError("Marca la ubicación de tu veterinaria en el mapa antes de continuar. Escribe la dirección y espera que aparezca el pin, o haz clic directamente en el mapa.");
+        return;
+      }
     }
     if (selectedRole === "INDEPENDENT" && !independentData.serviceArea?.trim()) {
       setError("La zona de atención es requerida.");
