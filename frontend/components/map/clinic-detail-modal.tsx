@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { GoogleMap, Marker } from "@react-google-maps/api";
-import { Phone, MapPin, Star, Clock, X } from "lucide-react";
+import { Phone, MapPin, Star, Clock, X, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Modal } from "@/components/ui/modal";
