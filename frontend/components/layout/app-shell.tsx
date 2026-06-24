@@ -13,9 +13,12 @@ import { useDarkMode } from "@/hooks/useAnimations";
 import { Footer } from "./footer";
 import { cn } from "@/lib/utils";
 
-const NAV_ITEMS = [
+const PUBLIC_NAV_ITEMS = [
   { href: "/", label: "Inicio" },
   { href: "/clinics", label: "Clínicas" },
+] as const satisfies ReadonlyArray<{ href: Route; label: string }>;
+
+const PROTECTED_NAV_ITEMS = [
   { href: "/pets", label: "Mis Mascotas" },
   { href: "/profile", label: "Perfil" },
   { href: "/bookings", label: "Reservas" },
@@ -26,7 +29,10 @@ const ADMIN_NAV_ITEM = { href: "/admin" as Route, label: "Admin" };
 export function AppShell({ children }: PropsWithChildren) {
   const pathname = usePathname();
   const { mobileMenuOpen, setMobileMenuOpen, selectedCity } = useAppState();
-  const { isAuthenticated, user, logout } = useAuthState();
+  const { isAuthenticated, isHydrated, user, logout } = useAuthState();
+  const navItems = isAuthenticated && isHydrated
+    ? [...PUBLIC_NAV_ITEMS, ...PROTECTED_NAV_ITEMS]
+    : PUBLIC_NAV_ITEMS;
   const { isDark, toggleDarkMode } = useDarkMode();
 
   return (
@@ -47,7 +53,7 @@ export function AppShell({ children }: PropsWithChildren) {
 
           {/* Desktop Nav */}
           <nav className="hidden items-center gap-0.5 md:flex">
-            {NAV_ITEMS.map((item) => {
+            {navItems.map((item) => {
               const active = pathname === item.href;
               return (
                 <Link
@@ -166,7 +172,7 @@ export function AppShell({ children }: PropsWithChildren) {
               className="border-t border-border bg-surface md:hidden shadow-lg"
             >
               <div className="page-container grid gap-0.5 py-3">
-                {NAV_ITEMS.map((item) => {
+                {navItems.map((item) => {
                   const active = pathname === item.href;
                   return (
                     <Link
