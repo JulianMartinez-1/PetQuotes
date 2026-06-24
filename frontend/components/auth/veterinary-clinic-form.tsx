@@ -28,21 +28,34 @@ export function VeterinaryClinicForm({ value, onChange }: VeterinaryClinicFormPr
   const mapRef = useRef<google.maps.Map | null>(null);
   const markerRef = useRef<google.maps.Marker | null>(null);
   const geocoderRef = useRef<google.maps.Geocoder | null>(null);
-  const lastReverseGeocodedAddressRef = useRef('');
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // Stored inside map init; callable from the forward-geocode effect
-  const placeMarkerFnRef = useRef<((latLng: google.maps.LatLng, skipGeocode?: boolean) => void) | null>(null);
+
+  // Anti-loop: the address set by reverse-geocode — skip forward-geocoding it
+  const lastReverseGeocodedAddrRef = useRef('');
+
+  // Separate debounce timers for address and city
+  const addrTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Version counters to ignore stale async results
+  const addrVersionRef = useRef(0);
+  const cityVersionRef = useRef(0);
+
+  // Stored inside map init so forward-geocode effect can move the marker
+  const moveMarkerFnRef = useRef<((latLng: google.maps.LatLng) => void) | null>(null);
 
   const [mapLoading, setMapLoading] = useState(true);
   const [mapError, setMapError] = useState(false);
   const [isGeocoding, setIsGeocoding] = useState(false);
 
+  // Always-fresh refs for value/onChange — avoids stale closure bugs
   const valueRef = useRef(value);
   const onChangeRef = useRef(onChange);
-  useEffect(() => { valueRef.current = value; onChangeRef.current = onChange; });
+  useEffect(() => {
+    valueRef.current = value;
+    onChangeRef.current = onChange;
+  });
 
-  const set = (patch: Partial<VeterinaryClinicData>) =>
-    onChange({ ...value, ...patch });
+  const set = (patch: Partial<VeterinaryClinicData>) => onChange({ ...value, ...patch });
 
   const toggleService = (svc: string) => {
     const current = value.services ?? [];
@@ -52,7 +65,22 @@ export function VeterinaryClinicForm({ value, onChange }: VeterinaryClinicFormPr
     set({ services: next });
   };
 
-  // ── Map init (runs once) ──────────────────────────────────────────────────
+  // ── 1. Load geocoder as early as possible (separate from map init) ────────
+  useEffect(() => {
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    if (!apiKey) return;
+    setOptions({ key: apiKey });
+    importLibrary("geocoding")
+      .then(() => {
+        if (!geocoderRef.current) {
+          geocoderRef.current = new google.maps.Geocoder();
+        }
+      })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ── 2. Map init ───────────────────────────────────────────────────────────
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
@@ -63,24 +91,27 @@ export function VeterinaryClinicForm({ value, onChange }: VeterinaryClinicFormPr
       return;
     }
 
-    let isDisposed = false;
+    let disposed = false;
 
     const initMap = async () => {
       try {
         setOptions({ key: apiKey });
-        await Promise.all([importLibrary("maps"), importLibrary("geocoding")]);
+        await importLibrary("maps");
 
-        if (isDisposed || !mapContainerRef.current) return;
+        if (disposed || !mapContainerRef.current) return;
 
-        geocoderRef.current = new google.maps.Geocoder();
+        // Geocoder might already be ready from effect #1; ensure it is
+        if (!geocoderRef.current) {
+          await importLibrary("geocoding");
+          if (!disposed) geocoderRef.current = new google.maps.Geocoder();
+        }
 
-        const center =
-          valueRef.current.latitude && valueRef.current.longitude
-            ? { lat: valueRef.current.latitude, lng: valueRef.current.longitude }
-            : DEFAULT_CENTER;
+        const initial = (valueRef.current.latitude && valueRef.current.longitude)
+          ? { lat: valueRef.current.latitude, lng: valueRef.current.longitude }
+          : DEFAULT_CENTER;
 
         const map = new google.maps.Map(mapContainerRef.current, {
-          center,
+          center: initial,
           zoom: 14,
           mapTypeControl: false,
           streetViewControl: false,
@@ -88,135 +119,154 @@ export function VeterinaryClinicForm({ value, onChange }: VeterinaryClinicFormPr
           clickableIcons: false,
           gestureHandling: "cooperative",
           zoomControl: true,
-          styles: [
-            { featureType: "poi.business", stylers: [{ visibility: "off" }] },
-          ],
+          styles: [{ featureType: "poi.business", stylers: [{ visibility: "off" }] }],
         });
         mapRef.current = map;
-
         setMapLoading(false);
 
-        const setCoords = (lat: number, lng: number) => {
-          onChangeRef.current({
-            ...valueRef.current,
-            latitude: Math.round(lat * 1e6) / 1e6,
-            longitude: Math.round(lng * 1e6) / 1e6,
-          });
-        };
-
-        const reverseGeocode = async (latLng: google.maps.LatLng) => {
-          if (!geocoderRef.current) return;
+        // Reverse-geocode a LatLng and push address + city + coords to form state.
+        // BUG FIX: always carry lat/lng explicitly — valueRef.current may be stale
+        // (React hasn't re-rendered yet) when this async callback resolves.
+        const reverseGeocode = async (pos: google.maps.LatLng) => {
+          const geocoder = geocoderRef.current;
+          if (!geocoder) return;
+          const lat = Math.round(pos.lat() * 1e6) / 1e6;
+          const lng = Math.round(pos.lng() * 1e6) / 1e6;
           try {
-            const result = await geocoderRef.current.geocode({ location: latLng });
-            if (result.results.length > 0) {
-              const addr = result.results[0].formatted_address;
-              // Extract city from address components
-              const cityComponent = result.results[0].address_components.find(
-                (c) => c.types.includes("locality") || c.types.includes("administrative_area_level_2"),
-              );
-              const city = cityComponent?.long_name ?? valueRef.current.city ?? '';
-              lastReverseGeocodedAddressRef.current = addr;
-              onChangeRef.current({ ...valueRef.current, address: addr, city });
-            }
-          } catch {
-            // geocoding errors are non-fatal
-          }
+            const { results } = await geocoder.geocode({ location: pos });
+            if (!results.length) return;
+            const addr = results[0].formatted_address;
+            const cityComp = results[0].address_components.find(
+              (c) => c.types.includes("locality") || c.types.includes("administrative_area_level_2"),
+            );
+            const city = cityComp?.long_name ?? valueRef.current.city ?? '';
+            lastReverseGeocodedAddrRef.current = addr;
+            // Merge lat/lng explicitly so they are never lost
+            onChangeRef.current({ ...valueRef.current, address: addr, city, latitude: lat, longitude: lng });
+          } catch { /* non-fatal */ }
         };
 
-        const placeMarker = (latLng: google.maps.LatLng, skipGeocode = false) => {
-          const lat = latLng.lat();
-          const lng = latLng.lng();
-          setCoords(lat, lng);
-
+        // Place or move the pin. skipGeocode=true when called from the
+        // forward-geocode effect (we already have coords, no need to reverse).
+        const placeOrMoveMarker = (pos: google.maps.LatLng, skipGeocode = false) => {
           if (markerRef.current) {
-            markerRef.current.setPosition(latLng);
+            markerRef.current.setPosition(pos);
           } else {
             const m = new google.maps.Marker({
               map,
-              position: latLng,
+              position: pos,
               draggable: true,
               animation: google.maps.Animation.DROP,
               title: "Ubicación de la veterinaria",
             });
             markerRef.current = m;
-
             m.addListener("dragend", () => {
-              const pos = m.getPosition();
-              if (pos) {
-                setCoords(pos.lat(), pos.lng());
-                reverseGeocode(pos);
-              }
+              const p = m.getPosition();
+              if (p) reverseGeocode(p);
             });
           }
 
-          if (!skipGeocode) reverseGeocode(latLng);
+          if (!skipGeocode) {
+            // Immediate coord snapshot (async geocode will also carry these)
+            const lat = Math.round(pos.lat() * 1e6) / 1e6;
+            const lng = Math.round(pos.lng() * 1e6) / 1e6;
+            onChangeRef.current({ ...valueRef.current, latitude: lat, longitude: lng });
+            reverseGeocode(pos);
+          }
         };
 
-        placeMarkerFnRef.current = placeMarker;
+        // Expose to forward-geocode/city effects via ref
+        moveMarkerFnRef.current = (pos) => placeOrMoveMarker(pos, true);
 
+        // Restore pin if form already has coordinates (e.g. back-navigation)
         if (valueRef.current.latitude && valueRef.current.longitude) {
-          placeMarker(
+          placeOrMoveMarker(
             new google.maps.LatLng(valueRef.current.latitude, valueRef.current.longitude),
-            true, // don't reverse-geocode on init
+            true,
           );
         }
 
         map.addListener("click", (e: google.maps.MapMouseEvent) => {
-          if (e.latLng) placeMarker(e.latLng);
+          if (e.latLng) placeOrMoveMarker(e.latLng);
         });
       } catch {
-        if (!isDisposed) {
-          setMapError(true);
-          setMapLoading(false);
-        }
+        if (!disposed) { setMapError(true); setMapLoading(false); }
       }
     };
 
     initMap();
-
-    return () => {
-      isDisposed = true;
-    };
+    return () => { disposed = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── Forward geocode on address change (debounced 600 ms) ─────────────────
+  // ── 3. Address → move pin (debounced 600 ms) ──────────────────────────────
   useEffect(() => {
     const addr = value.address;
     if (!addr || addr.length < 5) return;
-    // Skip if the address was just set BY a reverse-geocode (anti-loop guard)
-    if (addr === lastReverseGeocodedAddressRef.current) return;
+    // Anti-loop: skip if this address was just set by a reverse-geocode
+    if (addr === lastReverseGeocodedAddrRef.current) return;
 
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(async () => {
-      if (!geocoderRef.current) return;
+    if (addrTimerRef.current) clearTimeout(addrTimerRef.current);
+    const version = ++addrVersionRef.current;
+
+    addrTimerRef.current = setTimeout(async () => {
+      const geocoder = geocoderRef.current;
+      if (!geocoder) return;
       setIsGeocoding(true);
       try {
-        const result = await geocoderRef.current.geocode({ address: addr });
-        if (result.results.length > 0) {
-          const loc = result.results[0].geometry.location;
-          const lat = Math.round(loc.lat() * 1e6) / 1e6;
-          const lng = Math.round(loc.lng() * 1e6) / 1e6;
-          const latLng = new google.maps.LatLng(lat, lng);
+        const { results } = await geocoder.geocode({ address: addr });
+        // Ignore if a newer request superseded this one
+        if (version !== addrVersionRef.current) return;
+        if (!results.length) return;
 
-          onChangeRef.current({ ...valueRef.current, latitude: lat, longitude: lng });
+        const loc = results[0].geometry.location;
+        const lat = Math.round(loc.lat() * 1e6) / 1e6;
+        const lng = Math.round(loc.lng() * 1e6) / 1e6;
+        const latLng = new google.maps.LatLng(lat, lng);
 
-          if (placeMarkerFnRef.current) {
-            placeMarkerFnRef.current(latLng, true); // skipGeocode = true
-          }
-          mapRef.current?.panTo(latLng);
+        // Update coords in form state
+        onChangeRef.current({ ...valueRef.current, latitude: lat, longitude: lng });
+        // Move / create the pin (skip reverse-geocoding to avoid loop)
+        if (moveMarkerFnRef.current) {
+          moveMarkerFnRef.current(latLng);
         }
-      } catch {
-        // forward geocoding errors are non-fatal
-      } finally {
-        setIsGeocoding(false);
+        mapRef.current?.panTo(latLng);
+      } catch { /* non-fatal */ }
+      finally {
+        if (version === addrVersionRef.current) setIsGeocoding(false);
       }
     }, 600);
 
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
+    return () => { if (addrTimerRef.current) clearTimeout(addrTimerRef.current); };
   }, [value.address]);
+
+  // ── 4. City → pan map (debounced 800 ms, no pin change) ──────────────────
+  useEffect(() => {
+    const city = value.city;
+    if (!city || city.length < 2) return;
+
+    if (cityTimerRef.current) clearTimeout(cityTimerRef.current);
+    const version = ++cityVersionRef.current;
+
+    cityTimerRef.current = setTimeout(async () => {
+      const geocoder = geocoderRef.current;
+      const map = mapRef.current;
+      if (!geocoder || !map) return;
+      if (version !== cityVersionRef.current) return;
+      try {
+        const { results } = await geocoder.geocode({ address: `${city}, Colombia` });
+        if (!results.length) return;
+        if (version !== cityVersionRef.current) return;
+        const loc = results[0].geometry.location;
+        map.panTo({ lat: loc.lat(), lng: loc.lng() });
+        // Don't zoom in too tight — city level is around 12
+        const zoom = map.getZoom() ?? 14;
+        if (zoom > 14) map.setZoom(13);
+      } catch { /* non-fatal */ }
+    }, 800);
+
+    return () => { if (cityTimerRef.current) clearTimeout(cityTimerRef.current); };
+  }, [value.city]);
 
   return (
     <div className="space-y-4">
@@ -284,7 +334,7 @@ export function VeterinaryClinicForm({ value, onChange }: VeterinaryClinicFormPr
         <label className="block text-sm font-medium text-text-secondary mb-1.5">
           Ubicación en mapa{" "}
           <span className="text-xs text-text-muted font-normal">
-            (haz clic para marcar · arrastra el pin o escribe la dirección)
+            (haz clic para marcar · arrastra el pin · o escribe dirección / ciudad)
           </span>
         </label>
         <div
