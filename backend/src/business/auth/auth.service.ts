@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
+import type { Prisma } from '@prisma/client';
 import { UserRepository } from '@data/repositories/user.repository';
 import { JwtManager } from '@config/auth/jwt.manager';
 import { PrismaService } from '@shared/prisma/prisma.service';
@@ -59,15 +60,22 @@ export class AuthService {
     const passwordHash = await bcrypt.hash(password, 10);
     const role = options.role === 'VETERINARY' ? 'VETERINARY' : 'CLIENT';
 
-    const user = await this.userRepository.create({ email, passwordHash, fullName, role });
+    let user: Awaited<ReturnType<typeof this.userRepository.create>>;
 
     if (role === 'VETERINARY' && options.veterinaryType) {
-      await this._createVeterinaryProfile(user.id, options);
-      // Fire-and-forget: do not fail registration if notification fails
+      user = await this.prisma.$transaction(async (tx) => {
+        const createdUser = await tx.user.create({
+          data: { email, passwordHash, fullName, role },
+        });
+        await this._createVeterinaryProfileTx(tx, createdUser.id, options);
+        return createdUser;
+      });
       this._notifyAdminOfNewVeterinaryRequest(
         { fullName: user.fullName, email: user.email },
         options,
       ).catch(() => {});
+    } else {
+      user = await this.userRepository.create({ email, passwordHash, fullName, role });
     }
 
     const tokens = this.jwtManager.generateTokens(user.id, user.email, user.role, user.fullName);
@@ -75,60 +83,62 @@ export class AuthService {
     return { userId: user.id, email: user.email, fullName: user.fullName, role: user.role, veterinaryStatus, ...tokens };
   }
 
-  private async _createVeterinaryProfile(userId: string, options: RegisterOptions): Promise<void> {
+  private async _createVeterinaryProfileTx(
+    tx: Prisma.TransactionClient,
+    userId: string,
+    options: RegisterOptions,
+  ): Promise<void> {
     const { veterinaryType, clinicData, independentData } = options;
 
-    await this.prisma.$transaction(async (tx) => {
-      if (veterinaryType === 'CLINIC' && clinicData) {
-        const clinic = await tx.clinic.create({
-          data: {
-            ownerUserId: userId,
-            name: clinicData.clinicName,
-            description: clinicData.description ?? null,
-            phone: clinicData.phone ?? null,
-            licenseNumber: clinicData.licenseNumber ?? null,
-          },
-        });
+    if (veterinaryType === 'CLINIC' && clinicData) {
+      const clinic = await tx.clinic.create({
+        data: {
+          ownerUserId: userId,
+          name: clinicData.clinicName,
+          description: clinicData.description?.trim() || null,
+          phone: clinicData.phone?.trim() || null,
+          licenseNumber: clinicData.licenseNumber?.trim() || null,
+        },
+      });
 
-        await tx.branch.create({
-          data: {
+      await tx.branch.create({
+        data: {
+          clinicId: clinic.id,
+          name: clinicData.clinicName,
+          city: clinicData.city,
+          address: clinicData.address,
+          phone: clinicData.phone?.trim() || null,
+          latitude: clinicData.latitude,
+          longitude: clinicData.longitude,
+        },
+      });
+
+      if (clinicData.services && clinicData.services.length > 0) {
+        await tx.veterinaryService.createMany({
+          data: clinicData.services.map((category) => ({
             clinicId: clinic.id,
-            name: clinicData.clinicName,
-            city: clinicData.city,
-            address: clinicData.address,
-            phone: clinicData.phone ?? null,
-            latitude: clinicData.latitude,
-            longitude: clinicData.longitude,
-          },
-        });
-
-        if (clinicData.services && clinicData.services.length > 0) {
-          await tx.veterinaryService.createMany({
-            data: clinicData.services.map((category) => ({
-              clinicId: clinic.id,
-              name: category,
-              category,
-              price: 0,
-              duration: 30,
-            })),
-          });
-        }
-
-        await tx.veterinaryProfile.create({
-          data: { userId, veterinaryType: 'CLINIC', clinicId: clinic.id },
-        });
-      } else if (veterinaryType === 'INDEPENDENT' && independentData) {
-        await tx.veterinaryProfile.create({
-          data: {
-            userId,
-            veterinaryType: 'INDEPENDENT',
-            serviceArea: independentData.serviceArea,
-            homeVisits: independentData.homeVisits,
-            coverageRadius: independentData.coverageRadius ?? null,
-          },
+            name: category,
+            category,
+            price: 0,
+            duration: 30,
+          })),
         });
       }
-    });
+
+      await tx.veterinaryProfile.create({
+        data: { userId, veterinaryType: 'CLINIC', clinicId: clinic.id },
+      });
+    } else if (veterinaryType === 'INDEPENDENT' && independentData) {
+      await tx.veterinaryProfile.create({
+        data: {
+          userId,
+          veterinaryType: 'INDEPENDENT',
+          serviceArea: independentData.serviceArea,
+          homeVisits: independentData.homeVisits,
+          coverageRadius: independentData.coverageRadius ?? null,
+        },
+      });
+    }
   }
 
   private async _notifyAdminOfNewVeterinaryRequest(

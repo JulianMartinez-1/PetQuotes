@@ -69,6 +69,9 @@ export function normalizeApiErrorMessage(status: number, rawMessage?: string, pa
   }
 
   if (status === 409) {
+    if (path?.includes("/register")) {
+      return "Este correo electronico ya esta registrado. Si enviaste una solicitud como veterinaria, recibirás un correo de confirmacion cuando sea aprobada.";
+    }
     return "Esta accion no pudo completarse porque la informacion cambio. Actualiza e intenta de nuevo.";
   }
 
