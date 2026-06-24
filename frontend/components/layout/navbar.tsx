@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 
 export function NavBar() {
   const router = useRouter();
-  const { isAuthenticated, user, logout } = useAuthState();
+  const { isAuthenticated, isHydrated, user, logout } = useAuthState();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const { isDark, toggleDarkMode } = useDarkMode();
@@ -41,7 +41,7 @@ export function NavBar() {
   const navLinks = [
     { href: "/" as const, label: "Inicio", gradient: false },
     { href: "/clinics" as const, label: "Clínicas", gradient: false },
-    ...(isAuthenticated ? [
+    ...(isAuthenticated && isHydrated ? [
       { href: "/bookings" as const, label: "Mis Reservas", gradient: false },
       { href: "/pets" as const, label: "Mis Mascotas", gradient: false },
       { href: "/profile" as const, label: "Mi Perfil", gradient: false },
@@ -146,7 +146,7 @@ export function NavBar() {
               </motion.button>
 
               {/* Auth Actions */}
-              {isAuthenticated && user ? (
+              {isAuthenticated && isHydrated && user ? (
                 <div className="relative">
                   <motion.button
                     onClick={() => setProfileMenuOpen(!profileMenuOpen)}
@@ -310,7 +310,7 @@ export function NavBar() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              {isAuthenticated ? (
+              {isAuthenticated && isHydrated ? (
                 <Button
                   variant="danger"
                   size="sm"

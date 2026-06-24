@@ -58,21 +58,19 @@ export function AuthStateProvider({ children }: PropsWithChildren) {
         } catch {
           localStorage.removeItem("auth_user");
         }
-      }
 
-      if (mounted) setIsHydrated(true);
-
-      // Silently refresh the access token cookie so protected routes
-      // and API calls work even if the short-lived cookie has expired.
-      if (savedUser && mounted) {
+        // Validate the session before marking hydrated to avoid flashing
+        // authenticated UI while the token check is in flight.
         try {
           const { user: freshUser } = await refreshRequest();
           if (mounted) syncAuth({ user: freshUser });
         } catch {
-          // Refresh failed — user stays logged in from localStorage until
-          // their next explicit action triggers a 401.
+          // Refresh failed — session is no longer valid, clear stale auth.
+          if (mounted) clearAuth();
         }
       }
+
+      if (mounted) setIsHydrated(true);
     };
 
     void bootstrap();
