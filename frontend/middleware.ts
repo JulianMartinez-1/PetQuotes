@@ -40,7 +40,12 @@ export async function middleware(request: NextRequest) {
 
   const payload = await verifyJwtHs256(accessToken, jwtSecret);
   if (!payload) {
-    // Expired or tampered token — send to login so the client can refresh
+    // Expired or tampered token — if a refresh token exists, let the page load
+    // so AuthStateProvider can renew the session on mount.
+    const hasRefreshToken = !!request.cookies.get(AUTH_COOKIE_NAMES.refresh)?.value;
+    if (hasRefreshToken) {
+      return NextResponse.next();
+    }
     return redirectToLogin(request, pathname);
   }
 

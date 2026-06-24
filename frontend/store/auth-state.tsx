@@ -47,43 +47,36 @@ export function AuthStateProvider({ children }: PropsWithChildren) {
 
   // Initial load from localStorage
   useEffect(() => {
-    console.log("[Auth] useEffect bootstrap ejecutado");
     let mounted = true;
 
     const bootstrap = async () => {
-      try {
-        console.log("[Auth] bootstrap iniciado");
-        // Restaurar desde localStorage si existe
-        const savedUser = localStorage.getItem("auth_user");
-        console.log("[Auth] localStorage.getItem('auth_user'):", savedUser);
-        
-        if (savedUser) {
-          try {
-            const parsedUser = JSON.parse(savedUser) as AuthUser;
-            if (mounted) {
-              console.log("[Auth] Usuario restaurado de localStorage:", parsedUser.email);
-              setUser(parsedUser);
-            }
-          } catch (err) {
-            console.log("[Auth] Error parseando localStorage:", err);
-            localStorage.removeItem("auth_user");
-          }
-        } else {
-          console.log("[Auth] No hay usuario en localStorage");
+      const savedUser = localStorage.getItem("auth_user");
+      if (savedUser) {
+        try {
+          const parsedUser = JSON.parse(savedUser) as AuthUser;
+          if (mounted) setUser(parsedUser);
+        } catch {
+          localStorage.removeItem("auth_user");
         }
-      } finally {
-        if (mounted) {
-          console.log("[Auth] Bootstrap completado, estableciendo isHydrated=true");
-          setIsHydrated(true);
+      }
+
+      if (mounted) setIsHydrated(true);
+
+      // Silently refresh the access token cookie so protected routes
+      // and API calls work even if the short-lived cookie has expired.
+      if (savedUser && mounted) {
+        try {
+          const { user: freshUser } = await refreshRequest();
+          if (mounted) syncAuth({ user: freshUser });
+        } catch {
+          // Refresh failed — user stays logged in from localStorage until
+          // their next explicit action triggers a 401.
         }
       }
     };
 
     void bootstrap();
-    return () => { 
-      console.log("[Auth] Cleanup del bootstrap useEffect");
-      mounted = false; 
-    };
+    return () => { mounted = false; };
   }, []); // Empty dependency - solo ejecuta al montar
 
   const refreshSession = useCallback(async () => {
