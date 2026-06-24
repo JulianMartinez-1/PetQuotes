@@ -1,10 +1,11 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ArrowLeft, User, Mail, Lock, CheckCircle2, AlertCircle } from "lucide-react";
+import ReCAPTCHA from "react-google-recaptcha";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { AnimatedAuthPanel } from "@/components/auth/animated-auth-panel";
@@ -18,6 +19,8 @@ export default function RegisterPage() {
   const router = useRouter();
   const { login } = useAuthState();
   const [form, setForm] = useState({ fullName: "", email: "", password: "" });
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -55,21 +58,26 @@ export default function RegisterPage() {
       return;
     }
 
+    if (!captchaToken) {
+      setError("Completa la verificación reCAPTCHA para continuar.");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const response = await registerRequest(payload);
+      const response = await registerRequest({ ...payload, captchaToken });
       login({ user: response.user });
-      // Mostrar mensaje de éxito
       setSuccess(true);
       setError(null);
-      // Redirigir al inicio después de 3.5 segundos para que vea bien el mensaje
       setTimeout(() => {
         router.push("/");
       }, 3500);
     } catch (err) {
       setError((err as Error).message || "No fue posible crear la cuenta");
       setSuccess(false);
+      recaptchaRef.current?.reset();
+      setCaptchaToken(null);
     } finally {
       setLoading(false);
     }
@@ -190,6 +198,15 @@ export default function RegisterPage() {
                 )}
               </div>
 
+              <div className="flex justify-center">
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+                  onChange={(token) => setCaptchaToken(token)}
+                  onExpired={() => setCaptchaToken(null)}
+                />
+              </div>
+
               {error && (
                 <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
                   className="p-3 rounded-lg bg-danger/8 border border-danger/20 text-danger text-sm">
@@ -205,7 +222,7 @@ export default function RegisterPage() {
                 </motion.div>
               )}
 
-              <Button type="submit" variant="primary" size="lg" disabled={loading || !isFormValid || success} className="w-full">
+              <Button type="submit" variant="primary" size="lg" disabled={loading || !isFormValid || !captchaToken || success} className="w-full">
                 {success ? "¡Listo!" : loading ? "Creando cuenta..." : "Crear mi cuenta"}
               </Button>
 

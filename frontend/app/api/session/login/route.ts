@@ -1,14 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { callAuthBackend, getErrorPayload, normalizeSessionResponse, setSessionCookies } from "@/lib/auth-server";
+import { callAuthBackend, getErrorPayload, normalizeSessionResponse, setSessionCookies, verifyRecaptcha } from "@/lib/auth-server";
 import { normalizeApiErrorMessage } from "@/lib/error-copy";
 import { setCsrfCookie } from "@/lib/csrf";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
+  const { captchaToken, ...forwardBody } = body;
+
+  const captchaValid = await verifyRecaptcha(captchaToken ?? "");
+  if (!captchaValid) {
+    return NextResponse.json({ message: "Verificación reCAPTCHA fallida. Inténtalo de nuevo." }, { status: 400 });
+  }
+
   let backendResponse: Response;
 
   try {
-    backendResponse = await callAuthBackend("/api/auth/login", body);
+    backendResponse = await callAuthBackend("/api/auth/login", forwardBody);
   } catch (err) {
     console.error("[Login API] ❌ Error llamando backend:", err);
     return NextResponse.json({ message: normalizeApiErrorMessage(504, "upstream timeout", "/api/session/login") }, { status: 504 });

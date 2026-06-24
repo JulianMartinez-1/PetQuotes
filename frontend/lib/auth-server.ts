@@ -92,6 +92,21 @@ export function getRefreshTokenFromRequest(request: NextRequest) {
   return request.cookies.get(AUTH_COOKIE_NAMES.refresh)?.value;
 }
 
+export async function verifyRecaptcha(token: string): Promise<boolean> {
+  const secret = process.env.RECAPTCHA_SECRET_KEY;
+  if (!secret || !token) return false;
+  try {
+    const res = await fetch(
+      `https://www.google.com/recaptcha/api/siteverify?secret=${encodeURIComponent(secret)}&response=${encodeURIComponent(token)}`,
+      { method: "POST", cache: "no-store" }
+    );
+    const data = await res.json();
+    return data.success === true;
+  } catch {
+    return false;
+  }
+}
+
 export async function getErrorPayload(response: Response) {
   const text = await response.text();
   const payload = parseErrorPayload(text);

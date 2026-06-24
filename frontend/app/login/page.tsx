@@ -1,10 +1,11 @@
   "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ArrowLeft, Mail, Lock, CheckCircle2 } from "lucide-react";
+import ReCAPTCHA from "react-google-recaptcha";
 import { Input } from "@/components/ui/input";
 import { AnimatedAuthPanel } from "@/components/auth/animated-auth-panel";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,8 @@ export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuthState();
   const [form, setForm] = useState({ email: "", password: "" });
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -39,11 +42,16 @@ export default function LoginPage() {
       return;
     }
 
+    if (!captchaToken) {
+      setError("Completa la verificación reCAPTCHA para continuar.");
+      return;
+    }
+
     setLoading(true);
 
     try {
       console.log("[Login] Llamando loginRequest con:", payload.email);
-      const response = await loginRequest(payload);
+      const response = await loginRequest({ ...payload, captchaToken });
       console.log("[Login] ✅ loginRequest exitoso!");
       console.log("[Login] Usuario recibido:", response.user);
       
@@ -78,6 +86,8 @@ export default function LoginPage() {
       console.error("[Login] ❌ Error:", err);
       setError((err as Error).message || "No fue posible iniciar sesión");
       setSuccess(false);
+      recaptchaRef.current?.reset();
+      setCaptchaToken(null);
     } finally {
       setLoading(false);
     }
@@ -172,6 +182,15 @@ export default function LoginPage() {
                 </div>
               </div>
 
+              <div className="flex justify-center">
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+                  onChange={(token) => setCaptchaToken(token)}
+                  onExpired={() => setCaptchaToken(null)}
+                />
+              </div>
+
               {error && (
                 <motion.div
                   initial={{ opacity: 0, y: -4 }}
@@ -197,7 +216,7 @@ export default function LoginPage() {
                 type="submit"
                 variant="primary"
                 size="lg"
-                disabled={loading || success}
+                disabled={loading || success || !captchaToken}
                 className="w-full"
               >
                 {success ? "¡Listo!" : loading ? "Entrando..." : "Entrar a mi cuenta"}

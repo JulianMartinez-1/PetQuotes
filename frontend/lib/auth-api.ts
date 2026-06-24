@@ -3,12 +3,14 @@ import { requestJson } from "@/lib/api-client";
 export type LoginPayload = {
   email: string;
   password: string;
+  captchaToken: string;
 };
 
 export type RegisterPayload = {
   fullName: string;
   email: string;
   password: string;
+  captchaToken: string;
 };
 
 export type ForgotPasswordPayload = {
