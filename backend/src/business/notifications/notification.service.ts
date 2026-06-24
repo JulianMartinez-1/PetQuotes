@@ -29,6 +29,14 @@ export interface VeterinaryRejectionData {
   reason: string;
 }
 
+export interface VeterinaryApprovalData {
+  to: string;
+  applicantName: string;
+  veterinaryType: 'CLINIC' | 'INDEPENDENT';
+  clinicName?: string;
+  loginUrl: string;
+}
+
 @Injectable()
 export class NotificationService {
   private readonly logger = new Logger(NotificationService.name);
@@ -140,6 +148,58 @@ export class NotificationService {
               </td></tr>
             </table>
             <p style="margin:24px 0 0;color:#64748b;font-size:14px;">Ingresa al panel de administración para revisar y aprobar o rechazar esta solicitud.</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:20px 40px;background:#f8fafc;border-top:1px solid #e2e8f0;text-align:center;">
+            <p style="margin:0;color:#94a3b8;font-size:12px;">PetQuotes · Plataforma de reservas veterinarias</p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+    );
+  }
+
+  async sendVeterinaryApproval(data: VeterinaryApprovalData): Promise<void> {
+    const typeLabel = data.veterinaryType === 'CLINIC' ? 'clínica veterinaria' : 'perfil de veterinario independiente';
+    const entityLabel = data.clinicName ? `"${data.clinicName}"` : 'tu solicitud';
+
+    await this.send(
+      data.to,
+      `🎉 ¡Tu solicitud en PetQuotes fue aprobada!`,
+      `<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:40px 16px;">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);max-width:100%;">
+        <tr>
+          <td style="background:linear-gradient(135deg,#16a34a 0%,#15803d 100%);padding:36px 40px;text-align:center;">
+            <div style="font-size:48px;margin-bottom:12px;">🎉</div>
+            <h1 style="margin:0 0 6px;color:#fff;font-size:24px;font-weight:700;">¡Solicitud aprobada!</h1>
+            <p style="margin:0;color:rgba(255,255,255,0.85);font-size:14px;">PetQuotes · Registro Veterinario</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:32px 40px 24px;">
+            <p style="margin:0 0 16px;color:#334155;font-size:15px;">Hola <strong>${data.applicantName}</strong>,</p>
+            <p style="margin:0 0 24px;color:#64748b;font-size:14px;line-height:1.6;">
+              Nos complace informarte que tu solicitud para registrar ${entityLabel} como ${typeLabel} en PetQuotes ha sido <strong style="color:#16a34a;">aprobada</strong>. 🐾
+            </p>
+            <p style="margin:0 0 28px;color:#64748b;font-size:14px;line-height:1.6;">
+              Ya puedes acceder a tu cuenta y gestionar toda la información de tu veterinaria: foto, descripción, servicios, datos de contacto y más.
+            </p>
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr><td align="center">
+                <a href="${data.loginUrl}" style="display:inline-block;padding:14px 36px;background:linear-gradient(135deg,#1d4ed8 0%,#06b6d4 100%);color:#fff;font-size:15px;font-weight:700;text-decoration:none;border-radius:10px;letter-spacing:0.01em;">
+                  Ir a Mi Veterinaria →
+                </a>
+              </td></tr>
+            </table>
           </td>
         </tr>
         <tr>

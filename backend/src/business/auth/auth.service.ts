@@ -17,6 +17,7 @@ export interface LoginResult {
   email: string;
   fullName: string;
   role: string;
+  veterinaryStatus?: string;
   accessToken: string;
   refreshToken: string;
   expiresIn: number;
@@ -70,7 +71,8 @@ export class AuthService {
     }
 
     const tokens = this.jwtManager.generateTokens(user.id, user.email, user.role, user.fullName);
-    return { userId: user.id, email: user.email, fullName: user.fullName, role: user.role, ...tokens };
+    const veterinaryStatus = role === 'VETERINARY' ? await this._getVeterinaryStatus(user.id) : undefined;
+    return { userId: user.id, email: user.email, fullName: user.fullName, role: user.role, veterinaryStatus, ...tokens };
   }
 
   private async _createVeterinaryProfile(userId: string, options: RegisterOptions): Promise<void> {
@@ -193,7 +195,8 @@ export class AuthService {
     }
 
     const tokens = this.jwtManager.generateTokens(user.id, user.email, user.role, user.fullName);
-    return { userId: user.id, email: user.email, fullName: user.fullName, role: user.role, ...tokens };
+    const veterinaryStatus = user.role === 'VETERINARY' ? await this._getVeterinaryStatus(user.id) : undefined;
+    return { userId: user.id, email: user.email, fullName: user.fullName, role: user.role, veterinaryStatus, ...tokens };
   }
 
   async verifyToken(token: string) {
@@ -211,6 +214,15 @@ export class AuthService {
     }
 
     const tokens = this.jwtManager.generateTokens(user.id, user.email, user.role, user.fullName);
-    return { userId: user.id, email: user.email, fullName: user.fullName, role: user.role, ...tokens };
+    const veterinaryStatus = user.role === 'VETERINARY' ? await this._getVeterinaryStatus(user.id) : undefined;
+    return { userId: user.id, email: user.email, fullName: user.fullName, role: user.role, veterinaryStatus, ...tokens };
+  }
+
+  private async _getVeterinaryStatus(userId: string): Promise<string | undefined> {
+    const profile = await this.prisma.veterinaryProfile.findUnique({
+      where: { userId },
+      select: { status: true },
+    });
+    return profile?.status ?? undefined;
   }
 }

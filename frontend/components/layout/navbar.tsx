@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, LogOut, Settings, User, Moon, Sun } from "lucide-react";
+import { Menu, X, LogOut, User, Moon, Sun, Stethoscope } from "lucide-react";
 import { useAuthState } from "@/store/auth-state";
 import { useDarkMode } from "@/hooks/useAnimations";
 import { DURATIONS } from "@/constants/animations";
@@ -38,6 +38,8 @@ export function NavBar() {
     setMobileMenuOpen(false);
   };
 
+  const isApprovedVet = isAuthenticated && isHydrated && user?.role === "VETERINARY" && user?.veterinaryStatus === "APPROVED";
+
   const navLinks = [
     { href: "/" as const, label: "Inicio", gradient: false },
     { href: "/clinics" as const, label: "Clínicas", gradient: false },
@@ -46,6 +48,7 @@ export function NavBar() {
       { href: "/pets" as const, label: "Mis Mascotas", gradient: false },
       { href: "/profile" as const, label: "Mi Perfil", gradient: false },
     ] : []),
+    ...(isApprovedVet ? [{ href: "/mi-veterinaria" as const, label: "Mi Veterinaria", gradient: false }] : []),
   ];
 
   return (
@@ -210,6 +213,27 @@ export function NavBar() {
                               </button>
                             </Link>
                           </motion.div>
+
+                          {isApprovedVet && (
+                            <motion.div
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                            >
+                              <Link href="/mi-veterinaria">
+                                <button
+                                  onClick={() => setProfileMenuOpen(false)}
+                                  className={cn(
+                                    "w-full flex items-center gap-2 px-3 py-2 rounded-lg",
+                                    "text-sm font-bold text-text-primary",
+                                    "hover:bg-primary/20 transition-colors"
+                                  )}
+                                >
+                                  <Stethoscope size={16} />
+                                  Mi Veterinaria
+                                </button>
+                              </Link>
+                            </motion.div>
+                          )}
 
 
                           <motion.button

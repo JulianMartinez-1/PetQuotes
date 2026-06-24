@@ -17,6 +17,7 @@ import { AppointmentsModule } from '@presentation/appointments/appointments.modu
 import { AnalyticsModule } from '@presentation/analytics/analytics.module';
 import { NotificationsModule } from '@presentation/notifications/notifications.module';
 import { AdminModule } from '@presentation/admin/admin.module';
+import { VeterinaryModule } from '@presentation/veterinary/veterinary.module';
 
 // TODO: New modules - pending schema alignment
 // import { ProfessionalModule } from '@presentation/professionals/professionals.module';
@@ -45,6 +46,7 @@ import { AdminModule } from '@presentation/admin/admin.module';
     AnalyticsModule,
     NotificationsModule,
     AdminModule,
+    VeterinaryModule,
     // TODO: Add new modules after implementing with correct schema fields
     // ProfessionalModule,
   ],

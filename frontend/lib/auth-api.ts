@@ -53,6 +53,7 @@ type RawAuthResponse = {
     email: string;
     role: "CLIENT" | "VETERINARY" | "ADMIN";
     fullName: string;
+    veterinaryStatus?: string;
   };
 };
 

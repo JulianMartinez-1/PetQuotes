@@ -53,23 +53,30 @@ export async function POST(request: NextRequest) {
     console.log("[Register API] ✅ Backend response OK");
     console.log(`[Register API] Usuario registrado: ${sessionData.user.email}`);
     
-    const response = NextResponse.json(sessionData, {
-      status: 201,
-      headers: {
-        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
-        "Pragma": "no-cache",
-        "Expires": "0",
-        "X-Register-Success": "true",
-        "Content-Type": "application/json; charset=utf-8"
+    const isVetRegistration = forwardBody?.role === "VETERINARY";
+
+    const response = NextResponse.json(
+      isVetRegistration ? { pending: true } : sessionData,
+      {
+        status: 201,
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Register-Success": "true",
+          "Content-Type": "application/json; charset=utf-8"
+        }
       }
-    });
-    
-    setSessionCookies(response, auth);
-    setCsrfCookie(response);
-    
+    );
+
+    if (!isVetRegistration) {
+      setSessionCookies(response, auth);
+      setCsrfCookie(response);
+    }
+
     const setCookieHeaders = response.headers.getSetCookie();
     console.log(`[Register API] ✅ ${setCookieHeaders.length} Set-Cookie headers establecidos`);
-    
+
     return response;
   } catch (err) {
     console.error("[Register API] ❌ Error procesando respuesta:", err);

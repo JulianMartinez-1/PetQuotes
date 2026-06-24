@@ -13,6 +13,7 @@ type BackendAuthResponse = {
   email: string;
   fullName: string;
   role: AuthRole;
+  veterinaryStatus?: string;
 };
 
 export type SessionAuthResponse = {
@@ -21,6 +22,7 @@ export type SessionAuthResponse = {
     email: string;
     role: AuthRole;
     fullName: string;
+    veterinaryStatus?: string;
   };
 };
 
@@ -73,7 +75,8 @@ export function normalizeSessionResponse(raw: BackendAuthResponse): SessionAuthR
       id: payload.sub ?? raw.userId ?? "unknown",
       email: payload.email ?? raw.email ?? "unknown@petquotes.local",
       role,
-      fullName: payload.fullName ?? raw.fullName ?? (payload.email?.split("@")[0] ?? "Usuario")
+      fullName: payload.fullName ?? raw.fullName ?? (payload.email?.split("@")[0] ?? "Usuario"),
+      veterinaryStatus: raw.veterinaryStatus,
     }
   };
 }

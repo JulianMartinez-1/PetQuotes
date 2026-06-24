@@ -4,7 +4,7 @@ import { FormEvent, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, User, Mail, Lock, CheckCircle2, AlertCircle, ChevronLeft } from "lucide-react";
+import { ArrowLeft, User, Mail, Lock, CheckCircle2, AlertCircle, ChevronLeft, Clock } from "lucide-react";
 import ReCAPTCHA from "react-google-recaptcha";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [vetPending, setVetPending] = useState(false);
   const [validations, setValidations] = useState({ name: false, email: false, password: false });
 
   const checkValidations = (fullName: string, email: string, password: string) => {
@@ -117,10 +118,15 @@ export default function RegisterPage() {
       };
 
       const response = await registerRequest(registerPayload);
-      login({ user: response.user });
-      setSuccess(true);
-      setError(null);
-      setTimeout(() => router.push("/"), 3500);
+      if (isVet && (response as unknown as { pending: boolean }).pending) {
+        setVetPending(true);
+        setError(null);
+      } else {
+        login({ user: response.user });
+        setSuccess(true);
+        setError(null);
+        setTimeout(() => router.push("/"), 3500);
+      }
     } catch (err) {
       setError((err as Error).message || "No fue posible crear la cuenta");
       setSuccess(false);
@@ -182,6 +188,47 @@ export default function RegisterPage() {
       ))}
     </div>
   ) : null;
+
+  if (vetPending) {
+    return (
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-6 bg-surface-light">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="w-full max-w-md bg-surface rounded-2xl border border-border shadow-xl p-8 text-center"
+        >
+          <div className="flex items-center justify-center mb-5">
+            <div className="w-16 h-16 rounded-full bg-primary-50 border-2 border-primary-200 flex items-center justify-center">
+              <Clock size={32} className="text-primary-600" />
+            </div>
+          </div>
+          <h1 className="text-2xl font-bold text-text-primary mb-2">Tu solicitud ha sido enviada</h1>
+          <p className="text-text-secondary text-sm leading-relaxed mb-6">
+            Hemos recibido tu solicitud para registrarte como{" "}
+            <strong>{selectedRole === "CLINIC" ? "veterinaria" : "veterinario independiente"}</strong>.
+            Nuestro equipo la revisará pronto y recibirás un correo con la confirmación.
+          </p>
+          <div className="bg-primary-50 border border-primary-100 rounded-xl p-4 mb-6 text-left">
+            <div className="flex items-start gap-3">
+              <Mail size={18} className="text-primary-600 mt-0.5 shrink-0" />
+              <div>
+                <p className="text-sm font-semibold text-text-primary mb-0.5">Revisa tu correo</p>
+                <p className="text-xs text-text-secondary">
+                  Una vez aprobada tu solicitud, recibirás un correo con un enlace para acceder a tu cuenta y gestionar tu veterinaria.
+                </p>
+              </div>
+            </div>
+          </div>
+          <Link href="/">
+            <Button variant="primary" size="lg" className="w-full">
+              Volver al inicio
+            </Button>
+          </Link>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[calc(100vh-4rem)] grid lg:grid-cols-2">

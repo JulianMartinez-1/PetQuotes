@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '@shared/prisma/prisma.service';
 import { NotificationService } from '@business/notifications/notification.service';
 
@@ -7,6 +8,7 @@ export class AdminService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly notificationService: NotificationService,
+    private readonly config: ConfigService,
   ) {}
 
   async getVeterinaryRequests(status: 'PENDING' | 'APPROVED' | 'REJECTED' = 'PENDING') {
@@ -70,6 +72,17 @@ export class AdminService {
         },
       });
     });
+
+    const frontendUrl = this.config.get<string>('FRONTEND_URL') ?? 'https://petquotes.online';
+    this.notificationService
+      .sendVeterinaryApproval({
+        to: profile.user.email,
+        applicantName: profile.user.fullName,
+        veterinaryType: profile.veterinaryType as 'CLINIC' | 'INDEPENDENT',
+        clinicName: profile.clinic?.name,
+        loginUrl: `${frontendUrl}/mi-veterinaria`,
+      })
+      .catch(() => {});
 
     return { success: true, message: 'Solicitud aprobada' };
   }

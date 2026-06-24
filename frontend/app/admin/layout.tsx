@@ -4,7 +4,7 @@ import { PropsWithChildren } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ChevronLeft, Building2, ClipboardList, BarChart3, Stethoscope } from "lucide-react";
+import { ChevronLeft, Building2, ClipboardList, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuthState } from "@/store/auth-state";
@@ -12,8 +12,7 @@ import { useAuthState } from "@/store/auth-state";
 const NAV_ITEMS = [
   { href: "/admin/clinics", label: "Clínicas", icon: Building2 },
   { href: "/admin/reservas", label: "Reservas", icon: ClipboardList },
-  { href: "/admin/analytics", label: "Analítica", icon: BarChart3 },
-  { href: "/admin/veterinarias", label: "Solicitudes Vet.", icon: Stethoscope },
+  { href: "/admin/veterinarias", label: "Veterinarias", icon: Stethoscope },
 ];
 
 export default function AdminLayout({ children }: PropsWithChildren) {
