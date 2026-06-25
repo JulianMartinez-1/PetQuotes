@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { IsBoolean, IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
 import { PrismaService } from '@shared/prisma/prisma.service';
 
@@ -36,7 +36,6 @@ export class VeterinaryService {
     });
 
     if (!profile) throw new NotFoundException('Perfil veterinario no encontrado');
-    if (profile.status !== 'APPROVED') throw new ForbiddenException('Perfil pendiente de aprobación');
 
     return profile;
   }
@@ -48,7 +47,6 @@ export class VeterinaryService {
     });
 
     if (!profile) throw new NotFoundException('Perfil veterinario no encontrado');
-    if (profile.status !== 'APPROVED') throw new ForbiddenException('Perfil pendiente de aprobación');
 
     if (profile.veterinaryType === 'CLINIC' && profile.clinic) {
       const clinicUpdate: Record<string, unknown> = {};
