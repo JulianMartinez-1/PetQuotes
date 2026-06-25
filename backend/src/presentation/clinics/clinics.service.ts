@@ -536,7 +536,7 @@ async searchClinicsByCoordinates(
     independents: IndependentVetItem[];
   }> {
     const profiles = await this.prisma.veterinaryProfile.findMany({
-      where: { status: 'APPROVED' },
+      where: { status: { in: ['PENDING', 'APPROVED'] } },
       include: {
         user: { select: { fullName: true } },
         clinic: {

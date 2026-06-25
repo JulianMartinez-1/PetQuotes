@@ -38,7 +38,7 @@ export function NavBar() {
     setMobileMenuOpen(false);
   };
 
-  const isApprovedVet = isAuthenticated && isHydrated && user?.role === "VETERINARY" && user?.veterinaryStatus === "APPROVED";
+  const isApprovedVet = isAuthenticated && isHydrated && user?.role === "VETERINARY";
 
   const navLinks = [
     { href: "/" as const, label: "Inicio", gradient: false },

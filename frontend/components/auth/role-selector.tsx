@@ -1,10 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { User, Building2, Stethoscope, CheckCircle2 } from "lucide-react";
+import { User, Building2, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type SelectedRole = "CLIENT" | "CLINIC" | "INDEPENDENT";
+export type SelectedRole = "CLIENT" | "CLINIC";
 
 interface RoleSelectorProps {
   selected: SelectedRole | null;
@@ -37,15 +37,6 @@ const ROLES: {
     badge: "Establecimiento",
     gradient: "from-mint/10 to-secondary-600/10",
     border: "border-mint",
-  },
-  {
-    id: "INDEPENDENT",
-    icon: Stethoscope,
-    title: "Veterinario independiente",
-    description: "Ofrezco servicios veterinarios por cuenta propia",
-    badge: "Profesional",
-    gradient: "from-accent/10 to-primary-600/10",
-    border: "border-accent",
   },
 ];
 

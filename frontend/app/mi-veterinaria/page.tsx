@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 interface VetProfile {
   id: string;
   veterinaryType: "CLINIC" | "INDEPENDENT";
-  status: "APPROVED";
+  status: "PENDING" | "APPROVED" | "REJECTED";
   serviceArea: string | null;
   homeVisits: boolean;
   coverageRadius: number | null;
@@ -75,7 +75,6 @@ export default function MiVeterinariaPage() {
     if (!isHydrated) return;
     if (!user) { router.push("/login"); return; }
     if (user.role !== "VETERINARY") { router.push("/"); return; }
-    if (user.veterinaryStatus !== "APPROVED") { router.push("/"); return; }
 
     const load = async () => {
       try {

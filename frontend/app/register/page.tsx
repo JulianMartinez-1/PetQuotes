@@ -4,7 +4,7 @@ import { FormEvent, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, User, Mail, Lock, CheckCircle2, AlertCircle, ChevronLeft, Clock } from "lucide-react";
+import { ArrowLeft, User, Mail, Lock, CheckCircle2, AlertCircle, ChevronLeft } from "lucide-react";
 import ReCAPTCHA from "react-google-recaptcha";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,9 +12,8 @@ import { AnimatedAuthPanel } from "@/components/auth/animated-auth-panel";
 import { SocialAuthButtons } from "@/components/auth/social-auth-buttons";
 import { RoleSelector, type SelectedRole } from "@/components/auth/role-selector";
 import { VeterinaryClinicForm } from "@/components/auth/veterinary-clinic-form";
-import { VeterinaryIndependentForm } from "@/components/auth/veterinary-independent-form";
 import { registerRequest } from "@/lib/auth-api";
-import type { VeterinaryClinicData, VeterinaryIndependentData } from "@/lib/auth-api";
+import type { VeterinaryClinicData } from "@/lib/auth-api";
 import { useAuthState } from "@/store/auth-state";
 import { DURATIONS } from "@/constants/animations";
 import { cn } from "@/lib/utils";
@@ -29,13 +28,11 @@ export default function RegisterPage() {
   const [selectedRole, setSelectedRole] = useState<SelectedRole | null>(null);
   const [form, setForm] = useState({ fullName: "", email: "", password: "" });
   const [clinicData, setClinicData] = useState<Partial<VeterinaryClinicData>>({});
-  const [independentData, setIndependentData] = useState<Partial<VeterinaryIndependentData>>({ homeVisits: false });
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const recaptchaRef = useRef<ReCAPTCHA>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [vetPending, setVetPending] = useState(false);
   const [validations, setValidations] = useState({ name: false, email: false, password: false });
 
   const checkValidations = (fullName: string, email: string, password: string) => {
@@ -46,7 +43,7 @@ export default function RegisterPage() {
     });
   };
 
-  const isVet = selectedRole === "CLINIC" || selectedRole === "INDEPENDENT";
+  const isVet = selectedRole === "CLINIC";
   const isBaseFormValid = validations.name && validations.email && validations.password;
 
   const isClinicDataValid =
@@ -54,10 +51,7 @@ export default function RegisterPage() {
     !!clinicData.city?.trim() &&
     !!clinicData.address?.trim();
 
-  const isIndependentDataValid = !!independentData.serviceArea?.trim();
-
-  const isVetDataValid =
-    selectedRole === "CLINIC" ? isClinicDataValid : isIndependentDataValid;
+  const isVetDataValid = isClinicDataValid;
 
   const isFinalFormValid = isBaseFormValid && (!isVet || isVetDataValid);
 
@@ -100,10 +94,6 @@ export default function RegisterPage() {
         return;
       }
     }
-    if (selectedRole === "INDEPENDENT" && !independentData.serviceArea?.trim()) {
-      setError("La zona de atención es requerida.");
-      return;
-    }
 
     setLoading(true);
     try {
@@ -115,22 +105,13 @@ export default function RegisterPage() {
           veterinaryType: "CLINIC" as const,
           clinicData: clinicData as VeterinaryClinicData,
         }),
-        ...(selectedRole === "INDEPENDENT" && {
-          veterinaryType: "INDEPENDENT" as const,
-          independentData: independentData as VeterinaryIndependentData,
-        }),
       };
 
       const response = await registerRequest(registerPayload);
-      if (isVet && (response as unknown as { pending: boolean }).pending) {
-        setVetPending(true);
-        setError(null);
-      } else {
-        login({ user: response.user });
-        setSuccess(true);
-        setError(null);
-        setTimeout(() => router.push("/"), 3500);
-      }
+      login({ user: response.user });
+      setSuccess(true);
+      setError(null);
+      setTimeout(() => router.push(isVet ? "/mi-veterinaria" : "/"), 2000);
     } catch (err) {
       setError((err as Error).message || "No fue posible crear la cuenta");
       setSuccess(false);
@@ -156,14 +137,12 @@ export default function RegisterPage() {
       subtitle: "¿Cómo quieres usar PetQuotes?",
     },
     base: {
-      title: selectedRole === "CLINIC" ? "Datos de tu cuenta" : selectedRole === "INDEPENDENT" ? "Datos de tu cuenta" : "Crea tu cuenta",
+      title: selectedRole === "CLINIC" ? "Datos de tu cuenta" : "Crea tu cuenta",
       subtitle: "Información personal de acceso",
     },
     vet: {
-      title: selectedRole === "CLINIC" ? "Tu veterinaria" : "Tu perfil profesional",
-      subtitle: selectedRole === "CLINIC"
-        ? "Datos de la clínica que vas a registrar"
-        : "Información sobre tu práctica independiente",
+      title: "Tu veterinaria",
+      subtitle: "Datos de la clínica que vas a registrar",
     },
   };
 
@@ -192,47 +171,6 @@ export default function RegisterPage() {
       ))}
     </div>
   ) : null;
-
-  if (vetPending) {
-    return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-6 bg-surface-light">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="w-full max-w-md bg-surface rounded-2xl border border-border shadow-xl p-8 text-center"
-        >
-          <div className="flex items-center justify-center mb-5">
-            <div className="w-16 h-16 rounded-full bg-primary-50 border-2 border-primary-200 flex items-center justify-center">
-              <Clock size={32} className="text-primary-600" />
-            </div>
-          </div>
-          <h1 className="text-2xl font-bold text-text-primary mb-2">Tu solicitud ha sido enviada</h1>
-          <p className="text-text-secondary text-sm leading-relaxed mb-6">
-            Hemos recibido tu solicitud para registrarte como{" "}
-            <strong>{selectedRole === "CLINIC" ? "veterinaria" : "veterinario independiente"}</strong>.
-            Nuestro equipo la revisará pronto y recibirás un correo con la confirmación.
-          </p>
-          <div className="bg-primary-50 border border-primary-100 rounded-xl p-4 mb-6 text-left">
-            <div className="flex items-start gap-3">
-              <Mail size={18} className="text-primary-600 mt-0.5 shrink-0" />
-              <div>
-                <p className="text-sm font-semibold text-text-primary mb-0.5">Revisa tu correo</p>
-                <p className="text-xs text-text-secondary">
-                  Una vez aprobada tu solicitud, recibirás un correo con un enlace para acceder a tu cuenta y gestionar tu veterinaria.
-                </p>
-              </div>
-            </div>
-          </div>
-          <Link href="/">
-            <Button variant="primary" size="lg" className="w-full">
-              Volver al inicio
-            </Button>
-          </Link>
-        </motion.div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-[calc(100vh-4rem)] grid lg:grid-cols-2">
@@ -460,11 +398,7 @@ export default function RegisterPage() {
                   onSubmit={onSubmit}
                   className="space-y-4"
                 >
-                  {selectedRole === "CLINIC" ? (
-                    <VeterinaryClinicForm value={clinicData} onChange={setClinicData} />
-                  ) : (
-                    <VeterinaryIndependentForm value={independentData} onChange={setIndependentData} />
-                  )}
+                  <VeterinaryClinicForm value={clinicData} onChange={setClinicData} />
 
                   <div className="flex justify-center pt-2">
                     <ReCAPTCHA

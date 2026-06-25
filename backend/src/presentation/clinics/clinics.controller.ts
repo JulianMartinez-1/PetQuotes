@@ -152,7 +152,7 @@ export class ClinicsController {
   }
 
   /**
-   * Clínicas registradas en la plataforma con estado APPROVED
+   * Clínicas registradas en la plataforma (PENDING o APPROVED)
    * GET /clinics/platform-registered
    */
   @Get('platform-registered')

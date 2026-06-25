@@ -53,10 +53,8 @@ export async function POST(request: NextRequest) {
     console.log("[Register API] ✅ Backend response OK");
     console.log(`[Register API] Usuario registrado: ${sessionData.user.email}`);
     
-    const isVetRegistration = forwardBody?.role === "VETERINARY";
-
     const response = NextResponse.json(
-      isVetRegistration ? { pending: true } : sessionData,
+      sessionData,
       {
         status: 201,
         headers: {
@@ -69,10 +67,8 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    if (!isVetRegistration) {
-      setSessionCookies(response, auth);
-      setCsrfCookie(response);
-    }
+    setSessionCookies(response, auth);
+    setCsrfCookie(response);
 
     const setCookieHeaders = response.headers.getSetCookie();
     console.log(`[Register API] ✅ ${setCookieHeaders.length} Set-Cookie headers establecidos`);
