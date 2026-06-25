@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, PropsWithChildren, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, PropsWithChildren, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { logoutRequest, refreshRequest } from "@/lib/auth-api";
 
 type AuthUser = {
@@ -19,21 +19,23 @@ type AuthStateContextValue = {
   logout: () => void;
 };
 
-const REFRESH_INTERVAL_MS = 5 * 60 * 1000; // Reducido a 5 minutos para refrescar más frecuentemente
+const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
 const AuthStateContext = createContext<AuthStateContextValue | null>(null);
 
 export function AuthStateProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
+  // Incremented on every syncAuth call. Bootstrap reads a snapshot before the
+  // async refresh so it can detect if a concurrent login() has already set a
+  // fresh session and skip clearAuth() in that case.
+  const loginGenRef = useRef(0);
 
   const syncAuth = useCallback((payload: { user: AuthUser }) => {
+    loginGenRef.current += 1;
     try {
-      console.log("[Auth] syncAuth llamado con usuario:", payload.user);
       setUser(payload.user);
       if (typeof window !== "undefined") {
-        const serialized = JSON.stringify(payload.user);
-        localStorage.setItem("auth_user", serialized);
-        console.log("[Auth] Guardado en localStorage, verificando:", localStorage.getItem("auth_user"));
+        localStorage.setItem("auth_user", JSON.stringify(payload.user));
       }
     } catch (err) {
       console.error("[Auth] Error en syncAuth:", err);
@@ -41,7 +43,6 @@ export function AuthStateProvider({ children }: PropsWithChildren) {
   }, []);
 
   const clearAuth = useCallback(() => {
-    console.log("[Auth] clearAuth llamado");
     setUser(null);
     localStorage.removeItem("auth_user");
   }, []);
@@ -53,6 +54,10 @@ export function AuthStateProvider({ children }: PropsWithChildren) {
     const bootstrap = async () => {
       const savedUser = localStorage.getItem("auth_user");
       if (savedUser) {
+        // Snapshot generation BEFORE the async refresh so we can detect if
+        // a concurrent OAuth login() call has completed while we were waiting.
+        const genSnapshot = loginGenRef.current;
+
         try {
           const parsedUser = JSON.parse(savedUser) as AuthUser;
           if (mounted) setUser(parsedUser);
@@ -60,14 +65,16 @@ export function AuthStateProvider({ children }: PropsWithChildren) {
           localStorage.removeItem("auth_user");
         }
 
-        // Validate the session before marking hydrated to avoid flashing
-        // authenticated UI while the token check is in flight.
         try {
           const { user: freshUser } = await refreshRequest();
           if (mounted) syncAuth({ user: freshUser });
         } catch {
-          // Refresh failed — session is no longer valid, clear stale auth.
-          if (mounted) clearAuth();
+          // Only clear if no concurrent login() set a fresh session while the
+          // refresh was in flight. If loginGenRef changed, a login() already
+          // established a valid session and we must not wipe it.
+          if (mounted && loginGenRef.current === genSnapshot) {
+            clearAuth();
+          }
         }
       }
 
@@ -76,7 +83,7 @@ export function AuthStateProvider({ children }: PropsWithChildren) {
 
     void bootstrap();
     return () => { mounted = false; };
-  }, []); // Empty dependency - solo ejecuta al montar
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const refreshSession = useCallback(async () => {
     try {
@@ -98,7 +105,6 @@ export function AuthStateProvider({ children }: PropsWithChildren) {
   }, [isHydrated, refreshSession, user]);
 
   const login = useCallback(({ user: nextUser }: { user: AuthUser }) => {
-    console.log("[Auth] login() llamado con:", nextUser.email);
     syncAuth({ user: nextUser });
   }, [syncAuth]);
 
