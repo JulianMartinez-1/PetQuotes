@@ -31,11 +31,18 @@ export class JwtAuthGuard implements CanActivate {
 
   private extractToken(request: Request): string | null {
     const authHeader = request.headers.authorization;
-    if (!authHeader) return null;
+    if (authHeader) {
+      const [scheme, token] = authHeader.split(' ');
+      if (scheme === 'Bearer' && token) return token;
+    }
 
-    const [scheme, token] = authHeader.split(' ');
-    if (scheme !== 'Bearer' || !token) return null;
+    // Fallback: accept refreshToken from request body (used by the Next.js
+    // refresh proxy which forwards the httpOnly cookie value in the body).
+    const body = (request as any).body as Record<string, unknown> | undefined;
+    if (body?.refreshToken && typeof body.refreshToken === 'string') {
+      return body.refreshToken;
+    }
 
-    return token;
+    return null;
   }
 }
