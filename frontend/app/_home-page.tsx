@@ -3,12 +3,11 @@
 import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
-import { Search, ArrowRight, ShieldCheck, Zap, ClipboardList, Bell } from "lucide-react";
+import { Search, ArrowRight, ShieldCheck, Zap, ClipboardList, Bell, Send, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ServiceCard } from "@/components/ui/service-card";
 import { CTA } from "@/components/sections/cta-section";
-import { TestimonialsGrid } from "@/components/sections/testimonials-section";
 import { PlayfulPets, PetsParade, FloatingPets } from "@/components/animations/pet-animations";
 import { ScrollReactivePets } from "@/components/animations/scroll-reactive-pets";
 import { AdvancedSearch } from "@/components/search/advanced-search";
@@ -19,6 +18,9 @@ import { useRouter } from "next/navigation";
 export default function HomePageClient() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
+  const [contactStatus, setContactStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [contactError, setContactError] = useState("");
   const prefersReducedMotion = useReducedMotion();
 
   const handleSelectCity = (city: string) => {
@@ -31,6 +33,28 @@ export default function HomePageClient() {
 
   const handleSelectClinic = (clinicId: string) => {
     router.push(`/clinics/${clinicId}`);
+  };
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setContactStatus("loading");
+    setContactError("");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(contactForm),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message ?? "Error enviando el mensaje");
+      }
+      setContactStatus("success");
+      setContactForm({ name: "", email: "", message: "" });
+    } catch (err: unknown) {
+      setContactError(err instanceof Error ? err.message : "Error enviando el mensaje");
+      setContactStatus("error");
+    }
   };
 
   const services = [
@@ -91,35 +115,6 @@ export default function HomePageClient() {
     },
   ];
 
-  const testimonials = [
-    {
-      name: "María González",
-      role: "Dueña de Luna",
-      company: "La Floresta",
-      content:
-        "Encontré la mejor clínica para mi gato en minutos. El servicio fue excelente y Luna está mucho mejor.",
-      rating: 5,
-      color: "primary" as const,
-    },
-    {
-      name: "Carlos Ruiz",
-      role: "Dueño de Max",
-      company: "Zona Centro",
-      content:
-        "Aplicación intuitiva y fácil de usar. Recomendado a todos mis amigos con mascotas.",
-      rating: 5,
-      color: "mint" as const,
-    },
-    {
-      name: "Ana Martínez",
-      role: "Dueña de Bella",
-      company: "Norte",
-      content:
-        "Finalmente un lugar donde confiar. Las clínicas verificadas dan total tranquilidad.",
-      rating: 5,
-      color: "secondary" as const,
-    },
-  ];
 
   return (
     <main className="overflow-hidden bg-background relative">
@@ -533,14 +528,141 @@ export default function HomePageClient() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="relative py-32 bg-gradient-to-b from-transparent via-surface/20 to-surface/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <TestimonialsGrid
-            title="Lo que Dicen Nuestros Usuarios"
-            subtitle="Historias de mascotas felices y dueños satisfechos"
-            testimonials={testimonials}
-          />
+      {/* Contact Section */}
+      <section className="relative py-32 bg-gradient-to-b from-transparent via-surface/20 to-surface/10 overflow-hidden">
+        <div className="absolute inset-0 -z-10 opacity-5">
+          <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-primary rounded-full blur-3xl" />
+          <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-secondary rounded-full blur-3xl" />
+        </div>
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            viewport={{ once: false, amount: 0.3 }}
+            className="text-center mb-12"
+          >
+            <h2 className={cn(
+              "text-5xl sm:text-6xl font-black mb-4",
+              "bg-gradient-to-r from-primary-600 via-secondary-400 to-mint-500 bg-clip-text text-transparent"
+            )}>
+              Déjanos tus Dudas
+            </h2>
+            <p className="text-lg font-semibold text-text-primary max-w-xl mx-auto">
+              ¿Tienes alguna pregunta o inquietud? Escríbenos y te respondemos pronto.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
+            viewport={{ once: true, amount: 0.2 }}
+            className="bg-surface border border-border/30 rounded-2xl p-8 shadow-lg"
+          >
+            {contactStatus === "success" ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex flex-col items-center gap-4 py-8 text-center"
+              >
+                <CheckCircle2 size={56} className="text-mint" />
+                <h3 className="text-2xl font-bold text-text-primary">¡Mensaje enviado!</h3>
+                <p className="text-text-secondary max-w-sm">
+                  Recibimos tu consulta. Te responderemos al correo que nos dejaste a la brevedad.
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={() => setContactStatus("idle")}
+                  className="mt-2"
+                >
+                  Enviar otra consulta
+                </Button>
+              </motion.div>
+            ) : (
+              <form onSubmit={handleContactSubmit} className="space-y-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-semibold text-text-primary">Nombre</label>
+                    <input
+                      type="text"
+                      required
+                      minLength={2}
+                      maxLength={100}
+                      value={contactForm.name}
+                      onChange={e => setContactForm(f => ({ ...f, name: e.target.value }))}
+                      placeholder="Tu nombre"
+                      className={cn(
+                        "w-full px-4 py-3 rounded-xl text-sm font-medium",
+                        "bg-background border border-border/50 text-text-primary",
+                        "placeholder:text-text-secondary/50",
+                        "focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20",
+                        "transition-all duration-200"
+                      )}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-semibold text-text-primary">Correo electrónico</label>
+                    <input
+                      type="email"
+                      required
+                      maxLength={150}
+                      value={contactForm.email}
+                      onChange={e => setContactForm(f => ({ ...f, email: e.target.value }))}
+                      placeholder="tu@correo.com"
+                      className={cn(
+                        "w-full px-4 py-3 rounded-xl text-sm font-medium",
+                        "bg-background border border-border/50 text-text-primary",
+                        "placeholder:text-text-secondary/50",
+                        "focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20",
+                        "transition-all duration-200"
+                      )}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold text-text-primary">Mensaje</label>
+                  <textarea
+                    required
+                    minLength={10}
+                    maxLength={1000}
+                    rows={5}
+                    value={contactForm.message}
+                    onChange={e => setContactForm(f => ({ ...f, message: e.target.value }))}
+                    placeholder="Cuéntanos tu duda o inquietud..."
+                    className={cn(
+                      "w-full px-4 py-3 rounded-xl text-sm font-medium resize-none",
+                      "bg-background border border-border/50 text-text-primary",
+                      "placeholder:text-text-secondary/50",
+                      "focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20",
+                      "transition-all duration-200"
+                    )}
+                  />
+                </div>
+
+                {contactStatus === "error" && (
+                  <p className="text-sm text-red-500 font-medium">{contactError}</p>
+                )}
+
+                <Button
+                  type="submit"
+                  variant="gradient"
+                  size="lg"
+                  disabled={contactStatus === "loading"}
+                  className="w-full gap-2"
+                >
+                  {contactStatus === "loading" ? (
+                    <>Enviando...</>
+                  ) : (
+                    <>
+                      Enviar consulta
+                      <Send size={16} />
+                    </>
+                  )}
+                </Button>
+              </form>
+            )}
+          </motion.div>
         </div>
       </section>
 
