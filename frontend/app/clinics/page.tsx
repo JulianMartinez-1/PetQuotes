@@ -114,6 +114,7 @@ export default function ClinicsPage() {
   const [page, setPage] = useState(1);
   const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
   const [clinicsData, setClinicsData] = useState<typeof CLINIC_CATALOG>(CLINIC_CATALOG);
+  const [platformClinics, setPlatformClinics] = useState<typeof CLINIC_CATALOG>([]);
   const [loading, setLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
   const [locationError, setLocationError] = useState<string | null>(null);
@@ -212,15 +213,11 @@ export default function ClinicsPage() {
     loadNearByClinics();
   }, []);
 
-  // Merge platform-registered (APPROVED) clinics with the catalog
+  // Load platform-registered clinics into separate state so geolocation
+  // replacing clinicsData doesn't wipe them out.
   useEffect(() => {
     fetchPlatformClinics().then(({ clinics }) => {
-      if (clinics.length === 0) return;
-      setClinicsData((prev) => {
-        const existingIds = new Set(prev.map((c) => c.id));
-        const newOnes = clinics.filter((c) => !existingIds.has(c.id));
-        return newOnes.length > 0 ? [...prev, ...newOnes] : prev;
-      });
+      if (clinics.length > 0) setPlatformClinics(clinics);
     });
   }, []);
 
@@ -232,15 +229,22 @@ export default function ClinicsPage() {
     }
   }, [searchParams]);
 
+  // Merge platform clinics on top of geo/catalog clinics, deduplicating by id.
+  const allClinics = useMemo(() => {
+    const existingIds = new Set(clinicsData.map((c) => c.id));
+    const newOnes = platformClinics.filter((c) => !existingIds.has(c.id));
+    return newOnes.length > 0 ? [...clinicsData, ...newOnes] : clinicsData;
+  }, [clinicsData, platformClinics]);
+
   const cityOptions = useMemo(
-    () => ["all", ...new Set(clinicsData.map((item) => item.city))],
-    [clinicsData]
+    () => ["all", ...new Set(allClinics.map((item) => item.city))],
+    [allClinics]
   );
 
   const filtered = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
-    const base = clinicsData.filter((item) => {
+    const base = allClinics.filter((item) => {
       const matchesCity = selectedCity === "all" || item.city === selectedCity;
       const matchesOpenNow = !openNowOnly || item.openNow;
       const matchesQuery =
@@ -260,7 +264,7 @@ export default function ClinicsPage() {
     });
 
     return sorted;
-  }, [openNowOnly, query, selectedCity, sortMode, clinicsData]);
+  }, [openNowOnly, query, selectedCity, sortMode, allClinics]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / CATALOG_PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
@@ -291,7 +295,7 @@ export default function ClinicsPage() {
   };
 
   // Re-animar cuando las clínicas cambian
-  const animationKey = useMemo(() => clinicsData.map(c => c.id).join(','), [clinicsData]);
+  const animationKey = useMemo(() => allClinics.map(c => c.id).join(','), [allClinics]);
 
   return (
     <main className="overflow-hidden">
