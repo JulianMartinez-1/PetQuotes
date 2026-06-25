@@ -560,6 +560,25 @@ export function ClinicBookingModal({
                 }}
               />
 
+              <AnimatePresence>
+                {selectedTime && (
+                  <motion.div
+                    key="time-selected"
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.2 }}
+                    className="mt-4 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-secondary-50 border border-secondary-200"
+                  >
+                    <Clock size={15} className="text-secondary-600 shrink-0" />
+                    <span className="text-sm text-secondary-700">
+                      Hora seleccionada:{" "}
+                      <span className="font-bold">{formatTime(selectedTime)}</span>
+                    </span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               <div className="mt-6">
                 <label className="block text-sm font-semibold text-text-primary mb-2">
                   Notas adicionales{" "}
