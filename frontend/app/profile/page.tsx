@@ -16,6 +16,7 @@ import {
   Lock,
   PawPrint,
   AlertCircle,
+  Stethoscope,
 } from "lucide-react";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { Input } from "@/components/ui/input";
@@ -149,6 +150,7 @@ export default function ProfilePage() {
   const notifSectionRef = useRef<HTMLDivElement>(null);
 
   const [isNotifyRedirect, setIsNotifyRedirect] = useState(false);
+  const [clinicName, setClinicName] = useState<string | null>(null);
   const router = useRouter();
 
   // Load localStorage settings and DB profile
@@ -173,6 +175,16 @@ export default function ProfilePage() {
         if (data?.notificationChannel === "EMAIL") setNotificationChannel("EMAIL");
       })
       .catch(() => null);
+
+    // Fetch clinic name if user is a vet
+    if (user.role === "VETERINARY") {
+      fetch("/api/proxy/veterinary/my-profile")
+        .then((r) => r.ok ? r.json() : null)
+        .then((data) => {
+          if (data?.clinic?.name) setClinicName(data.clinic.name);
+        })
+        .catch(() => null);
+    }
   }, [user]);
 
   // Detect ?notify=1 redirect from booking wizard
@@ -318,6 +330,12 @@ export default function ProfilePage() {
                     <Shield size={11} />
                     Verificado
                   </span>
+                  {clinicName && (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-50 border border-secondary-200 text-secondary-700 text-xs font-semibold">
+                      <Stethoscope size={11} />
+                      Dueño de: {clinicName}
+                    </span>
+                  )}
                 </div>
                 <p className="text-text-secondary text-sm">{user.email}</p>
                 {savedAt && (
