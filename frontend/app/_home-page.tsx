@@ -3,11 +3,10 @@
 import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
-import { Search, ArrowRight } from "lucide-react";
+import { Search, ArrowRight, ShieldCheck, Zap, ClipboardList, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ServiceCard } from "@/components/ui/service-card";
-import { StatsGrid } from "@/components/sections/stats-section";
 import { CTA } from "@/components/sections/cta-section";
 import { TestimonialsGrid } from "@/components/sections/testimonials-section";
 import { PlayfulPets, PetsParade, FloatingPets } from "@/components/animations/pet-animations";
@@ -65,32 +64,30 @@ export default function HomePageClient() {
     },
   ];
 
-  const stats = [
+  const benefits = [
     {
-      label: "Clínicas Verificadas",
-      value: 250,
+      icon: ShieldCheck,
+      title: "Clínicas Verificadas",
+      description: "Solo trabajamos con veterinarias que cumplen estándares de calidad y tienen reseñas reales.",
       color: "primary" as const,
-      description: "En toda la región",
     },
     {
-      label: "Mascotas Felices",
-      value: 15000,
-      suffix: "+",
+      icon: Zap,
+      title: "Reserva Instantánea",
+      description: "Sin llamadas ni esperas. Elige horario, confirma y listo — todo desde la app.",
       color: "mint" as const,
-      description: "Cuidadas este año",
     },
     {
-      label: "Citas Reservadas",
-      value: 98,
-      suffix: "%",
+      icon: ClipboardList,
+      title: "Historial Centralizado",
+      description: "El historial médico de tu mascota siempre accesible, organizado y listo para compartir.",
       color: "secondary" as const,
-      description: "Tasa de confirmación",
     },
     {
-      label: "Tiempo Promedio",
-      value: 2,
+      icon: Bell,
+      title: "Notificaciones Automáticas",
+      description: "Recordatorios de citas, confirmaciones y alertas de salud directo a tu correo.",
       color: "accent" as const,
-      description: "Minutos para reservar",
     },
   ];
 
@@ -245,7 +242,7 @@ export default function HomePageClient() {
                 </Button>
               </Link>
               <p className="text-sm text-text-secondary">
-                Únete a más de 15,000 dueños de mascotas satisfechos
+                Gratis para dueños de mascotas — siempre
               </p>
             </motion.div>
           </motion.div>
@@ -337,15 +334,96 @@ export default function HomePageClient() {
       {/* Decorative spacing */}
       <div className="h-12" />
 
-      {/* Stats Section */}
-      <section className="relative py-32">
+      {/* Benefits Section */}
+      <section className="relative py-32 overflow-hidden">
+        <div className="absolute inset-0 -z-10 opacity-5">
+          <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-secondary rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/3 w-96 h-96 bg-accent rounded-full blur-3xl" />
+        </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <StatsGrid
-            title="Números que Hablan"
-            subtitle="Confianza y satisfacción en cada cifra"
-            stats={stats}
-            columns={4}
-          />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            viewport={{ once: false, amount: 0.3 }}
+            className="text-center mb-16"
+          >
+            <h2 className={cn(
+              "text-5xl sm:text-6xl font-black mb-4",
+              "bg-gradient-to-r from-primary-600 via-secondary-400 to-mint-500 bg-clip-text text-transparent"
+            )}>
+              Por Qué PetQuotes
+            </h2>
+            <p className="text-lg font-semibold text-text-primary max-w-2xl mx-auto">
+              Todo lo que necesitas para cuidar a tu mascota, sin complicaciones
+            </p>
+          </motion.div>
+
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ staggerChildren: 0.1, delayChildren: 0.1 }}
+            viewport={{ once: false, amount: 0.2 }}
+          >
+            {benefits.map((benefit, index) => {
+              const Icon = benefit.icon;
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.6, ease: "easeOut", delay: index * 0.08 }}
+                  viewport={{ once: false, amount: 0.3 }}
+                  className={cn(
+                    "relative overflow-hidden rounded-2xl p-8",
+                    "bg-surface border border-border/30",
+                    "hover:border-secondary/50 transition-all duration-300",
+                    "hover:shadow-lg hover:shadow-secondary/20"
+                  )}
+                  whileHover={{ y: -4, transition: { duration: 0.3 } }}
+                >
+                  {/* Top Accent */}
+                  <motion.div
+                    className={cn(
+                      "absolute top-0 left-0 h-1 w-12",
+                      benefit.color === "primary" && "bg-primary",
+                      benefit.color === "secondary" && "bg-secondary",
+                      benefit.color === "mint" && "bg-mint",
+                      benefit.color === "accent" && "bg-accent",
+                    )}
+                    initial={{ width: 0 }}
+                    whileInView={{ width: 48 }}
+                    transition={{ delay: index * 0.05 + 0.2, duration: 0.6 }}
+                    viewport={{ once: true }}
+                  />
+
+                  {/* Icon */}
+                  <div className={cn(
+                    "mb-6 mt-2 w-12 h-12 rounded-xl flex items-center justify-center",
+                    benefit.color === "primary" && "bg-primary/15 text-primary",
+                    benefit.color === "secondary" && "bg-secondary/15 text-secondary",
+                    benefit.color === "mint" && "bg-mint/15 text-mint",
+                    benefit.color === "accent" && "bg-accent/15 text-accent",
+                  )}>
+                    <Icon size={24} />
+                  </div>
+
+                  <h3 className="text-lg font-bold text-text-primary mb-3">{benefit.title}</h3>
+                  <p className="text-sm font-medium text-text-secondary leading-relaxed">{benefit.description}</p>
+
+                  {/* Background Accent */}
+                  <div className={cn(
+                    "absolute -bottom-8 -right-8 w-32 h-32 rounded-full opacity-10",
+                    benefit.color === "primary" && "bg-primary",
+                    benefit.color === "secondary" && "bg-secondary",
+                    benefit.color === "mint" && "bg-mint",
+                    benefit.color === "accent" && "bg-accent",
+                  )} />
+                </motion.div>
+              );
+            })}
+          </motion.div>
         </div>
       </section>
 
