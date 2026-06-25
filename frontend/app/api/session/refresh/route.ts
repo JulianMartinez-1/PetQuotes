@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
   let backendResponse: Response;
 
   try {
-    backendResponse = await callAuthBackend("/api/auth/refresh", { refreshToken });
+    backendResponse = await callAuthBackend("/api/auth/refresh", {}, refreshToken);
   } catch {
     return NextResponse.json({ message: normalizeApiErrorMessage(504, "upstream timeout") }, { status: 504 });
   }

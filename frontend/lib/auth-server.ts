@@ -28,12 +28,13 @@ export type SessionAuthResponse = {
 
 const API_GATEWAY_URL = process.env.API_BASE_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
-export async function callAuthBackend(path: string, body: unknown) {
+export async function callAuthBackend(path: string, body: unknown, bearerToken?: string) {
   const timeoutMs = Number(process.env.API_PROXY_TIMEOUT_MS ?? 8000);
   const response = await fetchWithTimeout(`${API_GATEWAY_URL}${path}`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      ...(bearerToken ? { Authorization: `Bearer ${bearerToken}` } : {}),
     },
     body: JSON.stringify(body),
     cache: "no-store"
